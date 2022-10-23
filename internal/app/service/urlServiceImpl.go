@@ -32,6 +32,7 @@ func (u *urlServiceImpl) ReduceAndSaveUrl(request *http.Request) (string, error)
 	}
 	reduceUrl := reducing()
 	urlStorage[reduceUrl] = url.Name
+	fmt.Println(urlStorage)
 	return localhost + reduceUrl, nil
 }
 
