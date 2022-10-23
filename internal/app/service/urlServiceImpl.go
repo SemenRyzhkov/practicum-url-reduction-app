@@ -32,7 +32,7 @@ func (u *urlServiceImpl) ReduceAndSaveUrl(request *http.Request) (string, error)
 	}
 
 	reduceUrl := mapUrlToReduceUrl(&url)
-	saveUrl(&reduceUrl)
+	saveUrl(reduceUrl)
 	return localhost + reduceUrl.ID, nil
 }
 
@@ -57,15 +57,17 @@ func findUrlById(id string) (string, error) {
 
 func mapUrlToReduceUrl(url *entities.Url) entities.ReduceUrl {
 	id := reducing()
-	return entities.ReduceUrl{
+	urls := entities.ReduceUrl{
 		ID:   id,
 		Name: url.Name,
 	}
+	fmt.Printf("UUUUUUUUUUURRRRRRRLLLLLLL %v", urls)
+	return urls
 }
 
-func saveUrl(reduceUrl *entities.ReduceUrl) {
+func saveUrl(reduceUrl entities.ReduceUrl) {
 	fmt.Printf("save url %v\n", reduceUrl)
-	urlStorage[reduceUrl.ID] = *reduceUrl
+	urlStorage[reduceUrl.ID] = reduceUrl
 	fmt.Println(urlStorage)
 }
 
