@@ -1,9 +1,9 @@
 package service
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/julienschmidt/httprouter"
+	"io"
 	"math/rand"
 	"net/http"
 )
@@ -23,12 +23,17 @@ func NewUrlService() UrlService {
 }
 
 func (u *urlServiceImpl) ReduceAndSaveUrl(request *http.Request) (string, error) {
-	var url string
-	json.NewDecoder(request.Body).Decode(&url)
+	b, err := io.ReadAll(request.Body)
+	if err != nil {
+		return "", fmt.Errorf("not valid request body")
+	}
+
+	url := string(b[:])
 
 	if isExist(url) {
 		return "", fmt.Errorf("url %s already exist", url)
 	}
+
 	reduceUrl := reducing()
 	originUrl := url
 	fmt.Println("Origin url " + originUrl)
