@@ -31,7 +31,7 @@ func (u *urlServiceImpl) ReduceAndSaveUrl(request *http.Request) (string, error)
 		return "", fmt.Errorf("url %s already exist", url.Name)
 	}
 	reduceUrl := reducing()
-	saveUrl(reduceUrl)
+	urlStorage[reduceUrl] = url.Name
 	return localhost + reduceUrl, nil
 }
 
@@ -52,12 +52,6 @@ func findUrlById(id string) (string, error) {
 		return "", fmt.Errorf("url with id %d not found", id)
 	}
 	return url, nil
-}
-
-func saveUrl(reduceUrl string) {
-	fmt.Printf("save url %v\n", reduceUrl)
-	urlStorage[reduceUrl] = reduceUrl
-	fmt.Println(urlStorage)
 }
 
 func reducing() string {

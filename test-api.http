@@ -1,4 +1,4 @@
-GET http://localhost:8080/XVlBz
+GET http://localhost:8080/gbaiC
 Accept: text/plain
 
 ###
@@ -6,7 +6,7 @@ POST http://localhost:8080/
 Content-Type: application/json
 
 {
-  "Name": "https://github.com/go-kit/kit/issues/806"
+  "Name": "https://learngitbranching.js.org/?locale=ru_RU"
 }
 
 ###
