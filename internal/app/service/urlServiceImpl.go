@@ -7,7 +7,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"math/rand"
 	"net/http"
-	"net/url"
 	"strconv"
 )
 
@@ -28,9 +27,9 @@ func (u *urlServiceImpl) ReduceAndSaveUrl(request *http.Request) (string, error)
 	var url entities.Url
 	json.NewDecoder(request.Body).Decode(&url)
 
-	if !isValidUrl(url.Name) {
-		return "", fmt.Errorf("wrong url %s", url.Name)
-	}
+	//if !isValidUrl(url.Name) {
+	//	return "", fmt.Errorf("wrong url %s", url.Name)
+	//}
 
 	if isExist(url.Name) {
 		return "", fmt.Errorf("url %s already exist", url.Name)
@@ -97,17 +96,17 @@ func reducing() string {
 	return string(b)
 }
 
-func isValidUrl(token string) bool {
-	_, err := url.ParseRequestURI(token)
-	if err != nil {
-		return false
-	}
-	u, err := url.Parse(token)
-	if err != nil || u.Host == "" {
-		return false
-	}
-	return true
-}
+//func isValidUrl(token string) bool {
+//	_, err := url.ParseRequestURI(token)
+//	if err != nil {
+//		return false
+//	}
+//	u, err := url.Parse(token)
+//	if err != nil || u.Host == "" {
+//		return false
+//	}
+//	return true
+//}
 
 func isExist(token string) bool {
 	for _, url := range urlStorage {
@@ -116,4 +115,5 @@ func isExist(token string) bool {
 		}
 	}
 	return false
+
 }
