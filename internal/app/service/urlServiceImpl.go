@@ -13,7 +13,7 @@ const localhost = "http://localhost:8080/"
 
 var (
 	_          UrlService = &urlServiceImpl{}
-	urlStorage            = make(map[string]entities.ReduceUrl)
+	urlStorage            = make(map[string]string)
 )
 
 type urlServiceImpl struct {
@@ -30,10 +30,9 @@ func (u *urlServiceImpl) ReduceAndSaveUrl(request *http.Request) (string, error)
 	if isExist(url.Name) {
 		return "", fmt.Errorf("url %s already exist", url.Name)
 	}
-
-	reduceUrl := mapUrlToReduceUrl(&url)
+	reduceUrl := reducing()
 	saveUrl(reduceUrl)
-	return localhost + reduceUrl.ID, nil
+	return localhost + reduceUrl, nil
 }
 
 func (u *urlServiceImpl) GetUrlById(request *http.Request, params httprouter.Params) (string, error) {
@@ -52,22 +51,12 @@ func findUrlById(id string) (string, error) {
 	if !ok {
 		return "", fmt.Errorf("url with id %d not found", id)
 	}
-	return url.Name, nil
+	return url, nil
 }
 
-func mapUrlToReduceUrl(url *entities.Url) entities.ReduceUrl {
-	id := reducing()
-	urls := entities.ReduceUrl{
-		ID:   id,
-		Name: url.Name,
-	}
-	fmt.Printf("UUUUUUUUUUURRRRRRRLLLLLLL %v", urls)
-	return urls
-}
-
-func saveUrl(reduceUrl entities.ReduceUrl) {
+func saveUrl(reduceUrl string) {
 	fmt.Printf("save url %v\n", reduceUrl)
-	urlStorage[reduceUrl.ID] = reduceUrl
+	urlStorage[reduceUrl] = reduceUrl
 	fmt.Println(urlStorage)
 }
 
@@ -83,10 +72,9 @@ func reducing() string {
 
 func isExist(token string) bool {
 	for _, url := range urlStorage {
-		if url.Name == token {
+		if url == token {
 			return true
 		}
 	}
 	return false
-
 }
