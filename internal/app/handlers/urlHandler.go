@@ -34,7 +34,7 @@ func reduceUrl(writer http.ResponseWriter, request *http.Request, _ httprouter.P
 		writer.WriteHeader(400)
 		writer.Write([]byte(err.Error()))
 	} else {
-		writer.WriteHeader(201)
+		writer.WriteHeader(http.StatusCreated)
 		writer.Write([]byte(reduceUrl))
 	}
 }
