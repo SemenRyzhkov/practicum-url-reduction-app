@@ -1,0 +1,12 @@
+GET http://localhost:8080/2
+Accept: text/plain
+
+###
+POST http://localhost:8080/
+Content-Type: application/json
+
+{
+  "Name": "https://github.com/go-kit/kit/issues/806"
+}
+
+###
