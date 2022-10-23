@@ -3,7 +3,6 @@ package service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app.git/internal/app/entities"
 	"github.com/julienschmidt/httprouter"
 	"math/rand"
 	"net/http"
@@ -24,14 +23,14 @@ func NewUrlService() UrlService {
 }
 
 func (u *urlServiceImpl) ReduceAndSaveUrl(request *http.Request) (string, error) {
-	var url entities.Url
+	var url string
 	json.NewDecoder(request.Body).Decode(&url)
 
-	if isExist(url.Name) {
-		return "", fmt.Errorf("url %s already exist", url.Name)
+	if isExist(url) {
+		return "", fmt.Errorf("url %s already exist", url)
 	}
 	reduceUrl := reducing()
-	originUrl := url.Name
+	originUrl := url
 	fmt.Println("Origin url " + originUrl)
 	urlStorage[reduceUrl] = originUrl
 	fmt.Println(urlStorage)
