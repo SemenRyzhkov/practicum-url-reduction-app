@@ -7,13 +7,11 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"math/rand"
 	"net/http"
-	"strconv"
 )
 
 var (
 	_          UrlService = &urlServiceImpl{}
-	idCounter  uint64
-	urlStorage = make(map[uint64]entities.ReduceUrl)
+	urlStorage            = make(map[string]entities.ReduceUrl)
 )
 
 type urlServiceImpl struct {
@@ -27,33 +25,27 @@ func (u *urlServiceImpl) ReduceAndSaveUrl(request *http.Request) (string, error)
 	var url entities.Url
 	json.NewDecoder(request.Body).Decode(&url)
 
-	//if !isValidUrl(url.Name) {
-	//	return "", fmt.Errorf("wrong url %s", url.Name)
-	//}
-
 	if isExist(url.Name) {
 		return "", fmt.Errorf("url %s already exist", url.Name)
 	}
 
 	reduceUrl := mapUrlToReduceUrl(&url)
 	saveUrl(reduceUrl)
-	return reduceUrl.ReduceName, nil
+	return reduceUrl.ID, nil
 }
 
 func (u *urlServiceImpl) GetUrlById(request *http.Request, params httprouter.Params) (string, error) {
-	if id, parsingErr := getIdFromParams(params); parsingErr != nil {
-		return "", parsingErr
+	id := params.ByName("id")
+
+	if url, notFoundErr := findUrlById(id); notFoundErr != nil {
+		return "", notFoundErr
 	} else {
-		if url, notFoundErr := findUrlById(id); notFoundErr != nil {
-			return "", notFoundErr
-		} else {
-			return url, nil
-		}
+		return url, nil
 	}
 }
 
-func findUrlById(id int) (string, error) {
-	url, ok := urlStorage[uint64(id)]
+func findUrlById(id string) (string, error) {
+	url, ok := urlStorage[id]
 	fmt.Println(url)
 	if !ok {
 		return "", fmt.Errorf("url with id %d not found", id)
@@ -61,22 +53,11 @@ func findUrlById(id int) (string, error) {
 	return url.Name, nil
 }
 
-func getIdFromParams(params httprouter.Params) (int, error) {
-	idVal := params.ByName("id")
-	id, err := strconv.Atoi(idVal)
-	if err != nil {
-		return 0, fmt.Errorf("parameter id not integer")
-	}
-	return id, nil
-}
-
 func mapUrlToReduceUrl(url *entities.Url) entities.ReduceUrl {
-	reduceName := reducing()
-	idCounter++
+	id := reducing()
 	return entities.ReduceUrl{
-		ID:         idCounter,
-		Name:       url.Name,
-		ReduceName: reduceName,
+		ID:   id,
+		Name: url.Name,
 	}
 }
 
@@ -95,18 +76,6 @@ func reducing() string {
 	}
 	return string(b)
 }
-
-//func isValidUrl(token string) bool {
-//	_, err := url.ParseRequestURI(token)
-//	if err != nil {
-//		return false
-//	}
-//	u, err := url.Parse(token)
-//	if err != nil || u.Host == "" {
-//		return false
-//	}
-//	return true
-//}
 
 func isExist(token string) bool {
 	for _, url := range urlStorage {
