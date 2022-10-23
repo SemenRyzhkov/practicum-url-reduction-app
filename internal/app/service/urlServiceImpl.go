@@ -9,6 +9,8 @@ import (
 	"net/http"
 )
 
+const localhost = "http://localhost:8080/"
+
 var (
 	_          UrlService = &urlServiceImpl{}
 	urlStorage            = make(map[string]entities.ReduceUrl)
@@ -30,8 +32,8 @@ func (u *urlServiceImpl) ReduceAndSaveUrl(request *http.Request) (string, error)
 	}
 
 	reduceUrl := mapUrlToReduceUrl(&url)
-	saveUrl(reduceUrl)
-	return "http://localhost:8080/" + reduceUrl.ID, nil
+	saveUrl(&reduceUrl)
+	return localhost + reduceUrl.ID, nil
 }
 
 func (u *urlServiceImpl) GetUrlById(request *http.Request, params httprouter.Params) (string, error) {
@@ -61,9 +63,9 @@ func mapUrlToReduceUrl(url *entities.Url) entities.ReduceUrl {
 	}
 }
 
-func saveUrl(reduceUrl entities.ReduceUrl) {
-	fmt.Printf("save url %v", reduceUrl)
-	urlStorage[reduceUrl.ID] = reduceUrl
+func saveUrl(reduceUrl *entities.ReduceUrl) {
+	fmt.Printf("save url %v\n", reduceUrl)
+	urlStorage[reduceUrl.ID] = *reduceUrl
 	fmt.Println(urlStorage)
 }
 
