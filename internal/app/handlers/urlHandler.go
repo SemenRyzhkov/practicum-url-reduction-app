@@ -31,7 +31,7 @@ func (h *handler) Register(router *httprouter.Router) {
 
 func reduceUrl(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
 	if reduceUrl, err := urlService.ReduceAndSaveUrl(request); err != nil {
-		writer.WriteHeader(400)
+		writer.WriteHeader(http.StatusBadRequest)
 		writer.Write([]byte(err.Error()))
 	} else {
 		writer.WriteHeader(http.StatusCreated)
@@ -41,10 +41,10 @@ func reduceUrl(writer http.ResponseWriter, request *http.Request, _ httprouter.P
 
 func getUrlById(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 	if url, err := urlService.GetUrlById(request, params); err != nil {
-		writer.WriteHeader(400)
+		writer.WriteHeader(http.StatusBadRequest)
 		writer.Write([]byte(err.Error()))
 	} else {
 		writer.Header().Add("Location", url)
-		writer.WriteHeader(307)
+		writer.WriteHeader(http.StatusTemporaryRedirect)
 	}
 }
