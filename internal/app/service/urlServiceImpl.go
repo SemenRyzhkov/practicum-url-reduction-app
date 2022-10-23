@@ -31,7 +31,9 @@ func (u *urlServiceImpl) ReduceAndSaveUrl(request *http.Request) (string, error)
 		return "", fmt.Errorf("url %s already exist", url.Name)
 	}
 	reduceUrl := reducing()
-	urlStorage[reduceUrl] = url.Name
+	originUrl := url.Name
+	fmt.Println("Origin url " + originUrl)
+	urlStorage[reduceUrl] = originUrl
 	fmt.Println(urlStorage)
 	return localhost + reduceUrl, nil
 }
