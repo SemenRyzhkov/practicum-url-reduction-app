@@ -31,7 +31,7 @@ func (u *urlServiceImpl) ReduceAndSaveUrl(request *http.Request) (string, error)
 
 	reduceUrl := mapUrlToReduceUrl(&url)
 	saveUrl(reduceUrl)
-	return reduceUrl.ID, nil
+	return "http://localhost:8080/" + reduceUrl.ID, nil
 }
 
 func (u *urlServiceImpl) GetUrlById(request *http.Request, params httprouter.Params) (string, error) {
