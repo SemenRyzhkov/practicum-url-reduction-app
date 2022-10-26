@@ -15,39 +15,17 @@ package main
 // Нужно учесть некорректные запросы и возвращать для них ответ с кодом 400.
 
 import (
-	"github.com/SemenRyzhkov/practicum-url-reduction-app.git/internal/app/handlers"
-	"github.com/julienschmidt/httprouter"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app.git/internal/app"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app.git/internal/config"
 	"log"
-	"net/http"
-	"time"
-)
-
-const (
-	host         = "localhost:8080"
-	writeTimeout = 5 * time.Second
-	readTimeout  = 5 * time.Second
 )
 
 func main() {
-	log.Println("create router")
-	router := httprouter.New()
-	log.Println("register URL's handler")
-	handler := handlers.NewHandler()
-	handler.Register(router)
-
-	startSever(router)
-}
-
-func startSever(router *httprouter.Router) {
-	log.Println("start application")
-
-	server := &http.Server{
-		Addr:         host,
-		Handler:      router,
-		WriteTimeout: writeTimeout,
-		ReadTimeout:  readTimeout,
+	cfg := config.New()
+	a, err := app.New(cfg)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	log.Fatal(server.ListenAndServe())
-
+	log.Fatal(a.Run())
 }

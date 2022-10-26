@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app.git/internal/repositories"
 	"github.com/julienschmidt/httprouter"
 	"io"
 	"math/rand"
@@ -11,8 +12,8 @@ import (
 const localhost = "http://localhost:8080/"
 
 var (
-	_          UrlService = &urlServiceImpl{}
-	urlStorage            = make(map[string]string)
+	_             UrlService = &urlServiceImpl{}
+	urlRepository            = repositories.NewUrlRepository()
 )
 
 type urlServiceImpl struct {
@@ -29,36 +30,18 @@ func (u *urlServiceImpl) ReduceAndSaveUrl(request *http.Request) (string, error)
 	}
 
 	url := string(b[:])
-
-	if isExist(url) {
-		return "", fmt.Errorf("url %s already exist", url)
-	}
-
 	reduceUrl := reducing()
-	originUrl := url
-	fmt.Println("Origin url " + originUrl)
-	urlStorage[reduceUrl] = originUrl
-	fmt.Println(urlStorage)
+
+	duplicateErr := urlRepository.Save(reduceUrl, url)
+	if duplicateErr != nil {
+		return "", err
+	}
 	return localhost + reduceUrl, nil
 }
 
 func (u *urlServiceImpl) GetUrlById(request *http.Request, params httprouter.Params) (string, error) {
 	id := params.ByName("id")
-
-	if url, notFoundErr := findUrlById(id); notFoundErr != nil {
-		return "", notFoundErr
-	} else {
-		return url, nil
-	}
-}
-
-func findUrlById(id string) (string, error) {
-	url, ok := urlStorage[id]
-	fmt.Println(url)
-	if !ok {
-		return "", fmt.Errorf("url with id %d not found", id)
-	}
-	return url, nil
+	return urlRepository.FindById(id)
 }
 
 func reducing() string {
@@ -69,13 +52,4 @@ func reducing() string {
 		b[i] = letterBytes[rand.Intn(len(letterBytes))]
 	}
 	return string(b)
-}
-
-func isExist(token string) bool {
-	for _, url := range urlStorage {
-		if url == token {
-			return true
-		}
-	}
-	return false
 }

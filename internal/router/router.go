@@ -1,7 +1,7 @@
-package handlers
+package router
 
 import "github.com/julienschmidt/httprouter"
 
-type Handler interface {
+type Router interface {
 	Register(router *httprouter.Router)
 }
