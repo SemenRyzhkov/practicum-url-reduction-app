@@ -21,7 +21,7 @@ func (u urlRepositoryImpl) Save(urlId, url string) error {
 func (u urlRepositoryImpl) FindById(urlId string) (string, error) {
 	url, ok := urlStorage[urlId]
 	if !ok {
-		return "", fmt.Errorf("url with id %d not found", urlId)
+		return "", fmt.Errorf("url with id %s not found", urlId)
 	}
 	return url, nil
 }
