@@ -1,12 +1,8 @@
 package service
 
 import (
-	"fmt"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app.git/internal/repositories"
-	"github.com/julienschmidt/httprouter"
-	"io"
 	"math/rand"
-	"net/http"
 )
 
 const localhost = "http://localhost:8080/"
@@ -23,25 +19,17 @@ func NewUrlService() UrlService {
 	return &urlServiceImpl{}
 }
 
-func (u *urlServiceImpl) ReduceAndSaveUrl(request *http.Request) (string, error) {
-	b, err := io.ReadAll(request.Body)
-	if err != nil {
-		return "", fmt.Errorf("not valid request body")
-	}
-
-	url := string(b[:])
+func (u *urlServiceImpl) ReduceAndSaveUrl(url string) (string, error) {
 	reduceUrl := reducing()
-
 	duplicateErr := urlRepository.Save(reduceUrl, url)
 	if duplicateErr != nil {
-		return "", err
+		return "", duplicateErr
 	}
 	return localhost + reduceUrl, nil
 }
 
-func (u *urlServiceImpl) GetUrlById(request *http.Request, params httprouter.Params) (string, error) {
-	id := params.ByName("id")
-	return urlRepository.FindById(id)
+func (u *urlServiceImpl) GetUrlById(urlId string) (string, error) {
+	return urlRepository.FindById(urlId)
 }
 
 func reducing() string {
