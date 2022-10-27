@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -28,7 +29,7 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			u := &urlServiceImpl{}
+			u := NewUrlService()
 			u.ReduceAndSaveUrl(tt.want)
 
 			got, err := u.GetUrlById(tt.urlId)
@@ -45,33 +46,34 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 
 	tests := []struct {
-		name      string
-		saveUrl   string
-		reduceUrl string
-		wantErr   bool
+		name    string
+		saveUrl string
+		want    string
+		wantErr bool
 	}{
 		{
-			name:      "positive test #1",
-			saveUrl:   "yandex.com",
-			reduceUrl: "http://localhost:8080/XVlBz",
-			wantErr:   false,
+			name:    "positive test #1",
+			saveUrl: "yandex1.com",
+			want:    "http://localhost:8080/MRAjW",
+			wantErr: false,
 		},
 		{
-			name:      "duplicate test #2",
-			saveUrl:   "yandex.com",
-			reduceUrl: "http://localhost:8080/XVlBz",
-			wantErr:   true,
+			name:    "duplicate test #2",
+			saveUrl: "yandex.com",
+			want:    "http://localhost:8080/XVlBz",
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			u := &urlServiceImpl{}
-			got, _ := u.ReduceAndSaveUrl(tt.saveUrl)
+			u := NewUrlService()
+
+			got, err := u.ReduceAndSaveUrl(tt.saveUrl)
+			fmt.Println(err)
 			if tt.wantErr {
-				_, err := u.ReduceAndSaveUrl(tt.saveUrl)
 				assert.NotNil(t, err)
 			} else {
-				assert.Equal(t, got, tt.reduceUrl)
+				assert.Equal(t, got, tt.want)
 
 			}
 		})
