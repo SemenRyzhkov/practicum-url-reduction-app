@@ -3,7 +3,6 @@ package app
 import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app.git/internal/config"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app.git/internal/router"
-	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
 )
@@ -14,14 +13,11 @@ type App struct {
 
 func New(cfg config.Config) (*App, error) {
 	log.Println("create router")
-	httpRouter := httprouter.New()
-	log.Println("register URL's handler")
-	r := router.NewRouter()
-	r.Register(httpRouter)
+	router := router.NewRouter()
 
 	server := &http.Server{
 		Addr:         cfg.Host,
-		Handler:      httpRouter,
+		Handler:      router,
 		WriteTimeout: cfg.WriteTimeout,
 		ReadTimeout:  cfg.ReadTimeout,
 	}

@@ -7,7 +7,6 @@ import (
 )
 
 func Test_urlServiceImpl_GetUrlById(t *testing.T) {
-
 	tests := []struct {
 		name    string
 		urlId   string
@@ -44,7 +43,6 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 }
 
 func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
-
 	tests := []struct {
 		name    string
 		saveUrl string
@@ -74,7 +72,6 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 				assert.NotNil(t, err)
 			} else {
 				assert.Equal(t, got, tt.want)
-
 			}
 		})
 	}

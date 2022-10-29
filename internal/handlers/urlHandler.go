@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app.git/internal/service"
-	"github.com/julienschmidt/httprouter"
+	"github.com/go-chi/chi/v5"
 	"io"
 	"net/http"
 )
@@ -11,7 +11,7 @@ var (
 	urlService = service.NewUrlService()
 )
 
-func ReduceUrl(writer http.ResponseWriter, request *http.Request, _ httprouter.Params) {
+func ReduceUrl(writer http.ResponseWriter, request *http.Request) {
 	b, err := io.ReadAll(request.Body)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
@@ -24,8 +24,12 @@ func ReduceUrl(writer http.ResponseWriter, request *http.Request, _ httprouter.P
 	}
 }
 
-func GetUrlById(writer http.ResponseWriter, _ *http.Request, params httprouter.Params) {
-	urlId := params.ByName("id")
+func GetUrlById(writer http.ResponseWriter, r *http.Request) {
+	urlId := chi.URLParam(r, "id")
+	if urlId == "" {
+		http.Error(writer, "urlId param is missed", http.StatusBadRequest)
+		return
+	}
 	if url, err := urlService.GetUrlById(urlId); err != nil {
 		http.Error(writer, err.Error(), http.StatusNotFound)
 	} else {
