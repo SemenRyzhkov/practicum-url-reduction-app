@@ -1,19 +1,32 @@
 package router
 
 import (
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service"
 )
 
 const (
 	expectedUrl       = "https://dzen.ru/?yredirect=true"
-	expectedReduceUrl = "http://localhost:8080/XVlBz"
+	expectedReduceUrl = "http://localhost:8080/1f67218b4bfbc6af9e52d502c3e5ef3d"
 )
+
+func setupTestServer() *httptest.Server {
+	repo := repositories.NewUrlRepository()
+	s := service.NewUrlService(repo)
+	h := handlers.NewHandler(s)
+	router := NewRouter(h)
+	return httptest.NewServer(router)
+}
 
 func testRequest(t *testing.T, ts *httptest.Server, method, path, body string) *http.Request {
 	var req *http.Request
@@ -29,8 +42,7 @@ func testRequest(t *testing.T, ts *httptest.Server, method, path, body string) *
 }
 
 func TestNewRouter(t *testing.T) {
-	r := NewRouter()
-	ts := httptest.NewServer(r)
+	ts := setupTestServer()
 	defer ts.Close()
 
 	req := testRequest(t, ts, "POST", "/", expectedUrl)
@@ -42,7 +54,7 @@ func TestNewRouter(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, resp.StatusCode)
 	assert.Equal(t, expectedReduceUrl, string(actualReduceUrl))
 
-	req = testRequest(t, ts, "GET", "/XVlBz", "")
+	req = testRequest(t, ts, "GET", "/1f67218b4bfbc6af9e52d502c3e5ef3d", "")
 	transport := http.Transport{}
 	resp, err = transport.RoundTrip(req)
 	require.NoError(t, err)
@@ -51,5 +63,4 @@ func TestNewRouter(t *testing.T) {
 	actualUrl := resp.Header.Get("Location")
 	assert.Equal(t, expectedUrl, actualUrl)
 	defer resp.Body.Close()
-
 }

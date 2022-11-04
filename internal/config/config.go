@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	host         = "localhost:8080"
-	writeTimeout = 5 * time.Second
-	readTimeout  = 5 * time.Second
+	defaultHost         = "localhost:8080"
+	defaultWriteTimeout = 5 * time.Second
+	defaultReadTimeout  = 5 * time.Second
 )
 
 type Config struct {
@@ -18,8 +18,8 @@ type Config struct {
 
 func New() Config {
 	return Config{
-		Host:         host,
-		WriteTimeout: writeTimeout,
-		ReadTimeout:  readTimeout,
+		Host:         defaultHost,
+		WriteTimeout: defaultWriteTimeout,
+		ReadTimeout:  defaultReadTimeout,
 	}
 }
