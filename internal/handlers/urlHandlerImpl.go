@@ -10,33 +10,33 @@ import (
 )
 
 type urlHandlerImpl struct {
-	urlService service.UrlService
+	urlService service.URLService
 }
 
-func NewHandler(urlService service.UrlService) UrlHandler {
+func NewHandler(urlService service.URLService) URLHandler {
 	return &urlHandlerImpl{urlService}
 }
 
-func (h *urlHandlerImpl) ReduceUrl(writer http.ResponseWriter, request *http.Request) {
+func (h *urlHandlerImpl) ReduceURL(writer http.ResponseWriter, request *http.Request) {
 	b, err := io.ReadAll(request.Body)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 	}
-	if reduceUrl, err := h.urlService.ReduceAndSaveUrl(string(b)); err != nil {
+	if reduceURL, err := h.urlService.ReduceAndSaveURL(string(b)); err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 	} else {
 		writer.WriteHeader(http.StatusCreated)
-		writer.Write([]byte(reduceUrl))
+		writer.Write([]byte(reduceURL))
 	}
 }
 
-func (h *urlHandlerImpl) GetUrlById(writer http.ResponseWriter, r *http.Request) {
-	urlId := chi.URLParam(r, "id")
-	if urlId == "" {
-		http.Error(writer, "urlId param is missed", http.StatusBadRequest)
+func (h *urlHandlerImpl) GetURLByID(writer http.ResponseWriter, r *http.Request) {
+	urlID := chi.URLParam(r, "id")
+	if urlID == "" {
+		http.Error(writer, "urlID param is missed", http.StatusBadRequest)
 		return
 	}
-	if url, err := h.urlService.GetUrlById(urlId); err != nil {
+	if url, err := h.urlService.GetURLByID(urlID); err != nil {
 		http.Error(writer, err.Error(), http.StatusNotFound)
 	} else {
 		writer.Header().Add("Location", url)

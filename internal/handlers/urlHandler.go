@@ -2,7 +2,7 @@ package handlers
 
 import "net/http"
 
-type UrlHandler interface {
-	ReduceUrl(writer http.ResponseWriter, request *http.Request)
-	GetUrlById(writer http.ResponseWriter, r *http.Request)
+type URLHandler interface {
+	ReduceURL(writer http.ResponseWriter, request *http.Request)
+	GetURLByID(writer http.ResponseWriter, r *http.Request)
 }

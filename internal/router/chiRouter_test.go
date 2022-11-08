@@ -16,13 +16,13 @@ import (
 )
 
 const (
-	expectedUrl       = "https://dzen.ru/?yredirect=true"
-	expectedReduceUrl = "http://localhost:8080/1f67218b4bfbc6af9e52d502c3e5ef3d"
+	expectedURL       = "https://dzen.ru/?yredirect=true"
+	expectedReduceURL = "http://localhost:8080/1f67218b4bfbc6af9e52d502c3e5ef3d"
 )
 
 func setupTestServer() *httptest.Server {
-	repo := repositories.NewUrlRepository()
-	s := service.NewUrlService(repo)
+	repo := repositories.NewURLRepository()
+	s := service.NewURLService(repo)
 	h := handlers.NewHandler(s)
 	router := NewRouter(h)
 	return httptest.NewServer(router)
@@ -45,14 +45,15 @@ func TestNewRouter(t *testing.T) {
 	ts := setupTestServer()
 	defer ts.Close()
 
-	req := testRequest(t, ts, "POST", "/", expectedUrl)
+	req := testRequest(t, ts, "POST", "/", expectedURL)
 	resp, err := http.DefaultClient.Do(req)
+	defer resp.Body.Close()
 	require.NoError(t, err)
 
-	actualReduceUrl, err := io.ReadAll(resp.Body)
+	actualReduceURL, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusCreated, resp.StatusCode)
-	assert.Equal(t, expectedReduceUrl, string(actualReduceUrl))
+	assert.Equal(t, expectedReduceURL, string(actualReduceURL))
 
 	req = testRequest(t, ts, "GET", "/1f67218b4bfbc6af9e52d502c3e5ef3d", "")
 	transport := http.Transport{}
@@ -60,7 +61,7 @@ func TestNewRouter(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusTemporaryRedirect, resp.StatusCode)
 
-	actualUrl := resp.Header.Get("Location")
-	assert.Equal(t, expectedUrl, actualUrl)
+	actualURL := resp.Header.Get("Location")
+	assert.Equal(t, expectedURL, actualURL)
 	defer resp.Body.Close()
 }

@@ -1,6 +1,6 @@
 package service
 
-type UrlService interface {
-	ReduceAndSaveUrl(url string) (string, error)
-	GetUrlById(urlId string) (string, error)
+type URLService interface {
+	ReduceAndSaveURL(url string) (string, error)
+	GetURLByID(urlID string) (string, error)
 }

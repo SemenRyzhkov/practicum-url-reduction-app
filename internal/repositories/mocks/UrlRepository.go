@@ -10,7 +10,7 @@ type UrlRepository struct {
 }
 
 // FindById provides a mock function with given fields: urlId
-func (_m *UrlRepository) FindById(urlId string) (string, error) {
+func (_m *UrlRepository) FindByID(urlId string) (string, error) {
 	ret := _m.Called(urlId)
 
 	var r0 string

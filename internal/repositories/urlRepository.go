@@ -1,6 +1,6 @@
 package repositories
 
-type UrlRepository interface {
-	Save(urlId, url string) error
-	FindById(urlId string) (string, error)
+type URLRepository interface {
+	Save(urlID, url string) error
+	FindByID(urlID string) (string, error)
 }

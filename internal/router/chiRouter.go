@@ -11,9 +11,9 @@ const (
 	getURLPath    = "/{id}"
 )
 
-func NewRouter(h handlers.UrlHandler) chi.Router {
+func NewRouter(h handlers.URLHandler) chi.Router {
 	r := chi.NewRouter()
-	r.Get(getURLPath, h.GetUrlById)
-	r.Post(reduceURLPath, h.ReduceUrl)
+	r.Get(getURLPath, h.GetURLByID)
+	r.Post(reduceURLPath, h.ReduceURL)
 	return r
 }

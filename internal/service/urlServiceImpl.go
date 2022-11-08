@@ -10,30 +10,30 @@ import (
 const localhost = "http://localhost:8080/"
 
 var (
-	_ UrlService = &urlServiceImpl{}
+	_ URLService = &urlServiceImpl{}
 )
 
 type urlServiceImpl struct {
-	urlRepository repositories.UrlRepository
+	urlRepository repositories.URLRepository
 }
 
-func NewUrlService(urlRepository repositories.UrlRepository) UrlService {
+func NewURLService(urlRepository repositories.URLRepository) URLService {
 	return &urlServiceImpl{
 		urlRepository,
 	}
 }
 
-func (u *urlServiceImpl) ReduceAndSaveUrl(url string) (string, error) {
-	reduceUrl := reducing(url)
-	duplicateErr := u.urlRepository.Save(reduceUrl, url)
+func (u *urlServiceImpl) ReduceAndSaveURL(url string) (string, error) {
+	reduceURL := reducing(url)
+	duplicateErr := u.urlRepository.Save(reduceURL, url)
 	if duplicateErr != nil {
 		return "", duplicateErr
 	}
-	return localhost + reduceUrl, nil
+	return localhost + reduceURL, nil
 }
 
-func (u *urlServiceImpl) GetUrlById(urlId string) (string, error) {
-	return u.urlRepository.FindById(urlId)
+func (u *urlServiceImpl) GetURLByID(urlID string) (string, error) {
+	return u.urlRepository.FindByID(urlID)
 }
 
 func reducing(url string) string {

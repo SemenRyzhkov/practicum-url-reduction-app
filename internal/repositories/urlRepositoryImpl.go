@@ -5,41 +5,41 @@ import (
 	"sync"
 )
 
-var _ UrlRepository = &urlRepositoryImpl{}
+var _ URLRepository = &urlRepositoryImpl{}
 
 type urlRepositoryImpl struct {
 	mx         sync.Mutex
 	urlStorage map[string]string
 }
 
-func (u *urlRepositoryImpl) Save(urlId, url string) error {
+func (u *urlRepositoryImpl) Save(urlID, url string) error {
 	u.mx.Lock()
 	defer u.mx.Unlock()
-	if isExist(u.urlStorage, urlId) {
+	if isExist(u.urlStorage, urlID) {
 		return fmt.Errorf("url %s already exist", url)
 	}
-	u.urlStorage[urlId] = url
+	u.urlStorage[urlID] = url
 	return nil
 }
 
-func (u *urlRepositoryImpl) FindById(urlId string) (string, error) {
+func (u *urlRepositoryImpl) FindByID(urlID string) (string, error) {
 	u.mx.Lock()
 	defer u.mx.Unlock()
-	url, ok := u.urlStorage[urlId]
+	url, ok := u.urlStorage[urlID]
 	if !ok {
-		return "", fmt.Errorf("url with id %s not found", urlId)
+		return "", fmt.Errorf("url with id %s not found", urlID)
 	}
 	return url, nil
 }
 
-func NewUrlRepository() UrlRepository {
+func NewURLRepository() URLRepository {
 	return &urlRepositoryImpl{
 		urlStorage: make(map[string]string),
 	}
 }
 
-func isExist(urlStorage map[string]string, urlId string) bool {
-	if _, ok := urlStorage[urlId]; ok {
+func isExist(urlStorage map[string]string, urlID string) bool {
+	if _, ok := urlStorage[urlID]; ok {
 		return true
 	}
 	return false
