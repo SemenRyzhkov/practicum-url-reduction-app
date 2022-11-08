@@ -1,0 +1,11 @@
+GET http://localhost:8080/gbaiC
+Accept: text/plain
+
+###
+POST http://localhost:8080/
+Content-Type: text/plain
+
+https://learngitbranching.js.org/?locale=ru_RU
+
+
+###
