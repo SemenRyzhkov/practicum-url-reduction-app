@@ -73,9 +73,9 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			u := NewUrlService(tt.repo)
-			got, err := u.ReduceAndSaveUrl(tt.saveUrl)
+			got, _ := u.ReduceAndSaveUrl(tt.saveUrl)
 			if tt.wantErr {
-				got, err = u.ReduceAndSaveUrl(tt.saveUrl)
+				_, err := u.ReduceAndSaveUrl(tt.saveUrl)
 				assert.NotNil(t, err)
 			} else {
 				assert.Equal(t, tt.want, got)
