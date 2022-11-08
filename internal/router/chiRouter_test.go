@@ -47,13 +47,13 @@ func TestNewRouter(t *testing.T) {
 
 	req := testRequest(t, ts, "POST", "/", expectedURL)
 	resp, err := http.DefaultClient.Do(req)
-	defer resp.Body.Close()
 	require.NoError(t, err)
 
 	actualReduceURL, err := io.ReadAll(resp.Body)
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusCreated, resp.StatusCode)
 	assert.Equal(t, expectedReduceURL, string(actualReduceURL))
+	defer resp.Body.Close()
 
 	req = testRequest(t, ts, "GET", "/1f67218b4bfbc6af9e52d502c3e5ef3d", "")
 	transport := http.Transport{}
