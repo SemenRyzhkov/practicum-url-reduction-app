@@ -33,7 +33,7 @@ func (h *urlHandlerImpl) ReduceURL(writer http.ResponseWriter, request *http.Req
 func (h *urlHandlerImpl) GetURLByID(writer http.ResponseWriter, r *http.Request) {
 	urlID := chi.URLParam(r, "id")
 	if urlID == "" {
-		http.Error(writer, "urlID param is missed", http.StatusBadRequest)
+		http.Error(writer, "urlID param is missing", http.StatusBadRequest)
 		return
 	}
 	if url, err := h.urlService.GetURLByID(urlID); err != nil {

@@ -31,7 +31,7 @@ func setupTestServer() *httptest.Server {
 func testRequest(t *testing.T, ts *httptest.Server, method, path, body string) *http.Request {
 	var req *http.Request
 	var err error
-	if method == "GET" {
+	if method == http.MethodGet {
 		req, err = http.NewRequest(method, ts.URL+path, nil)
 		require.NoError(t, err)
 	} else {

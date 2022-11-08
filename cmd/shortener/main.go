@@ -17,7 +17,7 @@ func main() {
 	}
 
 	err = a.Run()
-	if !errors.Is(err, http.ErrServerClosed) {
+	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal(err)
 	}
 }

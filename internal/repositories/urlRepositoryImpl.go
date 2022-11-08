@@ -39,8 +39,6 @@ func NewURLRepository() URLRepository {
 }
 
 func isExist(urlStorage map[string]string, urlID string) bool {
-	if _, ok := urlStorage[urlID]; ok {
-		return true
-	}
-	return false
+	_, ok := urlStorage[urlID]
+	return ok
 }
