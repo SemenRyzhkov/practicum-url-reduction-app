@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 )
 
@@ -80,6 +81,29 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 			} else {
 				assert.Equal(t, tt.want, got)
 			}
+		})
+	}
+}
+
+func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
+
+	tests := []struct {
+		repo    repositories.URLRepository
+		name    string
+		request entity.URLRequest
+		want    entity.URLResponse
+	}{
+		{
+			repo:    repositories.NewURLRepository(),
+			name:    "reducing JSON test #3",
+			want:    entity.URLResponse{Result: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b"},
+			request: entity.URLRequest{URl: "yandex1.com"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			u := NewURLService(tt.repo)
+			assert.Equalf(t, tt.want, u.ReduceUrlToJSON(tt.request), "ReduceUrlToJSON(%v)", tt.request)
 		})
 	}
 }

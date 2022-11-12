@@ -1,7 +1,10 @@
 package router
 
 import (
+	"bytes"
+	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -10,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service"
@@ -41,6 +45,18 @@ func testRequest(t *testing.T, ts *httptest.Server, method, path, body string) *
 	return req
 }
 
+func testJSONRequest(t *testing.T, ts *httptest.Server) *http.Request {
+	request := entity.URLRequest{URl: "yandex1.com"}
+	var buf bytes.Buffer
+	err := json.NewEncoder(&buf).Encode(request)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req, err := http.NewRequest(http.MethodPost, ts.URL+"/api/shorten", &buf)
+	require.NoError(t, err)
+	return req
+}
+
 func TestNewRouter(t *testing.T) {
 	ts := setupTestServer()
 	defer ts.Close()
@@ -64,4 +80,23 @@ func TestNewRouter(t *testing.T) {
 	actualURL := resp.Header.Get("Location")
 	assert.Equal(t, expectedURL, actualURL)
 	defer resp.Body.Close()
+}
+
+func TestNewRouterReducingJSON(t *testing.T) {
+	expectedResponse := entity.URLResponse{Result: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b"}
+
+	ts := setupTestServer()
+	defer ts.Close()
+	req := testJSONRequest(t, ts)
+	resp, err := http.DefaultClient.Do(req)
+	require.NoError(t, err)
+
+	var actualResponse entity.URLResponse
+	err = json.NewDecoder(resp.Body).Decode(&actualResponse)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusCreated, resp.StatusCode)
+	assert.Equal(t, expectedResponse, actualResponse)
+
+	defer resp.Body.Close()
+
 }

@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 )
 
@@ -20,6 +21,13 @@ type urlServiceImpl struct {
 func NewURLService(urlRepository repositories.URLRepository) URLService {
 	return &urlServiceImpl{
 		urlRepository,
+	}
+}
+
+func (u *urlServiceImpl) ReduceUrlToJSON(request entity.URLRequest) entity.URLResponse {
+	reduceURL := reducing(request.URl)
+	return entity.URLResponse{
+		Result: localhost + reduceURL,
 	}
 }
 
