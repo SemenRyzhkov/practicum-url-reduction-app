@@ -25,8 +25,8 @@ func NewURLService(urlRepository repositories.URLRepository) URLService {
 }
 
 func (u *urlServiceImpl) ReduceUrlToJSON(request entity.URLRequest) (entity.URLResponse, error) {
-	reduceURL := reducing(request.URl)
-	duplicateErr := u.urlRepository.Save(reduceURL, request.URl)
+	reduceURL := reducing(request.URL)
+	duplicateErr := u.urlRepository.Save(reduceURL, request.URL)
 	if duplicateErr != nil {
 		return entity.URLResponse{}, duplicateErr
 	}

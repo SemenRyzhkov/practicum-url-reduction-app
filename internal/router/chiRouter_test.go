@@ -46,7 +46,7 @@ func testRequest(t *testing.T, ts *httptest.Server, method, path, body string) *
 }
 
 func testJSONRequest(t *testing.T, ts *httptest.Server) *http.Request {
-	request := entity.URLRequest{URl: expectedURL}
+	request := entity.URLRequest{URL: expectedURL}
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(request)
 	if err != nil {
@@ -87,6 +87,7 @@ func TestNewRouterReducingJSON(t *testing.T) {
 
 	ts := setupTestServer()
 	defer ts.Close()
+
 	req := testJSONRequest(t, ts)
 	resp, err := http.DefaultClient.Do(req)
 	require.NoError(t, err)
@@ -96,6 +97,7 @@ func TestNewRouterReducingJSON(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusCreated, resp.StatusCode)
 	assert.Equal(t, expectedResponse, actualResponse)
+	defer resp.Body.Close()
 
 	req = testRequest(t, ts, "GET", "/1f67218b4bfbc6af9e52d502c3e5ef3d", "")
 	transport := http.Transport{}
@@ -105,8 +107,6 @@ func TestNewRouterReducingJSON(t *testing.T) {
 
 	actualURL := resp.Header.Get("Location")
 	assert.Equal(t, expectedURL, actualURL)
-	defer resp.Body.Close()
-
 	defer resp.Body.Close()
 
 }

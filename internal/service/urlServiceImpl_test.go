@@ -97,14 +97,14 @@ func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
 			repo:    repositories.NewURLRepository(),
 			name:    "reducing JSON test #1",
 			want:    entity.URLResponse{Result: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b"},
-			request: entity.URLRequest{URl: "yandex1.com"},
+			request: entity.URLRequest{URL: "yandex1.com"},
 			wantErr: false,
 		},
 		{
 			repo:    repositories.NewURLRepository(),
 			name:    "duplicate test #2",
 			want:    entity.URLResponse{Result: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b"},
-			request: entity.URLRequest{URl: "yandex1.com"},
+			request: entity.URLRequest{URL: "yandex1.com"},
 			wantErr: true,
 		},
 	}
