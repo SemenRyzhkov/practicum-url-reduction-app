@@ -111,12 +111,12 @@ func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			u := NewURLService(tt.repo)
-			got, _ := u.ReduceUrlToJSON(tt.request)
+			got, _ := u.ReduceURLToJSON(tt.request)
 			if tt.wantErr {
-				_, err := u.ReduceUrlToJSON(tt.request)
+				_, err := u.ReduceURLToJSON(tt.request)
 				assert.NotNil(t, err)
 			} else {
-				assert.Equalf(t, tt.want, got, "ReduceUrlToJSON(%v)", tt.request)
+				assert.Equalf(t, tt.want, got, "ReduceURLToJSON(%v)", tt.request)
 			}
 		})
 	}
