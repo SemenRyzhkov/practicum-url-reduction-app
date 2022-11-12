@@ -24,11 +24,15 @@ func NewURLService(urlRepository repositories.URLRepository) URLService {
 	}
 }
 
-func (u *urlServiceImpl) ReduceUrlToJSON(request entity.URLRequest) entity.URLResponse {
+func (u *urlServiceImpl) ReduceUrlToJSON(request entity.URLRequest) (entity.URLResponse, error) {
 	reduceURL := reducing(request.URl)
+	duplicateErr := u.urlRepository.Save(reduceURL, request.URl)
+	if duplicateErr != nil {
+		return entity.URLResponse{}, duplicateErr
+	}
 	return entity.URLResponse{
 		Result: localhost + reduceURL,
-	}
+	}, nil
 }
 
 func (u *urlServiceImpl) ReduceAndSaveURL(url string) (string, error) {

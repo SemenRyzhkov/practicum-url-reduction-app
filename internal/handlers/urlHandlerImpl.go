@@ -26,12 +26,14 @@ func (h *urlHandlerImpl) ReduceURLTOJSON(writer http.ResponseWriter, request *ht
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 	}
-	urlResponse := h.urlService.ReduceUrlToJSON(urlRequest)
-	writer.WriteHeader(http.StatusCreated)
-	err = json.NewEncoder(writer).Encode(urlResponse)
-	if err != nil {
+	if urlResponse, err := h.urlService.ReduceUrlToJSON(urlRequest); err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
-
+	} else {
+		writer.WriteHeader(http.StatusCreated)
+		err = json.NewEncoder(writer).Encode(urlResponse)
+		if err != nil {
+			http.Error(writer, err.Error(), http.StatusBadRequest)
+		}
 	}
 }
 

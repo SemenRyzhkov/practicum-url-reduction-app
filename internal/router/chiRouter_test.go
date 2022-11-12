@@ -46,7 +46,7 @@ func testRequest(t *testing.T, ts *httptest.Server, method, path, body string) *
 }
 
 func testJSONRequest(t *testing.T, ts *httptest.Server) *http.Request {
-	request := entity.URLRequest{URl: "yandex1.com"}
+	request := entity.URLRequest{URl: expectedURL}
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(request)
 	if err != nil {
@@ -83,7 +83,7 @@ func TestNewRouter(t *testing.T) {
 }
 
 func TestNewRouterReducingJSON(t *testing.T) {
-	expectedResponse := entity.URLResponse{Result: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b"}
+	expectedResponse := entity.URLResponse{Result: "http://localhost:8080/1f67218b4bfbc6af9e52d502c3e5ef3d"}
 
 	ts := setupTestServer()
 	defer ts.Close()
@@ -96,6 +96,16 @@ func TestNewRouterReducingJSON(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusCreated, resp.StatusCode)
 	assert.Equal(t, expectedResponse, actualResponse)
+
+	req = testRequest(t, ts, "GET", "/1f67218b4bfbc6af9e52d502c3e5ef3d", "")
+	transport := http.Transport{}
+	resp, err = transport.RoundTrip(req)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusTemporaryRedirect, resp.StatusCode)
+
+	actualURL := resp.Header.Get("Location")
+	assert.Equal(t, expectedURL, actualURL)
+	defer resp.Body.Close()
 
 	defer resp.Body.Close()
 
