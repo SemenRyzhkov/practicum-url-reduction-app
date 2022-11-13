@@ -3,6 +3,7 @@ package service
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 	"os"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
@@ -39,6 +40,7 @@ func (u *urlServiceImpl) ReduceAndSaveURL(url string) (string, error) {
 	if duplicateErr != nil {
 		return "", duplicateErr
 	}
+	fmt.Println("LOCALHOST " + localhost)
 	return localhost + reduceURL, nil
 }
 
