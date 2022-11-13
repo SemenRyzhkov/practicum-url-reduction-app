@@ -3,15 +3,15 @@ package service
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"os"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 )
 
-const localhost = "http://localhost:8080/"
-
 var (
-	_ URLService = &urlServiceImpl{}
+	_         URLService = &urlServiceImpl{}
+	localhost            = os.Getenv("BASE_URL")
 )
 
 type urlServiceImpl struct {
@@ -30,9 +30,7 @@ func (u *urlServiceImpl) ReduceURLToJSON(request entity.URLRequest) (entity.URLR
 	if duplicateErr != nil {
 		return entity.URLResponse{}, duplicateErr
 	}
-	return entity.URLResponse{
-		Result: localhost + reduceURL,
-	}, nil
+	return entity.URLResponse{Result: localhost + reduceURL}, nil
 }
 
 func (u *urlServiceImpl) ReduceAndSaveURL(url string) (string, error) {
