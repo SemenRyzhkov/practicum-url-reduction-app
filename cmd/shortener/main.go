@@ -4,12 +4,15 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/app"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/config"
 )
 
 func main() {
+	os.Setenv("SERVER_ADDRESS", "localhost:8080")
+	os.Setenv("BASE_URL", "http://localhost:8080")
 	cfg, err := config.New()
 	if err != nil {
 		log.Fatal(err)
