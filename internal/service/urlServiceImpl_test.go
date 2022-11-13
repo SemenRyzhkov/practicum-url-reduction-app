@@ -1,13 +1,23 @@
 package service
 
 import (
+	"log"
 	"testing"
 
+	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 )
+
+func testSetup() {
+	err := godotenv.Load("../../.env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+}
 
 func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 	tests := []struct {
@@ -34,6 +44,7 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			testSetup()
 			u := NewURLService(tt.repo)
 			u.ReduceAndSaveURL(tt.want)
 

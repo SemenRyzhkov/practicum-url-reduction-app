@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/joho/godotenv"
 
@@ -17,8 +16,6 @@ import (
 
 func main() {
 	err := godotenv.Load(".env")
-	host := os.Getenv("BASE_URL")
-	fmt.Println("HOST " + host)
 
 	if err != nil {
 		log.Fatalf("Error loading .env file")

@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -25,6 +26,12 @@ const (
 )
 
 func setupTestServer() *httptest.Server {
+	err := godotenv.Load("../../.env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
 	repo := repositories.NewURLRepository()
 	s := service.NewURLService(repo)
 	h := handlers.NewHandler(s)
