@@ -10,10 +10,7 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 )
 
-var (
-	_         URLService = &urlServiceImpl{}
-	localhost            = os.Getenv("BASE_URL")
-)
+var _ URLService = &urlServiceImpl{}
 
 type urlServiceImpl struct {
 	urlRepository repositories.URLRepository
@@ -31,7 +28,8 @@ func (u *urlServiceImpl) ReduceURLToJSON(request entity.URLRequest) (entity.URLR
 	if duplicateErr != nil {
 		return entity.URLResponse{}, duplicateErr
 	}
-	return entity.URLResponse{Result: localhost + reduceURL}, nil
+	fmt.Println("LOCALHOST " + os.Getenv("BASE_URL"))
+	return entity.URLResponse{Result: os.Getenv("BASE_URL") + reduceURL}, nil
 }
 
 func (u *urlServiceImpl) ReduceAndSaveURL(url string) (string, error) {
@@ -40,8 +38,8 @@ func (u *urlServiceImpl) ReduceAndSaveURL(url string) (string, error) {
 	if duplicateErr != nil {
 		return "", duplicateErr
 	}
-	fmt.Println("LOCALHOST " + localhost)
-	return localhost + reduceURL, nil
+	fmt.Println("LOCALHOST " + os.Getenv("BASE_URL"))
+	return os.Getenv("BASE_URL") + reduceURL, nil
 }
 
 func (u *urlServiceImpl) GetURLByID(urlID string) (string, error) {
