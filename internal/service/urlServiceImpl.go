@@ -29,7 +29,7 @@ func (u *urlServiceImpl) ReduceURLToJSON(request entity.URLRequest) (entity.URLR
 		return entity.URLResponse{}, duplicateErr
 	}
 	fmt.Println("LOCALHOST " + os.Getenv("BASE_URL"))
-	return entity.URLResponse{Result: os.Getenv("BASE_URL") + reduceURL}, nil
+	return entity.URLResponse{Result: fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL)}, nil
 }
 
 func (u *urlServiceImpl) ReduceAndSaveURL(url string) (string, error) {
@@ -39,7 +39,7 @@ func (u *urlServiceImpl) ReduceAndSaveURL(url string) (string, error) {
 		return "", duplicateErr
 	}
 	fmt.Println("LOCALHOST " + os.Getenv("BASE_URL"))
-	return os.Getenv("BASE_URL") + reduceURL, nil
+	return fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL), nil
 }
 
 func (u *urlServiceImpl) GetURLByID(urlID string) (string, error) {
