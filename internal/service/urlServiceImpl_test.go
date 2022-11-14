@@ -71,7 +71,7 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 			repo:    repositories.NewURLRepository(),
 			name:    "positive test #1",
 			saveURL: "yandex1.com",
-			want:    "http://127.0.0.1:8080/dc605989f530a3dfe9f7edacf1b3965b",
+			want:    "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b",
 			wantErr: false,
 		},
 		{
@@ -107,14 +107,14 @@ func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
 		{
 			repo:    repositories.NewURLRepository(),
 			name:    "reducing JSON test #1",
-			want:    entity.URLResponse{Result: "http://127.0.0.1:8080/dc605989f530a3dfe9f7edacf1b3965b"},
+			want:    entity.URLResponse{Result: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b"},
 			request: entity.URLRequest{URL: "yandex1.com"},
 			wantErr: false,
 		},
 		{
 			repo:    repositories.NewURLRepository(),
 			name:    "duplicate test #2",
-			want:    entity.URLResponse{Result: "http://127.0.0.1:8080/dc605989f530a3dfe9f7edacf1b3965b"},
+			want:    entity.URLResponse{Result: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b"},
 			request: entity.URLRequest{URL: "yandex1.com"},
 			wantErr: true,
 		},

@@ -22,7 +22,7 @@ import (
 
 const (
 	expectedURL       = "https://dzen.ru/?yredirect=true"
-	expectedReduceURL = "http://127.0.0.1:8080/1f67218b4bfbc6af9e52d502c3e5ef3d"
+	expectedReduceURL = "http://localhost:8080/1f67218b4bfbc6af9e52d502c3e5ef3d"
 )
 
 func setupTestServer() *httptest.Server {
@@ -90,7 +90,7 @@ func TestNewRouter(t *testing.T) {
 }
 
 func TestNewRouterReducingJSON(t *testing.T) {
-	expectedResponse := entity.URLResponse{Result: "http://127.0.0.1:8080/1f67218b4bfbc6af9e52d502c3e5ef3d"}
+	expectedResponse := entity.URLResponse{Result: "http://localhost:8080/1f67218b4bfbc6af9e52d502c3e5ef3d"}
 
 	ts := setupTestServer()
 	defer ts.Close()

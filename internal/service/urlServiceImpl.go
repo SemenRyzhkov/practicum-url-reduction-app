@@ -28,7 +28,6 @@ func (u *urlServiceImpl) ReduceURLToJSON(request entity.URLRequest) (entity.URLR
 	if duplicateErr != nil {
 		return entity.URLResponse{}, duplicateErr
 	}
-	fmt.Println("LOCALHOST " + os.Getenv("BASE_URL"))
 	return entity.URLResponse{Result: fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL)}, nil
 }
 
@@ -38,7 +37,6 @@ func (u *urlServiceImpl) ReduceAndSaveURL(url string) (string, error) {
 	if duplicateErr != nil {
 		return "", duplicateErr
 	}
-	fmt.Println("LOCALHOST " + os.Getenv("BASE_URL"))
 	return fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL), nil
 }
 
