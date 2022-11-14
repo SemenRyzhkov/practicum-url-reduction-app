@@ -23,10 +23,8 @@ func New(cfg config.Config) (*App, error) {
 	urlRouter := router.NewRouter(urlHandler)
 
 	server := &http.Server{
-		Addr:         cfg.Host,
-		Handler:      urlRouter,
-		WriteTimeout: cfg.WriteTimeout,
-		ReadTimeout:  cfg.ReadTimeout,
+		Addr:    cfg.Host,
+		Handler: urlRouter,
 	}
 
 	return &App{
