@@ -3,24 +3,20 @@ package router
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 
-	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/testUtils"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/fileStorage"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/memoryStorage"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service"
 )
 
@@ -30,42 +26,12 @@ const (
 )
 
 func setupTestServer() *httptest.Server {
-	err := godotenv.Load("../../.env")
-
-	if err != nil {
-		log.Fatalf("Error loading .env fileStorage")
-	}
-
-	repo := createRepository()
+	testUtils.LoadEnvironments()
+	repo := utils.CreateRepository()
 	s := service.NewURLService(repo)
 	h := handlers.NewHandler(s)
 	router := NewRouter(h)
 	return httptest.NewServer(router)
-}
-
-func afterTest() {
-	filePath := os.Getenv("FILE_STORAGE_PATH")
-	fmt.Println(filePath)
-	if len(strings.TrimSpace(filePath)) == 0 {
-		return
-	} else {
-		e := os.Truncate(filePath, 0)
-		if e != nil {
-			log.Fatal(e)
-		}
-	}
-}
-
-func createRepository() repositories.URLRepository {
-	filePath := os.Getenv("FILE_STORAGE_PATH")
-	fmt.Println(filePath)
-	if len(strings.TrimSpace(filePath)) == 0 {
-		fmt.Println("in memory")
-		return memoryStorage.NewURLMemoryRepository()
-	} else {
-		fmt.Println("in file")
-		return fileStorage.NewURLFileRepository()
-	}
 }
 
 func testRequest(t *testing.T, ts *httptest.Server, method, path, body string) *http.Request {
@@ -116,7 +82,7 @@ func TestNewRouter(t *testing.T) {
 	actualURL := resp.Header.Get("Location")
 	assert.Equal(t, expectedURL, actualURL)
 	defer resp.Body.Close()
-	afterTest()
+	testUtils.AfterTest()
 }
 
 func TestNewRouterReducingJSON(t *testing.T) {
@@ -145,6 +111,5 @@ func TestNewRouterReducingJSON(t *testing.T) {
 	actualURL := resp.Header.Get("Location")
 	assert.Equal(t, expectedURL, actualURL)
 	defer resp.Body.Close()
-	afterTest()
-
+	testUtils.AfterTest()
 }

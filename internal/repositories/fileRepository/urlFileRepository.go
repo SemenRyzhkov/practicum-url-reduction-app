@@ -1,4 +1,4 @@
-package fileStorage
+package fileRepository
 
 import (
 	"fmt"
@@ -25,7 +25,7 @@ func (u *urlFileRepository) Save(urlID, url string) error {
 		return fmt.Errorf("url %s already exist", url)
 	}
 	u.urlStorage[urlID] = url
-	savingURL := SavingURL{urlID, url}
+	savingURL := savingURL{urlID, url}
 	return u.producer.WriteURL(&savingURL)
 }
 
@@ -64,7 +64,7 @@ func initializeStorage(consumer *consumer) map[string]string {
 		if readErr != nil {
 			log.Fatal(readErr)
 		}
-		initializedStorage[reduceURL.UrlID] = reduceURL.Url
+		initializedStorage[reduceURL.URLID] = reduceURL.URL
 		fmt.Println(initializedStorage)
 	}
 	if err := consumer.scanner.Err(); err != nil {

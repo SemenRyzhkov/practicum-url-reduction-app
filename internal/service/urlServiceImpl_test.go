@@ -1,54 +1,18 @@
 package service
 
 import (
-	"fmt"
-	"log"
-	"os"
-	"strings"
 	"testing"
 
-	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/testUtils"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/fileStorage"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/memoryStorage"
 )
 
-func testSetup() {
-	err := godotenv.Load("../../.env")
-
-	if err != nil {
-		log.Fatalf("Error loading .env fileStorage")
-	}
-}
-
-func afterTest() {
-	filePath := os.Getenv("FILE_STORAGE_PATH")
-	fmt.Println(filePath)
-	if len(strings.TrimSpace(filePath)) == 0 {
-		return
-	} else {
-		e := os.Truncate(filePath, 0)
-		if e != nil {
-			log.Fatal(e)
-		}
-	}
-}
-
-func createRepository() repositories.URLRepository {
-	filePath := os.Getenv("FILE_STORAGE_PATH")
-	fmt.Println(filePath)
-	if len(strings.TrimSpace(filePath)) == 0 {
-		return memoryStorage.NewURLMemoryRepository()
-	} else {
-		return fileStorage.NewURLFileRepository()
-	}
-}
-
 func Test_urlServiceImpl_GetUrlById(t *testing.T) {
-	testSetup()
+	testUtils.LoadEnvironments()
 	tests := []struct {
 		repo    repositories.URLRepository
 		name    string
@@ -57,14 +21,14 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			repo:    createRepository(),
+			repo:    utils.CreateRepository(),
 			name:    "positive test #1",
 			want:    "yandex.com",
 			urlID:   "31aa70fc8589c52a763a2df36f304d28",
 			wantErr: false,
 		},
 		{
-			repo:    createRepository(),
+			repo:    utils.CreateRepository(),
 			name:    "not found test #2",
 			want:    "yandex.com",
 			urlID:   "31aa70fc8589c52a763a2df36f304d29",
@@ -83,12 +47,12 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 				assert.Equal(t, tt.want, got)
 			}
 		})
-		afterTest()
+		testUtils.AfterTest()
 	}
 }
 
 func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
-	testSetup()
+	testUtils.LoadEnvironments()
 	tests := []struct {
 		repo    repositories.URLRepository
 		name    string
@@ -97,14 +61,14 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			repo:    createRepository(),
+			repo:    utils.CreateRepository(),
 			name:    "positive test #1",
 			saveURL: "yandex1.com",
 			want:    "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b",
 			wantErr: false,
 		},
 		{
-			repo:    createRepository(),
+			repo:    utils.CreateRepository(),
 			name:    "duplicate test #2",
 			saveURL: "yandex.com",
 			want:    "http://localhost:8080/XVlBz",
@@ -122,14 +86,12 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 				assert.Equal(t, tt.want, got)
 			}
 		})
-		afterTest()
-
+		testUtils.AfterTest()
 	}
-
 }
 
 func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
-	testSetup()
+	testUtils.LoadEnvironments()
 	tests := []struct {
 		repo    repositories.URLRepository
 		name    string
@@ -138,14 +100,14 @@ func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			repo:    createRepository(),
+			repo:    utils.CreateRepository(),
 			name:    "reducing JSON test #1",
 			want:    entity.URLResponse{Result: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b"},
 			request: entity.URLRequest{URL: "yandex1.com"},
 			wantErr: false,
 		},
 		{
-			repo:    createRepository(),
+			repo:    utils.CreateRepository(),
 			name:    "duplicate test #2",
 			want:    entity.URLResponse{Result: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b"},
 			request: entity.URLRequest{URL: "yandex1.com"},
@@ -163,6 +125,6 @@ func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
 				assert.Equalf(t, tt.want, got, "ReduceURLToJSON(%v)", tt.request)
 			}
 		})
-		afterTest()
+		testUtils.AfterTest()
 	}
 }

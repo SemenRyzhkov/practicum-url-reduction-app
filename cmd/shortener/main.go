@@ -14,7 +14,7 @@ import (
 func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatalf("Error loading .env fileStorage")
+		log.Fatalf("Error loading .env file")
 	}
 
 	cfg, err := config.New()

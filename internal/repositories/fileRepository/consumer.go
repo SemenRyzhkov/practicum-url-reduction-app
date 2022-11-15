@@ -1,4 +1,4 @@
-package fileStorage
+package fileRepository
 
 import (
 	"bufio"
@@ -23,10 +23,10 @@ func NewConsumer(filename string) (*consumer, error) {
 	}, nil
 }
 
-func (c *consumer) ReadURL() (*SavingURL, error) {
+func (c *consumer) ReadURL() (*savingURL, error) {
 	data := c.scanner.Bytes()
 
-	su := SavingURL{}
+	su := savingURL{}
 	if len(data) > 0 {
 		err := json.Unmarshal(data, &su)
 		if err != nil {

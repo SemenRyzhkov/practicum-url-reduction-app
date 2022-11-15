@@ -1,4 +1,4 @@
-package fileStorage
+package fileRepository
 
 import (
 	"encoding/json"
@@ -22,7 +22,7 @@ func NewProducer(filename string) (*producer, error) {
 	}, nil
 }
 
-func (p *producer) WriteURL(su *SavingURL) error {
+func (p *producer) WriteURL(su *savingURL) error {
 	return p.encoder.Encode(su)
 }
 
