@@ -25,7 +25,7 @@ func (u *urlFileRepository) Save(urlID, url string) error {
 		return fmt.Errorf("url %s already exist", url)
 	}
 	u.urlStorage[urlID] = url
-	savingURL := savingURL{urlID, url}
+	savingURL := SavingURL{urlID, url}
 	return u.producer.WriteURL(&savingURL)
 }
 

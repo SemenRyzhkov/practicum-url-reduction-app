@@ -22,7 +22,7 @@ func NewProducer(filename string) (*producer, error) {
 	}, nil
 }
 
-func (p *producer) WriteURL(su *savingURL) error {
+func (p *producer) WriteURL(su *SavingURL) error {
 	return p.encoder.Encode(su)
 }
 

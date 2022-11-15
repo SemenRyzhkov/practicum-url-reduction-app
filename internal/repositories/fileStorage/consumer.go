@@ -23,10 +23,10 @@ func NewConsumer(filename string) (*consumer, error) {
 	}, nil
 }
 
-func (c *consumer) ReadURL() (*savingURL, error) {
+func (c *consumer) ReadURL() (*SavingURL, error) {
 	data := c.scanner.Bytes()
 
-	su := savingURL{}
+	su := SavingURL{}
 	if len(data) > 0 {
 		err := json.Unmarshal(data, &su)
 		if err != nil {
