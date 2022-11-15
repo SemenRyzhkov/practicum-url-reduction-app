@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -14,15 +13,14 @@ import (
 
 func main() {
 	err := godotenv.Load(".env")
-
 	if err != nil {
-		log.Fatalf("Error loading .env file")
+		log.Fatalf("Error loading .env fileStorage")
 	}
+
 	cfg, err := config.New()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("SERVER " + cfg.Host)
 
 	a, err := app.New(cfg)
 	if err != nil {

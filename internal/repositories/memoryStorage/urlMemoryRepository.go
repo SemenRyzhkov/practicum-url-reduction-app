@@ -1,18 +1,20 @@
-package repositories
+package memoryStorage
 
 import (
 	"fmt"
 	"sync"
+
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 )
 
-var _ URLRepository = &urlRepositoryImpl{}
+var _ repositories.URLRepository = &urlMemoryRepository{}
 
-type urlRepositoryImpl struct {
+type urlMemoryRepository struct {
 	mx         sync.Mutex
 	urlStorage map[string]string
 }
 
-func (u *urlRepositoryImpl) Save(urlID, url string) error {
+func (u *urlMemoryRepository) Save(urlID, url string) error {
 	u.mx.Lock()
 	defer u.mx.Unlock()
 	if isExist(u.urlStorage, urlID) {
@@ -22,7 +24,7 @@ func (u *urlRepositoryImpl) Save(urlID, url string) error {
 	return nil
 }
 
-func (u *urlRepositoryImpl) FindByID(urlID string) (string, error) {
+func (u *urlMemoryRepository) FindByID(urlID string) (string, error) {
 	u.mx.Lock()
 	defer u.mx.Unlock()
 	url, ok := u.urlStorage[urlID]
@@ -32,8 +34,8 @@ func (u *urlRepositoryImpl) FindByID(urlID string) (string, error) {
 	return url, nil
 }
 
-func NewURLRepository() URLRepository {
-	return &urlRepositoryImpl{
+func NewURLMemoryRepository() repositories.URLRepository {
+	return &urlMemoryRepository{
 		urlStorage: make(map[string]string),
 	}
 }
