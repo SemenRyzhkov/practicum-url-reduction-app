@@ -1,4 +1,4 @@
-package testUtils
+package testutils
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ func LoadEnvironments() {
 	err := godotenv.Load("../../.env")
 
 	if err != nil {
-		log.Fatalf("Error loading .env fileRepository")
+		log.Fatalf("Error loading .env filerepository")
 	}
 }
 

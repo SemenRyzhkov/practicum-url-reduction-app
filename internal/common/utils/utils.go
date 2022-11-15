@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/fileRepository"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/memoryRepository"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/filerepository"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/memoryrepository"
 )
 
 func CreateRepository() repositories.URLRepository {
@@ -15,9 +15,9 @@ func CreateRepository() repositories.URLRepository {
 	fmt.Println(filePath)
 	if len(strings.TrimSpace(filePath)) == 0 {
 		fmt.Println("in memory")
-		return memoryRepository.NewURLMemoryRepository()
+		return memoryrepository.NewURLMemoryRepository()
 	} else {
 		fmt.Println("in file")
-		return fileRepository.NewURLFileRepository()
+		return filerepository.NewURLFileRepository()
 	}
 }

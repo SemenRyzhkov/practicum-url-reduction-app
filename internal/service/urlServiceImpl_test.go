@@ -5,14 +5,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/testUtils"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/testutils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 )
 
 func Test_urlServiceImpl_GetUrlById(t *testing.T) {
-	testUtils.LoadEnvironments()
+	testutils.LoadEnvironments()
 	tests := []struct {
 		repo    repositories.URLRepository
 		name    string
@@ -47,12 +47,12 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 				assert.Equal(t, tt.want, got)
 			}
 		})
-		testUtils.AfterTest()
+		testutils.AfterTest()
 	}
 }
 
 func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
-	testUtils.LoadEnvironments()
+	testutils.LoadEnvironments()
 	tests := []struct {
 		repo    repositories.URLRepository
 		name    string
@@ -86,12 +86,12 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 				assert.Equal(t, tt.want, got)
 			}
 		})
-		testUtils.AfterTest()
+		testutils.AfterTest()
 	}
 }
 
 func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
-	testUtils.LoadEnvironments()
+	testutils.LoadEnvironments()
 	tests := []struct {
 		repo    repositories.URLRepository
 		name    string
@@ -125,6 +125,6 @@ func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
 				assert.Equalf(t, tt.want, got, "ReduceURLToJSON(%v)", tt.request)
 			}
 		})
-		testUtils.AfterTest()
+		testutils.AfterTest()
 	}
 }

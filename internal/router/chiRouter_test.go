@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/testUtils"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/testutils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers"
@@ -26,7 +26,7 @@ const (
 )
 
 func setupTestServer() *httptest.Server {
-	testUtils.LoadEnvironments()
+	testutils.LoadEnvironments()
 	repo := utils.CreateRepository()
 	s := service.NewURLService(repo)
 	h := handlers.NewHandler(s)
@@ -82,7 +82,7 @@ func TestNewRouter(t *testing.T) {
 	actualURL := resp.Header.Get("Location")
 	assert.Equal(t, expectedURL, actualURL)
 	defer resp.Body.Close()
-	testUtils.AfterTest()
+	testutils.AfterTest()
 }
 
 func TestNewRouterReducingJSON(t *testing.T) {
@@ -111,5 +111,5 @@ func TestNewRouterReducingJSON(t *testing.T) {
 	actualURL := resp.Header.Get("Location")
 	assert.Equal(t, expectedURL, actualURL)
 	defer resp.Body.Close()
-	testUtils.AfterTest()
+	testutils.AfterTest()
 }
