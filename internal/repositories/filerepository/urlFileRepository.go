@@ -65,7 +65,6 @@ func initializeStorage(consumer *consumer) map[string]string {
 			log.Fatal(readErr)
 		}
 		initializedStorage[reduceURL.URLID] = reduceURL.URL
-		fmt.Println(initializedStorage)
 	}
 	if err := consumer.scanner.Err(); err != nil {
 		log.Fatal(err)
