@@ -17,8 +17,15 @@ const (
 	reduceURLToJSONPath = "/api/shorten"
 )
 
+//Добавьте поддержку gzip в ваш сервис. Научите его:
+//принимать запросы в сжатом формате (HTTP-заголовок Content-Encoding);
+//отдавать сжатый ответ клиенту, который поддерживает обработку сжатых ответов (HTTP-заголовок Accept-Encoding).
+//Вспомните middleware из урока про HTTP-сервер, это может вам помочь.
+
 func NewRouter(h handlers.URLHandler) chi.Router {
 	r := chi.NewRouter()
+	r.Use(DecompressRequest)
+	r.Use(gzipHandle)
 	r.Get(getURLPath, h.GetURLByID)
 	r.Post(reduceURLPath, h.ReduceURL)
 	r.Post(reduceURLToJSONPath, h.ReduceURLTOJSON)

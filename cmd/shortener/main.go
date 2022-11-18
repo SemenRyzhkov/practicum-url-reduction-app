@@ -3,10 +3,8 @@ package main
 import (
 	"errors"
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/joho/godotenv"
 
@@ -28,9 +26,6 @@ func main() {
 
 	utils.HandleFlag()
 	flag.Parse()
-	fmt.Println(os.Getenv("SERVER_ADDRESS"))
-	fmt.Println(os.Getenv("BASE_URL"))
-	fmt.Println(os.Getenv("FILE_STORAGE_PATH"))
 
 	cfg, err := config.New()
 	if err != nil {

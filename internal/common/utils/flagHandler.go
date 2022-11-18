@@ -14,7 +14,7 @@ func HandleFlag() {
 		return os.Setenv("BASE_URL", bFlagValue)
 	})
 
-	flag.Func("f", "Path of file storage", func(aFlagValue string) error {
-		return os.Setenv("FILE_STORAGE_PATH", aFlagValue)
+	flag.Func("f", "Path of file storage", func(fFlagValue string) error {
+		return os.Setenv("FILE_STORAGE_PATH", fFlagValue)
 	})
 }
