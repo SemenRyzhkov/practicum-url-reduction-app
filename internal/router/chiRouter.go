@@ -15,8 +15,7 @@ const (
 
 func NewRouter(h handlers.URLHandler) chi.Router {
 	r := chi.NewRouter()
-	//r.Use(middleware.DecompressRequest)
-	r.Use(middleware.GzipHandle)
+	r.Use(middleware.DecompressRequest, middleware.CompressResponse)
 	r.Get(getURLPath, h.GetURLByID)
 	r.Post(reduceURLPath, h.ReduceURL)
 	r.Post(reduceURLToJSONPath, h.ReduceURLTOJSON)
