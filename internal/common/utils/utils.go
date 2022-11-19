@@ -14,8 +14,10 @@ func CreateRepository() repositories.URLRepository {
 	filePath := os.Getenv("FILE_STORAGE_PATH")
 	fmt.Println(filePath)
 	if len(strings.TrimSpace(filePath)) == 0 {
+		fmt.Println("in memory")
 		return inmemory.New()
 	} else {
+		fmt.Println("in file")
 		return infile.New()
 	}
 }
