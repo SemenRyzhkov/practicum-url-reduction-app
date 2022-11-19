@@ -13,11 +13,6 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/config"
 )
 
-//Поддержите конфигурирование сервиса с помощью флагов командной строки наравне с уже имеющимися переменными окружения:
-//флаг -a, отвечающий за адрес запуска HTTP-сервера (переменная SERVER_ADDRESS);
-//флаг -b, отвечающий за базовый адрес результирующего сокращённого URL (переменная BASE_URL);
-//флаг -f, отвечающий за путь до файла с сокращёнными URL (переменная FILE_STORAGE_PATH).
-
 func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
