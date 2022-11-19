@@ -25,6 +25,7 @@ func NewConsumer(filename string) (*consumer, error) {
 }
 
 func (c *consumer) initializeStorage() map[string]string {
+	defer c.file.Close()
 	initializedStorage := make(map[string]string)
 	for c.scanner.Scan() {
 		reduceURL, readErr := readURL(c)
