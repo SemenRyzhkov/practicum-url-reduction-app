@@ -12,7 +12,7 @@ type producer struct {
 }
 
 func NewProducer(filePath string) (*producer, error) {
-	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND, 0777)
+	file, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
 	if err != nil {
 		return nil, err
 	}
