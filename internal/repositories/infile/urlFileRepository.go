@@ -1,4 +1,4 @@
-package filerepository
+package infile
 
 import (
 	"fmt"
@@ -39,37 +39,23 @@ func (u *urlFileRepository) FindByID(urlID string) (string, error) {
 	return url, nil
 }
 
-func NewURLFileRepository() repositories.URLRepository {
-	fileName := os.Getenv("FILE_STORAGE_PATH")
+func New() repositories.URLRepository {
+	filePath := os.Getenv("FILE_STORAGE_PATH")
 
-	producer, producerErr := NewProducer(fileName)
+	producer, producerErr := NewProducer(filePath)
 	if producerErr != nil {
 		log.Fatal(producerErr)
 	}
 
-	consumer, consumerErr := NewConsumer(fileName)
+	consumer, consumerErr := NewConsumer(filePath)
 	if consumerErr != nil {
 		log.Fatal(consumerErr)
 	}
 
 	return &urlFileRepository{
 		producer:   producer,
-		urlStorage: initializeStorage(consumer),
+		urlStorage: consumer.initializeStorage(),
 	}
-}
-func initializeStorage(consumer *consumer) map[string]string {
-	initializedStorage := make(map[string]string)
-	for consumer.scanner.Scan() {
-		reduceURL, readErr := consumer.ReadURL()
-		if readErr != nil {
-			log.Fatal(readErr)
-		}
-		initializedStorage[reduceURL.URLID] = reduceURL.URL
-	}
-	if err := consumer.scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
-	return initializedStorage
 }
 
 func isExist(urlStorage map[string]string, urlID string) bool {

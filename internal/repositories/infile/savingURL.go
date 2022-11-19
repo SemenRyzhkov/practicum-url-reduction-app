@@ -1,4 +1,4 @@
-package filerepository
+package infile
 
 type savingURL struct {
 	URLID string `json:"urlID"`

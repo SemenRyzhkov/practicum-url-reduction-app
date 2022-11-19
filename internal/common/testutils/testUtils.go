@@ -1,7 +1,6 @@
 package testutils
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -13,13 +12,12 @@ func LoadEnvironments() {
 	err := godotenv.Load("../../.env")
 
 	if err != nil {
-		log.Fatalf("Error loading .env filerepository")
+		log.Fatalf("Error loading .env infile")
 	}
 }
 
 func AfterTest() {
 	filePath := os.Getenv("FILE_STORAGE_PATH")
-	fmt.Println(filePath)
 	if len(strings.TrimSpace(filePath)) == 0 {
 		return
 	} else {

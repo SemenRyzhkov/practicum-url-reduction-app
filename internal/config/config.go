@@ -1,18 +1,17 @@
 package config
 
 import (
-	"github.com/caarlos0/env/v6"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
-	Host string `env:"SERVER_ADDRESS"`
+	Host string
 }
 
 func New() (Config, error) {
-	cfg := Config{}
-	if err := env.Parse(&cfg); err != nil {
+	myEnv, err := godotenv.Read()
+	if err != nil {
 		return Config{}, err
 	}
-
-	return cfg, nil
+	return Config{Host: myEnv["SERVER_ADDRESS"]}, nil
 }

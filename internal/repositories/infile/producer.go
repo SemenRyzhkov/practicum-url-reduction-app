@@ -1,17 +1,18 @@
-package filerepository
+package infile
 
 import (
 	"encoding/json"
+	"io"
 	"os"
 )
 
 type producer struct {
-	file    *os.File
+	file    io.ReadWriteCloser
 	encoder *json.Encoder
 }
 
-func NewProducer(filename string) (*producer, error) {
-	file, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
+func NewProducer(filePath string) (*producer, error) {
+	file, err := os.OpenFile(filePath, os.O_CREATE|os.O_APPEND, 0777)
 	if err != nil {
 		return nil, err
 	}

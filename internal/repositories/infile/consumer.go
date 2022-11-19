@@ -1,8 +1,9 @@
-package filerepository
+package infile
 
 import (
 	"bufio"
 	"encoding/json"
+	"log"
 	"os"
 )
 
@@ -12,7 +13,7 @@ type consumer struct {
 }
 
 func NewConsumer(filename string) (*consumer, error) {
-	file, err := os.OpenFile(filename, os.O_RDONLY|os.O_CREATE, 0777)
+	file, err := os.OpenFile(filename, os.O_RDONLY|os.O_CREATE, 0644)
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +24,22 @@ func NewConsumer(filename string) (*consumer, error) {
 	}, nil
 }
 
-func (c *consumer) ReadURL() (*savingURL, error) {
+func (c *consumer) initializeStorage() map[string]string {
+	initializedStorage := make(map[string]string)
+	for c.scanner.Scan() {
+		reduceURL, readErr := readURL(c)
+		if readErr != nil {
+			log.Fatal(readErr)
+		}
+		initializedStorage[reduceURL.URLID] = reduceURL.URL
+	}
+	if err := c.scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+	return initializedStorage
+}
+
+func readURL(c *consumer) (*savingURL, error) {
 	data := c.scanner.Bytes()
 
 	su := savingURL{}

@@ -26,8 +26,10 @@ func (h *urlHandlerImpl) ReduceURLTOJSON(writer http.ResponseWriter, request *ht
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 	}
-	if urlResponse, err := h.urlService.ReduceURLToJSON(urlRequest); err != nil {
+	urlResponse, err := h.urlService.ReduceURLToJSON(urlRequest)
+	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
+		return
 	} else {
 		writer.WriteHeader(http.StatusCreated)
 		err = json.NewEncoder(writer).Encode(urlResponse)
@@ -56,8 +58,10 @@ func (h *urlHandlerImpl) GetURLByID(writer http.ResponseWriter, r *http.Request)
 		http.Error(writer, "urlID param is missing", http.StatusBadRequest)
 		return
 	}
-	if url, err := h.urlService.GetURLByID(urlID); err != nil {
+	url, err := h.urlService.GetURLByID(urlID)
+	if err != nil {
 		http.Error(writer, err.Error(), http.StatusNotFound)
+		return
 	} else {
 		writer.Header().Add("Location", url)
 		writer.WriteHeader(http.StatusTemporaryRedirect)

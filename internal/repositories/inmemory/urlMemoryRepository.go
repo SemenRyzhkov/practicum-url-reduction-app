@@ -1,4 +1,4 @@
-package memoryrepository
+package inmemory
 
 import (
 	"fmt"
@@ -34,7 +34,7 @@ func (u *urlMemoryRepository) FindByID(urlID string) (string, error) {
 	return url, nil
 }
 
-func NewURLMemoryRepository() repositories.URLRepository {
+func New() repositories.URLRepository {
 	return &urlMemoryRepository{
 		urlStorage: make(map[string]string),
 	}
