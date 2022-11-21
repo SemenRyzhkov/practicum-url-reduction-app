@@ -20,22 +20,24 @@ type urlFileRepository struct {
 
 func (u *urlFileRepository) Save(urlID, url string) error {
 	u.mx.Lock()
-	defer u.mx.Unlock()
 	if isExist(u.urlStorage, urlID) {
+		u.mx.Unlock()
 		return fmt.Errorf("url %s already exist", url)
 	}
 	u.urlStorage[urlID] = url
 	savingURL := savingURL{urlID, url}
+	u.mx.Unlock()
 	return u.producer.WriteURL(&savingURL)
 }
 
 func (u *urlFileRepository) FindByID(urlID string) (string, error) {
 	u.mx.Lock()
-	defer u.mx.Unlock()
 	url, ok := u.urlStorage[urlID]
 	if !ok {
+		u.mx.Unlock()
 		return "", fmt.Errorf("url with id %s not found", urlID)
 	}
+	u.mx.Unlock()
 	return url, nil
 }
 
