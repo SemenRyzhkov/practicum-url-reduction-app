@@ -1,4 +1,5 @@
-GET http://localhost:8080/gbaiC
+# @no-redirect
+GET http://localhost:8080/d9fc72c4e9e7bd2a4b5ff2ae3f196f24
 Accept: text/plain
 
 ###
@@ -7,5 +8,12 @@ Content-Type: text/plain
 
 https://learngitbranching.js.org/?locale=ru_RU
 
+###
+POST http://localhost:8080/api/shorten
+Content-Type: application/json
+
+{
+    "url": "https://stackoverflow.com/questions/51774563/yaml-unmarshal-errors-cannot-unmarshal-string-into-time-duration-in-golang"
+}
 
 ###

@@ -1,25 +1,13 @@
 package config
 
-import (
-	"time"
-)
-
-const (
-	defaultHost         = "localhost:8080"
-	defaultWriteTimeout = 5 * time.Second
-	defaultReadTimeout  = 5 * time.Second
-)
-
 type Config struct {
-	Host         string
-	WriteTimeout time.Duration
-	ReadTimeout  time.Duration
+	Host     string
+	FilePath string
 }
 
-func New() Config {
+func New(serverAddress, filePath string) Config {
 	return Config{
-		Host:         defaultHost,
-		WriteTimeout: defaultWriteTimeout,
-		ReadTimeout:  defaultReadTimeout,
+		Host:     serverAddress,
+		FilePath: filePath,
 	}
 }

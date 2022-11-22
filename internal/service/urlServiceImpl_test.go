@@ -5,10 +5,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/testutils"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 )
 
 func Test_urlServiceImpl_GetUrlById(t *testing.T) {
+	utils.LoadEnvironments("../../.env")
 	tests := []struct {
 		repo    repositories.URLRepository
 		name    string
@@ -17,14 +21,14 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			repo:    repositories.NewURLRepository(),
+			repo:    utils.CreateRepository(utils.GetFilePath()),
 			name:    "positive test #1",
 			want:    "yandex.com",
 			urlID:   "31aa70fc8589c52a763a2df36f304d28",
 			wantErr: false,
 		},
 		{
-			repo:    repositories.NewURLRepository(),
+			repo:    utils.CreateRepository(utils.GetFilePath()),
 			name:    "not found test #2",
 			want:    "yandex.com",
 			urlID:   "31aa70fc8589c52a763a2df36f304d29",
@@ -41,13 +45,14 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 				assert.NotNil(t, err)
 			} else {
 				assert.Equal(t, tt.want, got)
-
 			}
 		})
+		testutils.AfterTest()
 	}
 }
 
 func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
+	utils.LoadEnvironments("../../.env")
 	tests := []struct {
 		repo    repositories.URLRepository
 		name    string
@@ -56,14 +61,14 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			repo:    repositories.NewURLRepository(),
+			repo:    utils.CreateRepository(utils.GetFilePath()),
 			name:    "positive test #1",
 			saveURL: "yandex1.com",
 			want:    "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b",
 			wantErr: false,
 		},
 		{
-			repo:    repositories.NewURLRepository(),
+			repo:    utils.CreateRepository(utils.GetFilePath()),
 			name:    "duplicate test #2",
 			saveURL: "yandex.com",
 			want:    "http://localhost:8080/XVlBz",
@@ -81,5 +86,45 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 				assert.Equal(t, tt.want, got)
 			}
 		})
+		testutils.AfterTest()
+	}
+}
+
+func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
+	utils.LoadEnvironments("../../.env")
+	tests := []struct {
+		repo    repositories.URLRepository
+		name    string
+		request entity.URLRequest
+		want    entity.URLResponse
+		wantErr bool
+	}{
+		{
+			repo:    utils.CreateRepository(utils.GetFilePath()),
+			name:    "reducing JSON test #1",
+			want:    entity.URLResponse{Result: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b"},
+			request: entity.URLRequest{URL: "yandex1.com"},
+			wantErr: false,
+		},
+		{
+			repo:    utils.CreateRepository(utils.GetFilePath()),
+			name:    "duplicate test #2",
+			want:    entity.URLResponse{Result: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b"},
+			request: entity.URLRequest{URL: "yandex1.com"},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			u := NewURLService(tt.repo)
+			got, _ := u.ReduceURLToJSON(tt.request)
+			if tt.wantErr {
+				_, err := u.ReduceURLToJSON(tt.request)
+				assert.NotNil(t, err)
+			} else {
+				assert.Equalf(t, tt.want, got, "ReduceURLToJSON(%v)", tt.request)
+			}
+		})
+		testutils.AfterTest()
 	}
 }

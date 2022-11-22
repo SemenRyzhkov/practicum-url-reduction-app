@@ -4,9 +4,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/config"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/router"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service"
 )
@@ -17,16 +17,14 @@ type App struct {
 
 func New(cfg config.Config) (*App, error) {
 	log.Println("creating router")
-	urlRepository := repositories.NewURLRepository()
+	urlRepository := utils.CreateRepository(cfg.FilePath)
 	urlService := service.NewURLService(urlRepository)
 	urlHandler := handlers.NewHandler(urlService)
 	urlRouter := router.NewRouter(urlHandler)
 
 	server := &http.Server{
-		Addr:         cfg.Host,
-		Handler:      urlRouter,
-		WriteTimeout: cfg.WriteTimeout,
-		ReadTimeout:  cfg.ReadTimeout,
+		Addr:    cfg.Host,
+		Handler: urlRouter,
 	}
 
 	return &App{
