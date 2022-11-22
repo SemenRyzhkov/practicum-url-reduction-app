@@ -12,9 +12,7 @@ type producer struct {
 }
 
 func NewProducer(filePath string) (*producer, error) {
-	//Здесь, если не указать os.O_WRONLY, автотесты валятся с
-	//Messages:   	Невозможно распарсить полученный сокращенный URL - write reducedURL.log: bad file descriptor
-	file, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
+	file, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		return nil, err
 	}

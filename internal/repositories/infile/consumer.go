@@ -25,7 +25,6 @@ func NewConsumer(filename string) (*consumer, error) {
 }
 
 func (c *consumer) initializeStorage() map[string]string {
-	defer c.file.Close()
 	initializedStorage := make(map[string]string)
 	for c.scanner.Scan() {
 		reduceURL, readErr := readURL(c)
@@ -43,7 +42,7 @@ func (c *consumer) initializeStorage() map[string]string {
 func readURL(c *consumer) (*savingURL, error) {
 	data := c.scanner.Bytes()
 
-	su := savingURL{}
+	var su savingURL
 	if len(data) > 0 {
 		err := json.Unmarshal(data, &su)
 		if err != nil {

@@ -24,18 +24,18 @@ func (u *urlFileRepository) Save(urlID, url string) error {
 		return fmt.Errorf("url %s already exist", url)
 	}
 	u.urlStorage[urlID] = url
-	savingURL := savingURL{urlID, url}
 	u.mx.Unlock()
+	savingURL := savingURL{urlID, url}
 	return u.producer.WriteURL(&savingURL)
 }
 
 func (u *urlFileRepository) FindByID(urlID string) (string, error) {
 	u.mx.Lock()
 	url, ok := u.urlStorage[urlID]
+	u.mx.Unlock()
 	if !ok {
 		return "", fmt.Errorf("url with id %s not found", urlID)
 	}
-	u.mx.Unlock()
 	return url, nil
 }
 
@@ -49,6 +49,7 @@ func New(filePath string) repositories.URLRepository {
 	if consumerErr != nil {
 		log.Fatal(consumerErr)
 	}
+	defer consumer.Close()
 
 	return &urlFileRepository{
 		producer:   producer,

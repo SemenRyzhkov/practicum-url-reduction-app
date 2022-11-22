@@ -29,9 +29,8 @@ func LoadEnvironments(envFilePath string) {
 }
 
 func CreateRepository(filePath string) repositories.URLRepository {
-	if len(strings.TrimSpace(filePath)) == 0 {
-		return inmemory.New()
-	} else {
+	if len(strings.TrimSpace(filePath)) != 0 {
 		return infile.New(filePath)
 	}
+	return inmemory.New()
 }
