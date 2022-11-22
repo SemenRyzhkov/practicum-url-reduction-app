@@ -6,26 +6,19 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/joho/godotenv"
-
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/app"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/config"
 )
 
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-
+	utils.LoadEnvironments(".env")
 	utils.HandleFlag()
 	flag.Parse()
 
-	cfg, err := config.New()
-	if err != nil {
-		log.Fatal(err)
-	}
+	serverAddress := utils.GetServerAddress()
+	filePath := utils.GetFilePath()
+	cfg := config.New(serverAddress, filePath)
 
 	a, err := app.New(cfg)
 	if err != nil {

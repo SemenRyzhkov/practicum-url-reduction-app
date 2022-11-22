@@ -4,17 +4,7 @@ import (
 	"log"
 	"os"
 	"strings"
-
-	"github.com/joho/godotenv"
 )
-
-func LoadEnvironments() {
-	err := godotenv.Load("../../.env")
-
-	if err != nil {
-		log.Fatalf("Error loading .env infile")
-	}
-}
 
 func AfterTest() {
 	filePath := os.Getenv("FILE_STORAGE_PATH")

@@ -26,8 +26,8 @@ const (
 )
 
 func setupTestServer() *httptest.Server {
-	testutils.LoadEnvironments()
-	repo := utils.CreateRepository()
+	utils.LoadEnvironments("../../.env")
+	repo := utils.CreateRepository(utils.GetFilePath())
 	s := service.NewURLService(repo)
 	h := handlers.NewHandler(s)
 	router := NewRouter(h)

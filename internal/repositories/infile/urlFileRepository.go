@@ -3,7 +3,6 @@ package infile
 import (
 	"fmt"
 	"log"
-	"os"
 	"sync"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
@@ -34,16 +33,13 @@ func (u *urlFileRepository) FindByID(urlID string) (string, error) {
 	u.mx.Lock()
 	url, ok := u.urlStorage[urlID]
 	if !ok {
-		u.mx.Unlock()
 		return "", fmt.Errorf("url with id %s not found", urlID)
 	}
 	u.mx.Unlock()
 	return url, nil
 }
 
-func New() repositories.URLRepository {
-	filePath := os.Getenv("FILE_STORAGE_PATH")
-
+func New(filePath string) repositories.URLRepository {
 	producer, producerErr := NewProducer(filePath)
 	if producerErr != nil {
 		log.Fatal(producerErr)

@@ -1,13 +1,13 @@
 package config
 
-import (
-	"os"
-)
-
 type Config struct {
-	Host string
+	Host     string
+	FilePath string
 }
 
-func New() (Config, error) {
-	return Config{os.Getenv("SERVER_ADDRESS")}, nil
+func New(serverAddress, filePath string) Config {
+	return Config{
+		Host:     serverAddress,
+		FilePath: filePath,
+	}
 }

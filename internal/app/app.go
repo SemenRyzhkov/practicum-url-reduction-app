@@ -17,7 +17,7 @@ type App struct {
 
 func New(cfg config.Config) (*App, error) {
 	log.Println("creating router")
-	urlRepository := utils.CreateRepository()
+	urlRepository := utils.CreateRepository(cfg.FilePath)
 	urlService := service.NewURLService(urlRepository)
 	urlHandler := handlers.NewHandler(urlService)
 	urlRouter := router.NewRouter(urlHandler)

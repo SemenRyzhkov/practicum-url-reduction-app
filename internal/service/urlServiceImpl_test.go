@@ -12,7 +12,7 @@ import (
 )
 
 func Test_urlServiceImpl_GetUrlById(t *testing.T) {
-	testutils.LoadEnvironments()
+	utils.LoadEnvironments("../../.env")
 	tests := []struct {
 		repo    repositories.URLRepository
 		name    string
@@ -21,14 +21,14 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			repo:    utils.CreateRepository(),
+			repo:    utils.CreateRepository(utils.GetFilePath()),
 			name:    "positive test #1",
 			want:    "yandex.com",
 			urlID:   "31aa70fc8589c52a763a2df36f304d28",
 			wantErr: false,
 		},
 		{
-			repo:    utils.CreateRepository(),
+			repo:    utils.CreateRepository(utils.GetFilePath()),
 			name:    "not found test #2",
 			want:    "yandex.com",
 			urlID:   "31aa70fc8589c52a763a2df36f304d29",
@@ -52,7 +52,7 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 }
 
 func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
-	testutils.LoadEnvironments()
+	utils.LoadEnvironments("../../.env")
 	tests := []struct {
 		repo    repositories.URLRepository
 		name    string
@@ -61,14 +61,14 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			repo:    utils.CreateRepository(),
+			repo:    utils.CreateRepository(utils.GetFilePath()),
 			name:    "positive test #1",
 			saveURL: "yandex1.com",
 			want:    "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b",
 			wantErr: false,
 		},
 		{
-			repo:    utils.CreateRepository(),
+			repo:    utils.CreateRepository(utils.GetFilePath()),
 			name:    "duplicate test #2",
 			saveURL: "yandex.com",
 			want:    "http://localhost:8080/XVlBz",
@@ -91,7 +91,7 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 }
 
 func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
-	testutils.LoadEnvironments()
+	utils.LoadEnvironments("../../.env")
 	tests := []struct {
 		repo    repositories.URLRepository
 		name    string
@@ -100,14 +100,14 @@ func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			repo:    utils.CreateRepository(),
+			repo:    utils.CreateRepository(utils.GetFilePath()),
 			name:    "reducing JSON test #1",
 			want:    entity.URLResponse{Result: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b"},
 			request: entity.URLRequest{URL: "yandex1.com"},
 			wantErr: false,
 		},
 		{
-			repo:    utils.CreateRepository(),
+			repo:    utils.CreateRepository(utils.GetFilePath()),
 			name:    "duplicate test #2",
 			want:    entity.URLResponse{Result: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b"},
 			request: entity.URLRequest{URL: "yandex1.com"},

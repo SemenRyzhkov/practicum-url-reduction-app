@@ -9,11 +9,11 @@ import (
 
 type gzipWriter struct {
 	http.ResponseWriter
-	Writer io.Writer
+	writer io.Writer
 }
 
 func (w gzipWriter) Write(b []byte) (int, error) {
-	return w.Writer.Write(b)
+	return w.writer.Write(b)
 }
 
 func CompressResponse(next http.Handler) http.Handler {
@@ -31,6 +31,6 @@ func CompressResponse(next http.Handler) http.Handler {
 		defer gz.Close()
 
 		w.Header().Set("Content-Encoding", "gzip")
-		next.ServeHTTP(gzipWriter{ResponseWriter: w, Writer: gz}, r)
+		next.ServeHTTP(gzipWriter{ResponseWriter: w, writer: gz}, r)
 	})
 }
