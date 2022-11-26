@@ -11,12 +11,14 @@ const (
 	reduceURLPath       = "/"
 	getURLPath          = "/{id}"
 	reduceURLToJSONPath = "/api/shorten"
+	allURLPath          = "/api/user/urls"
 )
 
 func NewRouter(h handlers.URLHandler) chi.Router {
 	r := chi.NewRouter()
 	r.Use(middleware.DecompressRequest, middleware.CompressResponse)
 	r.Get(getURLPath, h.GetURLByID)
+	r.Get(allURLPath, h.GetAllURL)
 	r.Post(reduceURLPath, h.ReduceURL)
 	r.Post(reduceURLToJSONPath, h.ReduceURLTOJSON)
 	return r

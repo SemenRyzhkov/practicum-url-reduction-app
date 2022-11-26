@@ -1,4 +1,4 @@
-package service
+package urlService
 
 import (
 	"testing"
@@ -12,7 +12,7 @@ import (
 )
 
 func Test_urlServiceImpl_GetUrlById(t *testing.T) {
-	utils.LoadEnvironments("../../.env")
+	utils.LoadEnvironments("../../../.env")
 	tests := []struct {
 		repo    repositories.URLRepository
 		name    string
@@ -52,7 +52,7 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 }
 
 func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
-	utils.LoadEnvironments("../../.env")
+	utils.LoadEnvironments("../../../.env")
 	tests := []struct {
 		repo    repositories.URLRepository
 		name    string
@@ -91,7 +91,7 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 }
 
 func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
-	utils.LoadEnvironments("../../.env")
+	utils.LoadEnvironments("../../../.env")
 	tests := []struct {
 		repo    repositories.URLRepository
 		name    string

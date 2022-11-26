@@ -1,4 +1,4 @@
-package service
+package urlService
 
 import (
 	"crypto/md5"

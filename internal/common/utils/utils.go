@@ -20,6 +20,10 @@ func GetServerAddress() string {
 	return os.Getenv("SERVER_ADDRESS")
 }
 
+func GetKey() string {
+	return os.Getenv("SECRET_KEY")
+}
+
 func LoadEnvironments(envFilePath string) {
 	err := godotenv.Load(envFilePath)
 

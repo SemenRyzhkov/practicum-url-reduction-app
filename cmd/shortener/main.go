@@ -18,7 +18,8 @@ func main() {
 
 	serverAddress := utils.GetServerAddress()
 	filePath := utils.GetFilePath()
-	cfg := config.New(serverAddress, filePath)
+	key := utils.GetKey()
+	cfg := config.New(serverAddress, filePath, key)
 
 	a, err := app.New(cfg)
 	if err != nil {

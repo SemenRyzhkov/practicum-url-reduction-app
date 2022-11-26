@@ -1,4 +1,4 @@
-package service
+package urlService
 
 import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"

@@ -17,7 +17,7 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/urlService"
 )
 
 const (
@@ -28,7 +28,7 @@ const (
 func setupTestServer() *httptest.Server {
 	utils.LoadEnvironments("../../.env")
 	repo := utils.CreateRepository(utils.GetFilePath())
-	s := service.NewURLService(repo)
+	s := urlService.NewURLService(repo)
 	h := handlers.NewHandler(s)
 	router := NewRouter(h)
 	return httptest.NewServer(router)
