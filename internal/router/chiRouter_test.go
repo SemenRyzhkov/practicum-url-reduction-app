@@ -17,6 +17,7 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/cookieService"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/urlService"
 )
 
@@ -28,15 +29,20 @@ const (
 func setupTestServer() *httptest.Server {
 	utils.LoadEnvironments("../../.env")
 	repo := utils.CreateRepository(utils.GetFilePath())
-	s := urlService.NewURLService(repo)
-	h := handlers.NewHandler(s)
+	us := urlService.NewURLService(repo)
+	cs := cookieService.New(utils.GetKey())
+	h := handlers.NewHandler(us, cs)
 	router := NewRouter(h)
-	return httptest.NewServer(router)
+	ts := httptest.NewServer(router)
+	recorder := httptest.NewRecorder()
+	http.SetCookie(recorder, &http.Cookie{Name: "test", Value: "expected"})
+	return ts
 }
 
 func testRequest(t *testing.T, ts *httptest.Server, method, path, body string) *http.Request {
 	var req *http.Request
 	var err error
+
 	if method == http.MethodGet {
 		req, err = http.NewRequest(method, ts.URL+path, nil)
 		require.NoError(t, err)
@@ -74,6 +80,7 @@ func TestNewRouter(t *testing.T) {
 	defer resp.Body.Close()
 
 	req = testRequest(t, ts, "GET", "/1f67218b4bfbc6af9e52d502c3e5ef3d", "")
+	req.Header["Cookie"] = append(req.Header["Cookie"], resp.Header.Get("Set-Cookie"))
 	transport := http.Transport{}
 	resp, err = transport.RoundTrip(req)
 	require.NoError(t, err)
@@ -103,6 +110,7 @@ func TestNewRouterReducingJSON(t *testing.T) {
 	defer resp.Body.Close()
 
 	req = testRequest(t, ts, "GET", "/1f67218b4bfbc6af9e52d502c3e5ef3d", "")
+	req.Header["Cookie"] = append(req.Header["Cookie"], resp.Header.Get("Set-Cookie"))
 	transport := http.Transport{}
 	resp, err = transport.RoundTrip(req)
 	require.NoError(t, err)

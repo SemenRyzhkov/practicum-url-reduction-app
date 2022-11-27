@@ -19,6 +19,7 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 		urlID   string
 		want    string
 		wantErr bool
+		userID  string
 	}{
 		{
 			repo:    utils.CreateRepository(utils.GetFilePath()),
@@ -26,6 +27,7 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 			want:    "yandex.com",
 			urlID:   "31aa70fc8589c52a763a2df36f304d28",
 			wantErr: false,
+			userID:  "dec27dda-6249-4f49-be71-4f56fc5ee540",
 		},
 		{
 			repo:    utils.CreateRepository(utils.GetFilePath()),
@@ -33,14 +35,15 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 			want:    "yandex.com",
 			urlID:   "31aa70fc8589c52a763a2df36f304d29",
 			wantErr: true,
+			userID:  "dec27dda-6249-4f49-be71-4f56fc5ee540",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			u := NewURLService(tt.repo)
-			u.ReduceAndSaveURL(tt.want)
+			u.ReduceAndSaveURL(tt.userID, tt.want)
 
-			got, err := u.GetURLByID(tt.urlID)
+			got, err := u.GetURLByID(tt.userID, tt.urlID)
 			if tt.wantErr {
 				assert.NotNil(t, err)
 			} else {
@@ -59,6 +62,7 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 		saveURL string
 		want    string
 		wantErr bool
+		userID  string
 	}{
 		{
 			repo:    utils.CreateRepository(utils.GetFilePath()),
@@ -66,6 +70,7 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 			saveURL: "yandex1.com",
 			want:    "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b",
 			wantErr: false,
+			userID:  "dec27dda-6249-4f49-be71-4f56fc5ee540",
 		},
 		{
 			repo:    utils.CreateRepository(utils.GetFilePath()),
@@ -73,14 +78,15 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 			saveURL: "yandex.com",
 			want:    "http://localhost:8080/XVlBz",
 			wantErr: true,
+			userID:  "dec27dda-6249-4f49-be71-4f56fc5ee540",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			u := NewURLService(tt.repo)
-			got, _ := u.ReduceAndSaveURL(tt.saveURL)
+			got, _ := u.ReduceAndSaveURL(tt.userID, tt.saveURL)
 			if tt.wantErr {
-				_, err := u.ReduceAndSaveURL(tt.saveURL)
+				_, err := u.ReduceAndSaveURL(tt.userID, tt.saveURL)
 				assert.NotNil(t, err)
 			} else {
 				assert.Equal(t, tt.want, got)
@@ -98,6 +104,7 @@ func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
 		request entity.URLRequest
 		want    entity.URLResponse
 		wantErr bool
+		userID  string
 	}{
 		{
 			repo:    utils.CreateRepository(utils.GetFilePath()),
@@ -105,6 +112,7 @@ func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
 			want:    entity.URLResponse{Result: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b"},
 			request: entity.URLRequest{URL: "yandex1.com"},
 			wantErr: false,
+			userID:  "dec27dda-6249-4f49-be71-4f56fc5ee540",
 		},
 		{
 			repo:    utils.CreateRepository(utils.GetFilePath()),
@@ -112,14 +120,15 @@ func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
 			want:    entity.URLResponse{Result: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b"},
 			request: entity.URLRequest{URL: "yandex1.com"},
 			wantErr: true,
+			userID:  "dec27dda-6249-4f49-be71-4f56fc5ee540",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			u := NewURLService(tt.repo)
-			got, _ := u.ReduceURLToJSON(tt.request)
+			got, _ := u.ReduceURLToJSON(tt.userID, tt.request)
 			if tt.wantErr {
-				_, err := u.ReduceURLToJSON(tt.request)
+				_, err := u.ReduceURLToJSON(tt.userID, tt.request)
 				assert.NotNil(t, err)
 			} else {
 				assert.Equalf(t, tt.want, got, "ReduceURLToJSON(%v)", tt.request)

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -34,7 +35,10 @@ func LoadEnvironments(envFilePath string) {
 
 func CreateRepository(filePath string) repositories.URLRepository {
 	if len(strings.TrimSpace(filePath)) != 0 {
+		fmt.Println("in File")
+
 		return infile.New(filePath)
 	}
+	fmt.Println("in Memory")
 	return inmemory.New()
 }

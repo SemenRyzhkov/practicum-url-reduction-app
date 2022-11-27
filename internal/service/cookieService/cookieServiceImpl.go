@@ -30,10 +30,29 @@ func New(key string) CookieService {
 	return &cookieServiceImpl{secretKey}
 }
 
-func (c cookieServiceImpl) WriteSigned(w http.ResponseWriter) error {
+func (c cookieServiceImpl) GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(
+	w http.ResponseWriter,
+	r *http.Request, name string) (string, error) {
+	userID, err := c.readSigned(r, name)
+	if err == nil {
+		return userID, nil
+	}
+
+	if errors.Is(err, http.ErrNoCookie) || errors.Is(err, ErrInvalidValue) {
+		userID, writeErr := c.writeSigned(w)
+		if writeErr == nil {
+			return userID, nil
+		}
+		return "", writeErr
+	}
+	return "", err
+}
+
+func (c cookieServiceImpl) writeSigned(w http.ResponseWriter) (string, error) {
+	userID := uuid.New().String()
 	cookie := http.Cookie{
 		Name:     "userID",
-		Value:    uuid.New().String(),
+		Value:    userID,
 		MaxAge:   3600,
 		HttpOnly: true,
 		Secure:   true,
@@ -45,11 +64,11 @@ func (c cookieServiceImpl) WriteSigned(w http.ResponseWriter) error {
 
 	cookie.Value = string(signature) + cookie.Value
 
-	return write(w, cookie)
+	return userID, write(w, cookie)
 
 }
 
-func (c cookieServiceImpl) ReadSigned(r *http.Request, name string) (string, error) {
+func (c cookieServiceImpl) readSigned(r *http.Request, name string) (string, error) {
 	// {signature}{original value}
 	signedValue, err := read(r, name)
 	if err != nil {

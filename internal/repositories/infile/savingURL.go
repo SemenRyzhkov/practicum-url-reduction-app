@@ -1,6 +1,7 @@
 package infile
 
 type savingURL struct {
-	URLID string `json:"urlID"`
-	URL   string `json:"url"`
+	UserID string `json:"userID"`
+	URLID  string `json:"urlID"`
+	URL    string `json:"url"`
 }

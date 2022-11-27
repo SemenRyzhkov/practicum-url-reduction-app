@@ -22,26 +22,30 @@ func NewURLService(urlRepository repositories.URLRepository) URLService {
 	}
 }
 
-func (u *urlServiceImpl) ReduceURLToJSON(request entity.URLRequest) (entity.URLResponse, error) {
+func (u *urlServiceImpl) GetAllByUserID(userID string) ([]entity.FullURL, error) {
+	return u.urlRepository.GetAllByUserID(userID)
+}
+
+func (u *urlServiceImpl) ReduceURLToJSON(userID string, request entity.URLRequest) (entity.URLResponse, error) {
 	reduceURL := reducing(request.URL)
-	duplicateErr := u.urlRepository.Save(reduceURL, request.URL)
+	duplicateErr := u.urlRepository.Save(userID, reduceURL, request.URL)
 	if duplicateErr != nil {
 		return entity.URLResponse{}, duplicateErr
 	}
 	return entity.URLResponse{Result: fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL)}, nil
 }
 
-func (u *urlServiceImpl) ReduceAndSaveURL(url string) (string, error) {
+func (u *urlServiceImpl) ReduceAndSaveURL(userID, url string) (string, error) {
 	reduceURL := reducing(url)
-	duplicateErr := u.urlRepository.Save(reduceURL, url)
+	duplicateErr := u.urlRepository.Save(userID, reduceURL, url)
 	if duplicateErr != nil {
 		return "", duplicateErr
 	}
 	return fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL), nil
 }
 
-func (u *urlServiceImpl) GetURLByID(urlID string) (string, error) {
-	return u.urlRepository.FindByID(urlID)
+func (u *urlServiceImpl) GetURLByID(userID, urlID string) (string, error) {
+	return u.urlRepository.FindByID(userID, urlID)
 }
 
 func reducing(url string) string {

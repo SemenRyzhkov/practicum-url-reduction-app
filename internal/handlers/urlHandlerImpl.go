@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 
@@ -19,14 +18,19 @@ type urlHandlerImpl struct {
 }
 
 func (h *urlHandlerImpl) GetAllURL(writer http.ResponseWriter, request *http.Request) {
-	userID, errNoCookie := h.cookieService.ReadSigned(request, "userID")
-	if errNoCookie == nil {
-		fmt.Println(userID)
-		return
-	} else {
-		h.cookieService.WriteSigned(writer)
+	userID, cookieErr := h.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
+	if cookieErr != nil {
+		http.Error(writer, cookieErr.Error(), http.StatusBadRequest)
 	}
-
+	userURLList, notFoundErr := h.urlService.GetAllByUserID(userID)
+	if notFoundErr != nil {
+		http.Error(writer, notFoundErr.Error(), http.StatusNoContent)
+	}
+	writer.WriteHeader(http.StatusOK)
+	writeErr := json.NewEncoder(writer).Encode(userURLList)
+	if writeErr != nil {
+		http.Error(writer, writeErr.Error(), http.StatusBadRequest)
+	}
 }
 
 func NewHandler(urlService urlService.URLService, cookieService cookieService.CookieService) URLHandler {
@@ -34,13 +38,17 @@ func NewHandler(urlService urlService.URLService, cookieService cookieService.Co
 }
 
 func (h *urlHandlerImpl) ReduceURLTOJSON(writer http.ResponseWriter, request *http.Request) {
+	userID, cookieErr := h.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
+	if cookieErr != nil {
+		http.Error(writer, cookieErr.Error(), http.StatusBadRequest)
+	}
 	writer.Header().Set("Content-Type", "application/json")
 	var urlRequest entity.URLRequest
 	err := json.NewDecoder(request.Body).Decode(&urlRequest)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 	}
-	urlResponse, err := h.urlService.ReduceURLToJSON(urlRequest)
+	urlResponse, err := h.urlService.ReduceURLToJSON(userID, urlRequest)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 		return
@@ -54,30 +62,39 @@ func (h *urlHandlerImpl) ReduceURLTOJSON(writer http.ResponseWriter, request *ht
 }
 
 func (h *urlHandlerImpl) ReduceURL(writer http.ResponseWriter, request *http.Request) {
+	userID, cookieErr := h.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
+	if cookieErr != nil {
+		http.Error(writer, cookieErr.Error(), http.StatusBadRequest)
+	}
 	b, err := io.ReadAll(request.Body)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 	}
-	if reduceURL, err := h.urlService.ReduceAndSaveURL(string(b)); err != nil {
+	reduceURL, err := h.urlService.ReduceAndSaveURL(userID, string(b))
+	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
-	} else {
-		writer.WriteHeader(http.StatusCreated)
-		writer.Write([]byte(reduceURL))
 	}
+	writer.WriteHeader(http.StatusCreated)
+	writer.Write([]byte(reduceURL))
+
 }
 
-func (h *urlHandlerImpl) GetURLByID(writer http.ResponseWriter, r *http.Request) {
-	urlID := chi.URLParam(r, "id")
+func (h *urlHandlerImpl) GetURLByID(writer http.ResponseWriter, request *http.Request) {
+	userID, cookieErr := h.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
+	if cookieErr != nil {
+		http.Error(writer, cookieErr.Error(), http.StatusBadRequest)
+	}
+	urlID := chi.URLParam(request, "id")
 	if urlID == "" {
 		http.Error(writer, "urlID param is missing", http.StatusBadRequest)
 		return
 	}
-	url, err := h.urlService.GetURLByID(urlID)
+	url, err := h.urlService.GetURLByID(userID, urlID)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusNotFound)
 		return
-	} else {
-		writer.Header().Add("Location", url)
-		writer.WriteHeader(http.StatusTemporaryRedirect)
 	}
+	writer.Header().Add("Location", url)
+	writer.WriteHeader(http.StatusTemporaryRedirect)
+
 }
