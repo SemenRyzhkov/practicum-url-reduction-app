@@ -127,6 +127,7 @@ func TestNewRouterGetAll(t *testing.T) {
 	req := testJSONRequest(t, ts)
 	resp, err := http.DefaultClient.Do(req)
 	require.NoError(t, err)
+	defer resp.Body.Close()
 
 	req = testRequest(t, ts, "GET", "/api/user/urls", "")
 	req.Header["Cookie"] = append(req.Header["Cookie"], resp.Header.Get("Set-Cookie"))
@@ -136,6 +137,7 @@ func TestNewRouterGetAll(t *testing.T) {
 
 	var actualURLsList []entity.FullURL
 	err = json.NewDecoder(resp.Body).Decode(&actualURLsList)
+	require.NoError(t, err)
 	assert.Equal(t, expectedURLsList, actualURLsList)
 	defer resp.Body.Close()
 	testutils.AfterTest()
