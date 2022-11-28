@@ -46,6 +46,7 @@ func (h *urlHandlerImpl) ReduceURLTOJSON(writer http.ResponseWriter, request *ht
 		http.Error(writer, cookieErr.Error(), http.StatusBadRequest)
 	}
 	writer.Header().Set("Content-Type", "application/json")
+	writer.Header().Set("Authorization", userID)
 	var urlRequest entity.URLRequest
 	err := json.NewDecoder(request.Body).Decode(&urlRequest)
 	if err != nil {
