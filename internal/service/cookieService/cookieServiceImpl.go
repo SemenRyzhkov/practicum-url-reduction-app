@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -63,6 +64,7 @@ func (c cookieServiceImpl) writeSigned(w http.ResponseWriter) (string, error) {
 	signature := mac.Sum(nil)
 
 	cookie.Value = string(signature) + cookie.Value
+	fmt.Println("Write userID " + userID)
 
 	return userID, write(w, cookie)
 
@@ -81,7 +83,7 @@ func (c cookieServiceImpl) readSigned(r *http.Request, name string) (string, err
 
 	signature := signedValue[:sha256.Size]
 	value := signedValue[sha256.Size:]
-
+	fmt.Println("read userID " + value)
 	mac := hmac.New(sha256.New, c.secretKey)
 	mac.Write([]byte(name))
 	mac.Write([]byte(value))

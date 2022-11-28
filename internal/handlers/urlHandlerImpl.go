@@ -26,6 +26,7 @@ func (h *urlHandlerImpl) GetAllURL(writer http.ResponseWriter, request *http.Req
 	if notFoundErr != nil {
 		http.Error(writer, notFoundErr.Error(), http.StatusNoContent)
 	}
+	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
 	writeErr := json.NewEncoder(writer).Encode(userURLList)
 	if writeErr != nil {

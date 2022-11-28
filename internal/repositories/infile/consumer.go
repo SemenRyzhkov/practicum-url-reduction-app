@@ -3,7 +3,6 @@ package infile
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 )
@@ -40,8 +39,7 @@ func (c *consumer) initializeStorage() map[string]map[string]string {
 		userURLStorage[reduceURL.URLID] = reduceURL.URL
 		initializedStorage[reduceURL.UserID] = userURLStorage
 		initializedCommonStorage[reduceURL.URLID] = reduceURL.URL
-		fmt.Println(initializedStorage)
-		fmt.Println(initializedCommonStorage)
+		//fmt.Println(initializedCommonStorage)
 	}
 	if err := c.scanner.Err(); err != nil {
 		log.Fatal(err)

@@ -33,10 +33,7 @@ func setupTestServer() *httptest.Server {
 	cs := cookieService.New(utils.GetKey())
 	h := handlers.NewHandler(us, cs)
 	router := NewRouter(h)
-	ts := httptest.NewServer(router)
-	recorder := httptest.NewRecorder()
-	http.SetCookie(recorder, &http.Cookie{Name: "test", Value: "expected"})
-	return ts
+	return httptest.NewServer(router)
 }
 
 func testRequest(t *testing.T, ts *httptest.Server, method, path, body string) *http.Request {
