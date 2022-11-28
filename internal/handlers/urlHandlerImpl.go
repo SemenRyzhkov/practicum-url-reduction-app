@@ -41,7 +41,7 @@ func NewHandler(urlService urlService.URLService, cookieService cookieService.Co
 }
 
 func (h *urlHandlerImpl) ReduceURLTOJSON(writer http.ResponseWriter, request *http.Request) {
-	userID, cookieErr := h.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
+	userID, cookieErr := h.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "Authorization")
 	if cookieErr != nil {
 		http.Error(writer, cookieErr.Error(), http.StatusBadRequest)
 	}
@@ -65,7 +65,7 @@ func (h *urlHandlerImpl) ReduceURLTOJSON(writer http.ResponseWriter, request *ht
 }
 
 func (h *urlHandlerImpl) ReduceURL(writer http.ResponseWriter, request *http.Request) {
-	userID, cookieErr := h.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
+	userID, cookieErr := h.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "Authorization")
 	if cookieErr != nil {
 		http.Error(writer, cookieErr.Error(), http.StatusBadRequest)
 	}

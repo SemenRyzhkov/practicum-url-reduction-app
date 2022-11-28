@@ -54,7 +54,7 @@ func (c cookieServiceImpl) GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingO
 func (c cookieServiceImpl) writeSigned(w http.ResponseWriter) (string, error) {
 	userID := uuid.New().String()
 	cookie := http.Cookie{
-		Name:     "userID",
+		Name:     "Authorization",
 		Value:    userID,
 		MaxAge:   3600,
 		HttpOnly: true,
