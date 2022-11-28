@@ -44,6 +44,7 @@ func (h *urlHandlerImpl) ReduceURLTOJSON(writer http.ResponseWriter, request *ht
 	userID, cookieErr := h.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
 	if cookieErr != nil {
 		http.Error(writer, cookieErr.Error(), http.StatusBadRequest)
+		return
 	}
 	writer.Header().Set("Content-Type", "application/json")
 	var urlRequest entity.URLRequest
@@ -68,6 +69,7 @@ func (h *urlHandlerImpl) ReduceURL(writer http.ResponseWriter, request *http.Req
 	userID, cookieErr := h.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
 	if cookieErr != nil {
 		http.Error(writer, cookieErr.Error(), http.StatusBadRequest)
+		return
 	}
 	b, err := io.ReadAll(request.Body)
 	if err != nil {

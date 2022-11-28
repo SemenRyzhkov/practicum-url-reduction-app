@@ -43,7 +43,11 @@ func (u *urlFileRepository) Save(userID, urlID, url string) error {
 	u.commonURLStorage[urlID] = url
 	fmt.Println(u.urlStorage)
 	u.mx.Unlock()
-	savingURL := savingURL{userID, urlID, url}
+	savingURL := savingURL{
+		UserID: userID,
+		URLID:  urlID,
+		URL:    url,
+	}
 	return u.producer.WriteURL(&savingURL)
 }
 
