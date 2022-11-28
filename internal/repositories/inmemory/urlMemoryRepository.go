@@ -12,8 +12,9 @@ import (
 var _ repositories.URLRepository = &urlMemoryRepository{}
 
 type urlMemoryRepository struct {
-	mx         sync.Mutex
-	urlStorage map[string]map[string]string
+	mx               sync.Mutex
+	commonURLStorage map[string]string
+	urlStorage       map[string]map[string]string
 }
 
 func (u *urlMemoryRepository) GetAllByUserID(userID string) ([]entity.FullURL, error) {
@@ -36,17 +37,14 @@ func (u *urlMemoryRepository) Save(userID, urlID, url string) error {
 	}
 	userURLStorage[urlID] = url
 	u.urlStorage[userID] = userURLStorage
+	u.commonURLStorage[urlID] = url
 	return nil
 }
 
-func (u *urlMemoryRepository) FindByID(userID, urlID string) (string, error) {
+func (u *urlMemoryRepository) FindByID(urlID string) (string, error) {
 	u.mx.Lock()
 	defer u.mx.Unlock()
-	userURLStorage, ok := u.urlStorage[userID]
-	if !ok {
-		return "", fmt.Errorf("user with id %s has not reducing urls", userID)
-	}
-	url, ok := userURLStorage[urlID]
+	url, ok := u.commonURLStorage[urlID]
 	if !ok {
 		return "", fmt.Errorf("url with id %s not found", urlID)
 	}
@@ -55,7 +53,8 @@ func (u *urlMemoryRepository) FindByID(userID, urlID string) (string, error) {
 
 func New() repositories.URLRepository {
 	return &urlMemoryRepository{
-		urlStorage: make(map[string]map[string]string),
+		commonURLStorage: make(map[string]string),
+		urlStorage:       make(map[string]map[string]string),
 	}
 }
 

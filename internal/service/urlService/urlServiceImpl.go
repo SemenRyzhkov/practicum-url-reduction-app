@@ -44,8 +44,8 @@ func (u *urlServiceImpl) ReduceAndSaveURL(userID, url string) (string, error) {
 	return fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL), nil
 }
 
-func (u *urlServiceImpl) GetURLByID(userID, urlID string) (string, error) {
-	return u.urlRepository.FindByID(userID, urlID)
+func (u *urlServiceImpl) GetURLByID(urlID string) (string, error) {
+	return u.urlRepository.FindByID(urlID)
 }
 
 func reducing(url string) string {

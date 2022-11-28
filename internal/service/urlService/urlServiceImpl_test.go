@@ -27,7 +27,6 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 			want:    "yandex.com",
 			urlID:   "31aa70fc8589c52a763a2df36f304d28",
 			wantErr: false,
-			userID:  "dec27dda-6249-4f49-be71-4f56fc5ee540",
 		},
 		{
 			repo:    utils.CreateRepository(utils.GetFilePath()),
@@ -35,7 +34,6 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 			want:    "yandex.com",
 			urlID:   "31aa70fc8589c52a763a2df36f304d29",
 			wantErr: true,
-			userID:  "dec27dda-6249-4f49-be71-4f56fc5ee540",
 		},
 	}
 	for _, tt := range tests {
@@ -43,7 +41,7 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 			u := NewURLService(tt.repo)
 			u.ReduceAndSaveURL(tt.userID, tt.want)
 
-			got, err := u.GetURLByID(tt.userID, tt.urlID)
+			got, err := u.GetURLByID(tt.urlID)
 			if tt.wantErr {
 				assert.NotNil(t, err)
 			} else {

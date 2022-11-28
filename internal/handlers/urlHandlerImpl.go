@@ -80,16 +80,12 @@ func (h *urlHandlerImpl) ReduceURL(writer http.ResponseWriter, request *http.Req
 }
 
 func (h *urlHandlerImpl) GetURLByID(writer http.ResponseWriter, request *http.Request) {
-	userID, cookieErr := h.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
-	if cookieErr != nil {
-		http.Error(writer, cookieErr.Error(), http.StatusBadRequest)
-	}
 	urlID := chi.URLParam(request, "id")
 	if urlID == "" {
 		http.Error(writer, "urlID param is missing", http.StatusBadRequest)
 		return
 	}
-	url, err := h.urlService.GetURLByID(userID, urlID)
+	url, err := h.urlService.GetURLByID(urlID)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusNotFound)
 		return

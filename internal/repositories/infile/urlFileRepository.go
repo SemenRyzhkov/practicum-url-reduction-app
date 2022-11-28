@@ -13,10 +13,11 @@ import (
 var _ repositories.URLRepository = &urlFileRepository{}
 
 type urlFileRepository struct {
-	mx         sync.Mutex
-	urlStorage map[string]map[string]string
-	consumer   *consumer
-	producer   *producer
+	mx               sync.Mutex
+	commonURLStorage map[string]string
+	urlStorage       map[string]map[string]string
+	consumer         *consumer
+	producer         *producer
 }
 
 func (u *urlFileRepository) GetAllByUserID(userID string) ([]entity.FullURL, error) {
@@ -39,19 +40,17 @@ func (u *urlFileRepository) Save(userID, urlID, url string) error {
 	}
 	userURLStorage[urlID] = url
 	u.urlStorage[userID] = userURLStorage
+	u.commonURLStorage[urlID] = url
 	fmt.Println(u.urlStorage)
+	fmt.Println(u.commonURLStorage)
 	u.mx.Unlock()
 	savingURL := savingURL{userID, urlID, url}
 	return u.producer.WriteURL(&savingURL)
 }
 
-func (u *urlFileRepository) FindByID(userID, urlID string) (string, error) {
+func (u *urlFileRepository) FindByID(urlID string) (string, error) {
 	u.mx.Lock()
-	userURLStorage, ok := u.urlStorage[userID]
-	if !ok {
-		return "", fmt.Errorf("user with id %s has not reducing urls", userID)
-	}
-	url, ok := userURLStorage[urlID]
+	url, ok := u.commonURLStorage[urlID]
 	u.mx.Unlock()
 	if !ok {
 		return "", fmt.Errorf("url with id %s not found", urlID)
@@ -72,8 +71,9 @@ func New(filePath string) repositories.URLRepository {
 	defer consumer.Close()
 
 	return &urlFileRepository{
-		producer:   producer,
-		urlStorage: consumer.initializeStorage(),
+		producer:         producer,
+		urlStorage:       consumer.initializeStorage(),
+		commonURLStorage: make(map[string]string),
 	}
 }
 
