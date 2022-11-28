@@ -36,7 +36,7 @@ func (c cookieServiceImpl) GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingO
 	r *http.Request, name string) (string, error) {
 	userID, err := c.readSigned(r, name)
 	fmt.Println("userID in big method " + userID)
-	fmt.Println("Errrr" + err.Error())
+	//fmt.Println("Errrr" + err.Error())
 	if err == nil {
 		return userID, nil
 	}
