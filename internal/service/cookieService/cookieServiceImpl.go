@@ -58,7 +58,7 @@ func (c cookieServiceImpl) writeSigned(w http.ResponseWriter) (string, error) {
 		Value:    userID,
 		MaxAge:   3600,
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   false,
 	}
 	mac := hmac.New(sha256.New, c.secretKey)
 	mac.Write([]byte(cookie.Name))
