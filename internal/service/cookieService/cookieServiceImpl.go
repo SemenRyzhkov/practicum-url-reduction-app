@@ -35,6 +35,8 @@ func (c cookieServiceImpl) GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingO
 	w http.ResponseWriter,
 	r *http.Request, name string) (string, error) {
 	userID, err := c.readSigned(r, name)
+	fmt.Println("userID in big method " + userID)
+
 	if err == nil {
 		return userID, nil
 	}
@@ -76,6 +78,7 @@ func (c cookieServiceImpl) readSigned(r *http.Request, name string) (string, err
 	if err != nil {
 		return "", err
 	}
+	fmt.Println("signed Value " + signedValue)
 
 	if len(signedValue) < sha256.Size {
 		return "", ErrInvalidValue
