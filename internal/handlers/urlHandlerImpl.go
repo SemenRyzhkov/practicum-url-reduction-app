@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -22,6 +23,7 @@ func (h *urlHandlerImpl) GetAllURL(writer http.ResponseWriter, request *http.Req
 	if cookieErr != nil {
 		http.Error(writer, cookieErr.Error(), http.StatusBadRequest)
 	}
+	log.Println("Get All Url for user " + userID)
 	userURLList, notFoundErr := h.urlService.GetAllByUserID(userID)
 	if notFoundErr != nil {
 		http.Error(writer, notFoundErr.Error(), http.StatusNoContent)
