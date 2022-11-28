@@ -3,6 +3,7 @@ package cookieService
 import (
 	"crypto/hmac"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -99,11 +100,11 @@ func (c cookieServiceImpl) readSigned(r *http.Request, name string) (string, err
 }
 
 func write(w http.ResponseWriter, cookie http.Cookie) error {
-	//cookie.Value = base64.URLEncoding.EncodeToString([]byte(cookie.Value))
-	//
-	//if len(cookie.String()) > 4096 {
-	//	return ErrValueTooLong
-	//}
+	cookie.Value = base64.URLEncoding.EncodeToString([]byte(cookie.Value))
+
+	if len(cookie.String()) > 4096 {
+		return ErrValueTooLong
+	}
 
 	http.SetCookie(w, &cookie)
 
@@ -114,14 +115,14 @@ func read(r *http.Request, name string) (string, error) {
 	fmt.Println("name " + name)
 	cookie, err := r.Cookie(name)
 	if err != nil {
-		fmt.Println("QQQQQQQQQq " + err.Error())
+		fmt.Println("Not found cookie " + err.Error())
 		return "", err
 	}
 
-	//value, err := base64.URLEncoding.DecodeString(cookie.Value)
-	//if err != nil {
-	//	return "", ErrInvalidValue
-	//}
+	value, err := base64.URLEncoding.DecodeString(cookie.Value)
+	if err != nil {
+		return "", ErrInvalidValue
+	}
 
-	return cookie.Value, nil
+	return string(value), nil
 }
