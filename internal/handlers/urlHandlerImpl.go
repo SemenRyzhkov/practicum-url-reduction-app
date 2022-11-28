@@ -78,6 +78,7 @@ func (h *urlHandlerImpl) ReduceURL(writer http.ResponseWriter, request *http.Req
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 	}
+	writer.Header().Set("Authorization", userID)
 	writer.WriteHeader(http.StatusCreated)
 	writer.Write([]byte(reduceURL))
 
