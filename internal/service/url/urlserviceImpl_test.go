@@ -1,4 +1,4 @@
-package urlService
+package url
 
 import (
 	"testing"
@@ -38,7 +38,7 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			u := NewURLService(tt.repo)
+			u := New(tt.repo)
 			u.ReduceAndSaveURL(tt.userID, tt.want)
 
 			got, err := u.GetURLByID(tt.urlID)
@@ -81,7 +81,7 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			u := NewURLService(tt.repo)
+			u := New(tt.repo)
 			got, _ := u.ReduceAndSaveURL(tt.userID, tt.saveURL)
 			if tt.wantErr {
 				_, err := u.ReduceAndSaveURL(tt.userID, tt.saveURL)
@@ -123,13 +123,58 @@ func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			u := NewURLService(tt.repo)
+			u := New(tt.repo)
 			got, _ := u.ReduceURLToJSON(tt.userID, tt.request)
 			if tt.wantErr {
 				_, err := u.ReduceURLToJSON(tt.userID, tt.request)
 				assert.NotNil(t, err)
 			} else {
 				assert.Equalf(t, tt.want, got, "ReduceURLToJSON(%v)", tt.request)
+			}
+		})
+		testutils.AfterTest()
+	}
+}
+
+func Test_urlServiceImpl_GetAllByUserID(t *testing.T) {
+	utils.LoadEnvironments("../../../.env")
+
+	tests := []struct {
+		repo    repositories.URLRepository
+		name    string
+		url     string
+		want    []entity.FullURL
+		wantErr bool
+		userID  string
+	}{
+		{
+			repo:    utils.CreateRepository(utils.GetFilePath()),
+			name:    "get all test #1",
+			want:    []entity.FullURL{{ShortURL: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b", OriginalURL: "yandex1.com"}},
+			url:     "yandex1.com",
+			wantErr: false,
+			userID:  "dec27dda-6249-4f49-be71-4f56fc5ee540",
+		},
+		{
+			repo:    utils.CreateRepository(utils.GetFilePath()),
+			name:    "not found test #2",
+			url:     "yandex1.com",
+			wantErr: true,
+			userID:  "dec27dda-6249-4f49-be71-4f56fc5ee540",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			u := New(tt.repo)
+			u.ReduceAndSaveURL(tt.userID, tt.url)
+
+			got, _ := u.GetAllByUserID(tt.userID)
+			if tt.wantErr {
+				wrongUserID := "dec27dda-6249-4f49-be71-4f56fc5ee541"
+				_, err := u.GetAllByUserID(wrongUserID)
+				assert.NotNil(t, err)
+			} else {
+				assert.Equal(t, tt.want, got)
 			}
 		})
 		testutils.AfterTest()

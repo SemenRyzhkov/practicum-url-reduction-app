@@ -8,8 +8,8 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/config"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/router"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/cookieService"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/urlService"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/cookie"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/url"
 )
 
 type App struct {
@@ -19,8 +19,8 @@ type App struct {
 func New(cfg config.Config) (*App, error) {
 	log.Println("creating router")
 	urlRepository := utils.CreateRepository(cfg.FilePath)
-	urlService := urlService.NewURLService(urlRepository)
-	cookieService := cookieService.New(cfg.Key)
+	urlService := url.New(urlRepository)
+	cookieService := cookie.New(cfg.Key)
 	urlHandler := handlers.NewHandler(urlService, cookieService)
 	urlRouter := router.NewRouter(urlHandler)
 

@@ -17,8 +17,8 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/cookieService"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/urlService"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/cookie"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/url"
 )
 
 const (
@@ -29,8 +29,8 @@ const (
 func setupTestServer() *httptest.Server {
 	utils.LoadEnvironments("../../.env")
 	repo := utils.CreateRepository(utils.GetFilePath())
-	us := urlService.NewURLService(repo)
-	cs := cookieService.New(utils.GetKey())
+	us := url.New(repo)
+	cs := cookie.New(utils.GetKey())
 	h := handlers.NewHandler(us, cs)
 	router := NewRouter(h)
 	return httptest.NewServer(router)
@@ -115,6 +115,28 @@ func TestNewRouterReducingJSON(t *testing.T) {
 
 	actualURL := resp.Header.Get("Location")
 	assert.Equal(t, expectedURL, actualURL)
+	defer resp.Body.Close()
+	testutils.AfterTest()
+}
+
+func TestNewRouterGetAll(t *testing.T) {
+	expectedURLsList := []entity.FullURL{{ShortURL: expectedReduceURL, OriginalURL: expectedURL}}
+	ts := setupTestServer()
+	defer ts.Close()
+
+	req := testJSONRequest(t, ts)
+	resp, err := http.DefaultClient.Do(req)
+	require.NoError(t, err)
+
+	req = testRequest(t, ts, "GET", "/api/user/urls", "")
+	req.Header["Cookie"] = append(req.Header["Cookie"], resp.Header.Get("Set-Cookie"))
+	resp, err = http.DefaultClient.Do(req)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+	var actualURLsList []entity.FullURL
+	err = json.NewDecoder(resp.Body).Decode(&actualURLsList)
+	assert.Equal(t, expectedURLsList, actualURLsList)
 	defer resp.Body.Close()
 	testutils.AfterTest()
 }

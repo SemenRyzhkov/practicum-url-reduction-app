@@ -3,19 +3,18 @@ package handlers
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/cookieService"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/urlService"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/cookie"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/url"
 )
 
 type urlHandlerImpl struct {
-	urlService    urlService.URLService
-	cookieService cookieService.CookieService
+	urlService    url.URLService
+	cookieService cookie.CookieService
 }
 
 func (h *urlHandlerImpl) GetAllURL(writer http.ResponseWriter, request *http.Request) {
@@ -23,7 +22,6 @@ func (h *urlHandlerImpl) GetAllURL(writer http.ResponseWriter, request *http.Req
 	if cookieErr != nil {
 		http.Error(writer, cookieErr.Error(), http.StatusBadRequest)
 	}
-	log.Println("Get All Url for user " + userID)
 	userURLList, notFoundErr := h.urlService.GetAllByUserID(userID)
 	if notFoundErr != nil {
 		http.Error(writer, notFoundErr.Error(), http.StatusNoContent)
@@ -36,7 +34,7 @@ func (h *urlHandlerImpl) GetAllURL(writer http.ResponseWriter, request *http.Req
 	}
 }
 
-func NewHandler(urlService urlService.URLService, cookieService cookieService.CookieService) URLHandler {
+func NewHandler(urlService url.URLService, cookieService cookie.CookieService) URLHandler {
 	return &urlHandlerImpl{urlService, cookieService}
 }
 

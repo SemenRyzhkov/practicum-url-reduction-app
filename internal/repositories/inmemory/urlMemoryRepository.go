@@ -18,11 +18,11 @@ type urlMemoryRepository struct {
 }
 
 func (u *urlMemoryRepository) GetAllByUserID(userID string) ([]entity.FullURL, error) {
-	userURlMap, ok := u.urlStorage[userID]
+	userURLMap, ok := u.urlStorage[userID]
 	if !ok {
 		return nil, fmt.Errorf("user with id %s has not URL's", userID)
 	}
-	return mapper.FromMapToSliceOfFullURL(userURlMap), nil
+	return mapper.FromMapToSliceOfFullURL(userURLMap), nil
 }
 
 func (u *urlMemoryRepository) Save(userID, urlID, url string) error {

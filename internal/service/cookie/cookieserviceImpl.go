@@ -1,4 +1,4 @@
-package cookieService
+package cookie
 
 import (
 	"crypto/hmac"
@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -35,8 +34,6 @@ func (c cookieServiceImpl) GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingO
 	w http.ResponseWriter,
 	r *http.Request, name string) (string, error) {
 	userID, err := c.readSigned(r, name)
-	fmt.Println("userID in big method " + userID)
-	//fmt.Println("Errrr" + err.Error())
 	if err == nil {
 		return userID, nil
 	}
@@ -66,10 +63,8 @@ func (c cookieServiceImpl) writeSigned(w http.ResponseWriter) (string, error) {
 	signature := mac.Sum(nil)
 
 	cookie.Value = string(signature) + cookie.Value
-	fmt.Println("Write userID " + userID)
 
 	return userID, write(w, cookie)
-
 }
 
 func (c cookieServiceImpl) readSigned(r *http.Request, name string) (string, error) {
@@ -78,7 +73,6 @@ func (c cookieServiceImpl) readSigned(r *http.Request, name string) (string, err
 	if err != nil {
 		return "", err
 	}
-	fmt.Println("signed Value " + signedValue)
 
 	if len(signedValue) < sha256.Size {
 		return "", ErrInvalidValue
@@ -86,7 +80,6 @@ func (c cookieServiceImpl) readSigned(r *http.Request, name string) (string, err
 
 	signature := signedValue[:sha256.Size]
 	value := signedValue[sha256.Size:]
-	fmt.Println("read userID " + value)
 	mac := hmac.New(sha256.New, c.secretKey)
 	mac.Write([]byte(name))
 	mac.Write([]byte(value))
@@ -112,10 +105,8 @@ func write(w http.ResponseWriter, cookie http.Cookie) error {
 }
 
 func read(r *http.Request, name string) (string, error) {
-	fmt.Println("name " + name)
 	cookie, err := r.Cookie(name)
 	if err != nil {
-		fmt.Println("Not found cookie " + err.Error())
 		return "", err
 	}
 

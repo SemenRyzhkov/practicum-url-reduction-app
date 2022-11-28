@@ -1,4 +1,4 @@
-package urlService
+package url
 
 import (
 	"crypto/md5"
@@ -16,7 +16,7 @@ type urlServiceImpl struct {
 	urlRepository repositories.URLRepository
 }
 
-func NewURLService(urlRepository repositories.URLRepository) URLService {
+func New(urlRepository repositories.URLRepository) URLService {
 	return &urlServiceImpl{
 		urlRepository,
 	}
