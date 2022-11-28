@@ -112,6 +112,7 @@ func write(w http.ResponseWriter, cookie http.Cookie) error {
 }
 
 func read(r *http.Request, name string) (string, error) {
+	fmt.Println("name " + name)
 	cookie, err := r.Cookie(name)
 	if err != nil {
 		fmt.Println("QQQQQQQQQq " + err.Error())
