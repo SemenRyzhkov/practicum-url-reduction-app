@@ -17,6 +17,7 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers/dbhandler"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/cookie"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/url"
 )
@@ -32,7 +33,8 @@ func setupTestServer() *httptest.Server {
 	us := url.New(repo)
 	cs := cookie.New(utils.GetKey())
 	h := handlers.NewHandler(us, cs)
-	router := NewRouter(h)
+	db := dbhandler.NewDBHandler(utils.GetDBAddress())
+	router := NewRouter(h, db)
 	return httptest.NewServer(router)
 }
 

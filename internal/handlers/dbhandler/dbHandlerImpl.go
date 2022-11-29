@@ -1,4 +1,4 @@
-package dbHandler
+package dbhandler
 
 import (
 	"database/sql"
