@@ -25,6 +25,10 @@ func GetKey() string {
 	return os.Getenv("SECRET_KEY")
 }
 
+func GetDBAddress() string {
+	return os.Getenv("DATABASE_DSN")
+}
+
 func LoadEnvironments(envFilePath string) {
 	err := godotenv.Load(envFilePath)
 

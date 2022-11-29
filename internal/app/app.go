@@ -7,6 +7,7 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/config"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers/dbHandler"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/router"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/cookie"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/url"
@@ -22,7 +23,8 @@ func New(cfg config.Config) (*App, error) {
 	urlService := url.New(urlRepository)
 	cookieService := cookie.New(cfg.Key)
 	urlHandler := handlers.NewHandler(urlService, cookieService)
-	urlRouter := router.NewRouter(urlHandler)
+	dbHandler := dbHandler.NewDBHandler(cfg.DataBaseAddress)
+	urlRouter := router.NewRouter(urlHandler, dbHandler)
 
 	server := &http.Server{
 		Addr:    cfg.Host,

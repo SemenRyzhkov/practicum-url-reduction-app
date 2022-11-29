@@ -8,6 +8,8 @@ require (
 	github.com/joho/godotenv v1.4.0
 )
 
+require github.com/lib/pq v1.10.7 // indirect
+
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

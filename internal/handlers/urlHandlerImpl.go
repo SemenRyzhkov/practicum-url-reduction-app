@@ -17,6 +17,10 @@ type urlHandlerImpl struct {
 	cookieService cookie.CookieService
 }
 
+func NewHandler(urlService url.URLService, cookieService cookie.CookieService) URLHandler {
+	return &urlHandlerImpl{urlService, cookieService}
+}
+
 func (h *urlHandlerImpl) GetAllURL(writer http.ResponseWriter, request *http.Request) {
 	userID, cookieErr := h.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
 	if cookieErr != nil {
@@ -32,10 +36,6 @@ func (h *urlHandlerImpl) GetAllURL(writer http.ResponseWriter, request *http.Req
 	if writeErr != nil {
 		http.Error(writer, writeErr.Error(), http.StatusBadRequest)
 	}
-}
-
-func NewHandler(urlService url.URLService, cookieService cookie.CookieService) URLHandler {
-	return &urlHandlerImpl{urlService, cookieService}
 }
 
 func (h *urlHandlerImpl) ReduceURLTOJSON(writer http.ResponseWriter, request *http.Request) {
@@ -95,5 +95,4 @@ func (h *urlHandlerImpl) GetURLByID(writer http.ResponseWriter, request *http.Re
 	}
 	writer.Header().Add("Location", url)
 	writer.WriteHeader(http.StatusTemporaryRedirect)
-
 }
