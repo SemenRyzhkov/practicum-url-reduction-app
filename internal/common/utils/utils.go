@@ -41,6 +41,7 @@ func LoadEnvironments(envFilePath string) {
 func CreateRepository(filePath, dbAddress string) repositories.URLRepository {
 	if len(strings.TrimSpace(dbAddress)) != 0 {
 		fmt.Println("in dataBase")
+		fmt.Println(dbAddress)
 		return indatabase.New(dbAddress)
 	}
 
