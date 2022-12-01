@@ -100,11 +100,11 @@ func initDB(dbAddress string) *sql.DB {
 }
 
 func createTableIfNotExists(db *sql.DB) {
-	//_, err := db.Exec(initDBQuery)
-	//
-	//if err != nil {
-	//	fmt.Println("create err " + err.Error())
-	//	log.Fatal(err)
-	//}
+	_, err := db.Exec(initDBQuery)
+
+	if err != nil {
+		fmt.Println("create err " + err.Error())
+		log.Fatal(err)
+	}
 	fmt.Println("2Successful")
 }
