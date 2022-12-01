@@ -8,16 +8,16 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/cookie"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/url"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/cookieservice"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/urlservice"
 )
 
 type urlHandlerImpl struct {
-	urlService    url.URLService
-	cookieService cookie.CookieService
+	urlService    urlservice.URLService
+	cookieService cookieservice.CookieService
 }
 
-func NewHandler(urlService url.URLService, cookieService cookie.CookieService) URLHandler {
+func NewHandler(urlService urlservice.URLService, cookieService cookieservice.CookieService) URLHandler {
 	return &urlHandlerImpl{urlService, cookieService}
 }
 
@@ -26,7 +26,7 @@ func (h *urlHandlerImpl) GetAllURL(writer http.ResponseWriter, request *http.Req
 	if cookieErr != nil {
 		http.Error(writer, cookieErr.Error(), http.StatusBadRequest)
 	}
-	userURLList, notFoundErr := h.urlService.GetAllByUserID(userID)
+	userURLList, notFoundErr := h.urlService.GetAllByUserID(request.Context(), userID)
 	if notFoundErr != nil {
 		http.Error(writer, notFoundErr.Error(), http.StatusNoContent)
 	}
@@ -50,7 +50,7 @@ func (h *urlHandlerImpl) ReduceURLTOJSON(writer http.ResponseWriter, request *ht
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 	}
-	urlResponse, err := h.urlService.ReduceURLToJSON(userID, urlRequest)
+	urlResponse, err := h.urlService.ReduceURLToJSON(request.Context(), userID, urlRequest)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 		return
@@ -73,7 +73,7 @@ func (h *urlHandlerImpl) ReduceURL(writer http.ResponseWriter, request *http.Req
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 	}
-	reduceURL, err := h.urlService.ReduceAndSaveURL(userID, string(b))
+	reduceURL, err := h.urlService.ReduceAndSaveURL(request.Context(), userID, string(b))
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 	}
@@ -88,7 +88,7 @@ func (h *urlHandlerImpl) GetURLByID(writer http.ResponseWriter, request *http.Re
 		http.Error(writer, "urlID param is missing", http.StatusBadRequest)
 		return
 	}
-	url, err := h.urlService.GetURLByID(urlID)
+	url, err := h.urlService.GetURLByID(request.Context(), urlID)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusNotFound)
 		return

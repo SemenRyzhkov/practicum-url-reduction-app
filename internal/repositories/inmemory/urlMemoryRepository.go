@@ -1,6 +1,7 @@
 package inmemory
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
@@ -17,7 +18,7 @@ type urlMemoryRepository struct {
 	urlStorage       map[string]map[string]string
 }
 
-func (u *urlMemoryRepository) GetAllByUserID(userID string) ([]entity.FullURL, error) {
+func (u *urlMemoryRepository) GetAllByUserID(_ context.Context, userID string) ([]entity.FullURL, error) {
 	userURLMap, ok := u.urlStorage[userID]
 	if !ok {
 		return nil, fmt.Errorf("user with id %s has not URL's", userID)
@@ -25,7 +26,7 @@ func (u *urlMemoryRepository) GetAllByUserID(userID string) ([]entity.FullURL, e
 	return mapper.FromMapToSliceOfFullURL(userURLMap), nil
 }
 
-func (u *urlMemoryRepository) Save(userID, urlID, url string) error {
+func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string) error {
 	u.mx.Lock()
 	defer u.mx.Unlock()
 	userURLStorage, ok := u.urlStorage[userID]
@@ -33,7 +34,7 @@ func (u *urlMemoryRepository) Save(userID, urlID, url string) error {
 		userURLStorage = make(map[string]string)
 	}
 	if isExist(userURLStorage, urlID) {
-		return fmt.Errorf("url %s already exist", url)
+		return fmt.Errorf("urlservice %s already exist", url)
 	}
 	userURLStorage[urlID] = url
 	u.urlStorage[userID] = userURLStorage
@@ -41,12 +42,12 @@ func (u *urlMemoryRepository) Save(userID, urlID, url string) error {
 	return nil
 }
 
-func (u *urlMemoryRepository) FindByID(urlID string) (string, error) {
+func (u *urlMemoryRepository) FindByID(_ context.Context, urlID string) (string, error) {
 	u.mx.Lock()
 	defer u.mx.Unlock()
 	url, ok := u.commonURLStorage[urlID]
 	if !ok {
-		return "", fmt.Errorf("url with id %s not found", urlID)
+		return "", fmt.Errorf("urlservice with id %s not found", urlID)
 	}
 	return url, nil
 }

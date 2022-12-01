@@ -8,7 +8,12 @@ require (
 	github.com/joho/godotenv v1.4.0
 )
 
-require github.com/lib/pq v1.10.7
+require (
+	github.com/golang/mock v1.6.0
+	github.com/lib/pq v1.10.7
+)
+
+require github.com/stretchr/objx v0.5.0 // indirect
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect

@@ -1,6 +1,7 @@
 package infile
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"sync"
@@ -20,7 +21,7 @@ type urlFileRepository struct {
 	producer         *producer
 }
 
-func (u *urlFileRepository) GetAllByUserID(userID string) ([]entity.FullURL, error) {
+func (u *urlFileRepository) GetAllByUserID(_ context.Context, userID string) ([]entity.FullURL, error) {
 	userURLMap, ok := u.urlStorage[userID]
 	if !ok {
 		return nil, fmt.Errorf("user with id %s has not URL's", userID)
@@ -28,7 +29,7 @@ func (u *urlFileRepository) GetAllByUserID(userID string) ([]entity.FullURL, err
 	return mapper.FromMapToSliceOfFullURL(userURLMap), nil
 }
 
-func (u *urlFileRepository) Save(userID, urlID, url string) error {
+func (u *urlFileRepository) Save(_ context.Context, userID, urlID, url string) error {
 	u.mx.Lock()
 	userURLStorage, ok := u.urlStorage[userID]
 	if !ok {
@@ -36,7 +37,7 @@ func (u *urlFileRepository) Save(userID, urlID, url string) error {
 	}
 	if isExist(userURLStorage, urlID) {
 		u.mx.Unlock()
-		return fmt.Errorf("url %s already exist", url)
+		return fmt.Errorf("urlservice %s already exist", url)
 	}
 	userURLStorage[urlID] = url
 	u.urlStorage[userID] = userURLStorage
@@ -51,12 +52,12 @@ func (u *urlFileRepository) Save(userID, urlID, url string) error {
 	return u.producer.WriteURL(&savingURL)
 }
 
-func (u *urlFileRepository) FindByID(urlID string) (string, error) {
+func (u *urlFileRepository) FindByID(_ context.Context, urlID string) (string, error) {
 	u.mx.Lock()
 	url, ok := u.commonURLStorage[urlID]
 	u.mx.Unlock()
 	if !ok {
-		return "", fmt.Errorf("url with id %s not found", urlID)
+		return "", fmt.Errorf("urlservice with id %s not found", urlID)
 	}
 	return url, nil
 }

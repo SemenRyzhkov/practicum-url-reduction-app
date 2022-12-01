@@ -9,6 +9,7 @@ import (
 	"github.com/joho/godotenv"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/indatabase"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/infile"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/inmemory"
 )
@@ -37,12 +38,17 @@ func LoadEnvironments(envFilePath string) {
 	}
 }
 
-func CreateRepository(filePath string) repositories.URLRepository {
+func CreateRepository(filePath, dbAddress string) repositories.URLRepository {
+	if len(strings.TrimSpace(dbAddress)) != 0 {
+		fmt.Println("in dataBase")
+		return indatabase.New(dbAddress)
+	}
+
 	if len(strings.TrimSpace(filePath)) != 0 {
 		fmt.Println("in File")
-
 		return infile.New(filePath)
 	}
+
 	fmt.Println("in Memory")
 	return inmemory.New()
 }

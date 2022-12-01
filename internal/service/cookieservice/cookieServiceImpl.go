@@ -1,4 +1,4 @@
-package cookie
+package cookieservice
 
 import (
 	"crypto/hmac"
@@ -14,8 +14,8 @@ import (
 
 var (
 	_               CookieService = &cookieServiceImpl{}
-	ErrValueTooLong               = errors.New("cookie value too long")
-	ErrInvalidValue               = errors.New("invalid cookie value")
+	ErrValueTooLong               = errors.New("cookieservice value too long")
+	ErrInvalidValue               = errors.New("invalid cookieservice value")
 )
 
 type cookieServiceImpl struct {

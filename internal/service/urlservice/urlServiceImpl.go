@@ -1,6 +1,7 @@
-package url
+package urlservice
 
 import (
+	"context"
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
@@ -22,30 +23,30 @@ func New(urlRepository repositories.URLRepository) URLService {
 	}
 }
 
-func (u *urlServiceImpl) GetAllByUserID(userID string) ([]entity.FullURL, error) {
-	return u.urlRepository.GetAllByUserID(userID)
+func (u *urlServiceImpl) GetAllByUserID(ctx context.Context, userID string) ([]entity.FullURL, error) {
+	return u.urlRepository.GetAllByUserID(ctx, userID)
 }
 
-func (u *urlServiceImpl) ReduceURLToJSON(userID string, request entity.URLRequest) (entity.URLResponse, error) {
+func (u *urlServiceImpl) ReduceURLToJSON(ctx context.Context, userID string, request entity.URLRequest) (entity.URLResponse, error) {
 	reduceURL := reducing(request.URL)
-	duplicateErr := u.urlRepository.Save(userID, reduceURL, request.URL)
+	duplicateErr := u.urlRepository.Save(ctx, userID, reduceURL, request.URL)
 	if duplicateErr != nil {
 		return entity.URLResponse{}, duplicateErr
 	}
 	return entity.URLResponse{Result: fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL)}, nil
 }
 
-func (u *urlServiceImpl) ReduceAndSaveURL(userID, url string) (string, error) {
+func (u *urlServiceImpl) ReduceAndSaveURL(ctx context.Context, userID, url string) (string, error) {
 	reduceURL := reducing(url)
-	duplicateErr := u.urlRepository.Save(userID, reduceURL, url)
+	duplicateErr := u.urlRepository.Save(ctx, userID, reduceURL, url)
 	if duplicateErr != nil {
 		return "", duplicateErr
 	}
 	return fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL), nil
 }
 
-func (u *urlServiceImpl) GetURLByID(urlID string) (string, error) {
-	return u.urlRepository.FindByID(urlID)
+func (u *urlServiceImpl) GetURLByID(ctx context.Context, urlID string) (string, error) {
+	return u.urlRepository.FindByID(ctx, urlID)
 }
 
 func reducing(url string) string {
