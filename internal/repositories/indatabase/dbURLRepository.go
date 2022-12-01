@@ -93,7 +93,7 @@ func initDB(dbAddress string) *sql.DB {
 	if connectionErr != nil {
 		log.Fatal(connectionErr)
 	}
-	fmt.Println("Successful")
+	fmt.Println("1Successful")
 
 	createTableIfNotExists(db)
 	return db
@@ -103,7 +103,8 @@ func createTableIfNotExists(db *sql.DB) {
 	_, err := db.Exec(initDBQuery)
 
 	if err != nil {
+		fmt.Println("create err " + err.Error())
 		log.Fatal(err)
 	}
-	fmt.Println("Successful")
+	fmt.Println("2Successful")
 }
