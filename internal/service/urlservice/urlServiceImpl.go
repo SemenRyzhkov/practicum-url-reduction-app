@@ -27,6 +27,10 @@ func (u *urlServiceImpl) GetAllByUserID(ctx context.Context, userID string) ([]e
 	return u.urlRepository.GetAllByUserID(ctx, userID)
 }
 
+func (u *urlServiceImpl) GetURLByID(ctx context.Context, urlID string) (string, error) {
+	return u.urlRepository.FindByID(ctx, urlID)
+}
+
 func (u *urlServiceImpl) ReduceURLToJSON(ctx context.Context, userID string, request entity.URLRequest) (entity.URLResponse, error) {
 	reduceURL := reducing(request.URL)
 	duplicateErr := u.urlRepository.Save(ctx, userID, reduceURL, request.URL)
@@ -45,8 +49,22 @@ func (u *urlServiceImpl) ReduceAndSaveURL(ctx context.Context, userID, url strin
 	return fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL), nil
 }
 
-func (u *urlServiceImpl) GetURLByID(ctx context.Context, urlID string) (string, error) {
-	return u.urlRepository.FindByID(ctx, urlID)
+func (u *urlServiceImpl) ReduceSeveralURL(ctx context.Context, userID string, list []entity.URLWithIDRequest) ([]entity.URLWithIDResponse, error) {
+	var urlWithIDResponseList []entity.URLWithIDResponse
+	for _, urlReq := range list {
+		correlationID := urlReq.CorrelationID
+		reduceURL := reducing(urlReq.OriginalURL)
+		duplicateErr := u.urlRepository.Save(ctx, userID, reduceURL, urlReq.OriginalURL)
+		if duplicateErr != nil {
+			return nil, duplicateErr
+		}
+		urlWihIDResponse := entity.URLWithIDResponse{
+			CorrelationID: correlationID,
+			ShortURL:      fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL),
+		}
+		urlWithIDResponseList = append(urlWithIDResponseList, urlWihIDResponse)
+	}
+	return urlWithIDResponseList, nil
 }
 
 func reducing(url string) string {

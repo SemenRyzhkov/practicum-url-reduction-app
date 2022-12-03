@@ -38,6 +38,21 @@ func (h *urlHandlerImpl) GetAllURL(writer http.ResponseWriter, request *http.Req
 	}
 }
 
+func (h *urlHandlerImpl) GetURLByID(writer http.ResponseWriter, request *http.Request) {
+	urlID := chi.URLParam(request, "id")
+	if urlID == "" {
+		http.Error(writer, "urlID param is missing", http.StatusBadRequest)
+		return
+	}
+	url, err := h.urlService.GetURLByID(request.Context(), urlID)
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusNotFound)
+		return
+	}
+	writer.Header().Add("Location", url)
+	writer.WriteHeader(http.StatusTemporaryRedirect)
+}
+
 func (h *urlHandlerImpl) ReduceURLTOJSON(writer http.ResponseWriter, request *http.Request) {
 	userID, cookieErr := h.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
 	if cookieErr != nil {
@@ -82,17 +97,27 @@ func (h *urlHandlerImpl) ReduceURL(writer http.ResponseWriter, request *http.Req
 
 }
 
-func (h *urlHandlerImpl) GetURLByID(writer http.ResponseWriter, request *http.Request) {
-	urlID := chi.URLParam(request, "id")
-	if urlID == "" {
-		http.Error(writer, "urlID param is missing", http.StatusBadRequest)
+func (h *urlHandlerImpl) ReduceSeveralURL(writer http.ResponseWriter, request *http.Request) {
+	userID, cookieErr := h.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
+	if cookieErr != nil {
+		http.Error(writer, cookieErr.Error(), http.StatusBadRequest)
 		return
 	}
-	url, err := h.urlService.GetURLByID(request.Context(), urlID)
+	writer.Header().Set("Content-Type", "application/json")
+	var urlWithIDRequestList []entity.URLWithIDRequest
+	err := json.NewDecoder(request.Body).Decode(&urlWithIDRequestList)
 	if err != nil {
-		http.Error(writer, err.Error(), http.StatusNotFound)
-		return
+		http.Error(writer, err.Error(), http.StatusBadRequest)
 	}
-	writer.Header().Add("Location", url)
-	writer.WriteHeader(http.StatusTemporaryRedirect)
+	urlWithIDResponseList, err := h.urlService.ReduceSeveralURL(request.Context(), userID, urlWithIDRequestList)
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusBadRequest)
+		return
+	} else {
+		writer.WriteHeader(http.StatusCreated)
+		err = json.NewEncoder(writer).Encode(urlWithIDResponseList)
+		if err != nil {
+			http.Error(writer, err.Error(), http.StatusBadRequest)
+		}
+	}
 }

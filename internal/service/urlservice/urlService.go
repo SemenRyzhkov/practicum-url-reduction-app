@@ -7,8 +7,9 @@ import (
 )
 
 type URLService interface {
-	ReduceAndSaveURL(ctx context.Context, userID, url string) (string, error)
 	GetURLByID(ctx context.Context, urlID string) (string, error)
-	ReduceURLToJSON(ctx context.Context, userID string, request entity.URLRequest) (entity.URLResponse, error)
 	GetAllByUserID(ctx context.Context, userID string) ([]entity.FullURL, error)
+	ReduceAndSaveURL(ctx context.Context, userID, url string) (string, error)
+	ReduceURLToJSON(ctx context.Context, userID string, request entity.URLRequest) (entity.URLResponse, error)
+	ReduceSeveralURL(ctx context.Context, userID string, list []entity.URLWithIDRequest) ([]entity.URLWithIDResponse, error)
 }

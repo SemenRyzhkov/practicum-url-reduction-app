@@ -8,4 +8,5 @@ type URLHandler interface {
 
 	ReduceURL(writer http.ResponseWriter, request *http.Request)
 	ReduceURLTOJSON(writer http.ResponseWriter, request *http.Request)
+	ReduceSeveralURL(writer http.ResponseWriter, request *http.Request)
 }

@@ -9,11 +9,12 @@ import (
 )
 
 const (
-	reduceURLPath       = "/"
-	getURLPath          = "/{id}"
-	reduceURLToJSONPath = "/api/shorten"
-	allURLPath          = "/api/user/urls"
-	pingPath            = "/ping"
+	reduceURLPath        = "/"
+	getURLPath           = "/{id}"
+	reduceURLToJSONPath  = "/api/shorten"
+	allURLPath           = "/api/user/urls"
+	pingPath             = "/ping"
+	reduceSeveralURLPath = "/api/shorten/batch"
 )
 
 func NewRouter(h handlers.URLHandler, db dbhandler.DBHandler) chi.Router {
@@ -24,5 +25,6 @@ func NewRouter(h handlers.URLHandler, db dbhandler.DBHandler) chi.Router {
 	r.Get(allURLPath, h.GetAllURL)
 	r.Post(reduceURLPath, h.ReduceURL)
 	r.Post(reduceURLToJSONPath, h.ReduceURLTOJSON)
+	r.Post(reduceSeveralURLPath, h.ReduceSeveralURL)
 	return r
 }
