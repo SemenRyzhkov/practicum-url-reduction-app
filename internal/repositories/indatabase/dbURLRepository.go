@@ -41,12 +41,10 @@ func New(dbAddress string) repositories.URLRepository {
 }
 
 func (d dbURLRepository) Save(ctx context.Context, userID, urlID, url string) error {
-	rows, err := d.db.QueryContext(ctx, insertURLQuery, urlID, url, userID)
+	_, err := d.db.ExecContext(ctx, insertURLQuery, urlID, url, userID)
 	if err != nil {
 		return err
 	}
-
-	defer rows.Close()
 
 	return nil
 }

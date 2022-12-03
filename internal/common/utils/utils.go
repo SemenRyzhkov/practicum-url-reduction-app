@@ -38,13 +38,7 @@ func LoadEnvironments(envFilePath string) {
 	}
 }
 
-func CreateRepository(filePath, dbAddress string) repositories.URLRepository {
-	if len(strings.TrimSpace(dbAddress)) != 0 {
-		fmt.Println("in dataBase")
-		fmt.Println(dbAddress)
-		return indatabase.New(dbAddress)
-	}
-
+func CreateMemoryOrFileRepository(filePath string) repositories.URLRepository {
 	if len(strings.TrimSpace(filePath)) != 0 {
 		fmt.Println("in File")
 		return infile.New(filePath)
@@ -52,4 +46,16 @@ func CreateRepository(filePath, dbAddress string) repositories.URLRepository {
 
 	fmt.Println("in Memory")
 	return inmemory.New()
+}
+
+func CreateRepository(filePath, dbAddress string) repositories.URLRepository {
+	var repo repositories.URLRepository
+	if len(strings.TrimSpace(dbAddress)) != 0 {
+		fmt.Println("in dataBase")
+		fmt.Println(dbAddress)
+		repo = indatabase.New(dbAddress)
+	} else {
+		repo = CreateMemoryOrFileRepository(filePath)
+	}
+	return repo
 }

@@ -65,9 +65,9 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 				}
 			} else {
 				u := New(tt.repo)
-				u.ReduceAndSaveURL(nil, tt.userID, tt.want)
+				u.ReduceAndSaveURL(context.TODO(), tt.userID, tt.want)
 
-				got, err := u.GetURLByID(nil, tt.urlID)
+				got, err := u.GetURLByID(context.TODO(), tt.urlID)
 				if tt.wantErr {
 					assert.NotNil(t, err)
 				} else {
@@ -133,9 +133,9 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 				}
 			} else {
 				u := New(tt.repo)
-				got, _ := u.ReduceAndSaveURL(nil, tt.userID, tt.saveURL)
+				got, _ := u.ReduceAndSaveURL(context.TODO(), tt.userID, tt.saveURL)
 				if tt.wantErr {
-					_, err := u.ReduceAndSaveURL(nil, tt.userID, tt.saveURL)
+					_, err := u.ReduceAndSaveURL(context.TODO(), tt.userID, tt.saveURL)
 					assert.NotNil(t, err)
 				} else {
 					assert.Equal(t, tt.want, got)
@@ -199,9 +199,9 @@ func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
 				}
 			} else {
 				u := New(tt.repo)
-				got, _ := u.ReduceURLToJSON(nil, tt.userID, tt.request)
+				got, _ := u.ReduceURLToJSON(context.TODO(), tt.userID, tt.request)
 				if tt.wantErr {
-					_, err := u.ReduceURLToJSON(nil, tt.userID, tt.request)
+					_, err := u.ReduceURLToJSON(context.TODO(), tt.userID, tt.request)
 					assert.NotNil(t, err)
 				} else {
 					assert.Equalf(t, tt.want, got, "ReduceURLToJSON(%v)", tt.request)
@@ -262,12 +262,12 @@ func Test_urlServiceImpl_GetAllByUserID(t *testing.T) {
 				}
 			} else {
 				u := New(tt.repo)
-				u.ReduceAndSaveURL(nil, tt.userID, tt.url)
+				u.ReduceAndSaveURL(context.TODO(), tt.userID, tt.url)
 
-				got, _ := u.GetAllByUserID(nil, tt.userID)
+				got, _ := u.GetAllByUserID(context.TODO(), tt.userID)
 				if tt.wantErr {
 					wrongUserID := "dec27dda-6249-4f49-be71-4f56fc5ee541"
-					_, err := u.GetAllByUserID(nil, wrongUserID)
+					_, err := u.GetAllByUserID(context.TODO(), wrongUserID)
 					assert.NotNil(t, err)
 				} else {
 					assert.Equal(t, tt.want, got)
