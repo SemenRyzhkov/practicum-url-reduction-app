@@ -277,3 +277,86 @@ func Test_urlServiceImpl_GetAllByUserID(t *testing.T) {
 		testutils.AfterTest()
 	}
 }
+
+func Test_urlServiceImpl_ReduceSeveralURL(t *testing.T) {
+	utils.LoadEnvironments("../../../.env")
+
+	tests := []struct {
+		repo         repositories.URLRepository
+		name         string
+		request      []entity.URLWithIDRequest
+		wantResponse []entity.URLWithIDResponse
+		wantErr      bool
+		userID       string
+		urlID        []string
+	}{
+		{
+			repo: utils.CreateRepository(utils.GetFilePath(), utils.GetDBAddress()),
+			name: "reduce several url test #1",
+			request: []entity.URLWithIDRequest{
+				{CorrelationID: "test1", OriginalURL: "yandex1.ru"},
+				{CorrelationID: "test2", OriginalURL: "yandex2.ru"},
+			},
+			wantResponse: []entity.URLWithIDResponse{
+				{
+					CorrelationID: "test1",
+					ShortURL:      "http://localhost:8080/b6ad61b613c33a6d62e6d14198e465b8",
+				},
+				{
+					CorrelationID: "test2",
+					ShortURL:      "http://localhost:8080/50754651b2f907807de0b789248f1f1b",
+				},
+			},
+			wantErr: false,
+			urlID:   []string{"b6ad61b613c33a6d62e6d14198e465b8", "50754651b2f907807de0b789248f1f1b"},
+			userID:  "dec27dda-6249-4f49-be71-4f56fc5ee540",
+		},
+		{
+			repo: utils.CreateRepository(utils.GetFilePath(), utils.GetDBAddress()),
+			name: "duplicate error test #2",
+			request: []entity.URLWithIDRequest{
+				{CorrelationID: "test1", OriginalURL: "yandex1.ru"},
+				{CorrelationID: "test2", OriginalURL: "yandex1.ru"},
+			},
+			wantErr: true,
+			userID:  "dec27dda-6249-4f49-be71-4f56fc5ee540",
+			urlID:   []string{"b6ad61b613c33a6d62e6d14198e465b8"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if len(strings.TrimSpace(utils.GetDBAddress())) != 0 {
+				ctrl := gomock.NewController(t)
+				defer ctrl.Finish()
+
+				s := mock_repositories.NewMockURLRepository(ctrl)
+
+				ctx := context.Background()
+
+				if tt.wantErr {
+					s.EXPECT().Save(ctx, tt.userID, tt.urlID[0], tt.request[0].OriginalURL).Return(fmt.Errorf("error"))
+					u := New(s)
+					_, err := u.ReduceSeveralURL(ctx, tt.userID, tt.request)
+					assert.NotNil(t, err)
+				} else {
+					s.EXPECT().Save(ctx, tt.userID, tt.urlID[0], tt.request[0].OriginalURL).Return(nil)
+					s.EXPECT().Save(ctx, tt.userID, tt.urlID[1], tt.request[1].OriginalURL).Return(nil)
+					u := New(s)
+					got, _ := u.ReduceSeveralURL(ctx, tt.userID, tt.request)
+					assert.Equal(t, tt.wantResponse, got)
+				}
+			} else {
+				u := New(tt.repo)
+
+				if tt.wantErr {
+					_, err := u.ReduceSeveralURL(context.TODO(), tt.userID, tt.request)
+					assert.NotNil(t, err)
+				} else {
+					got, _ := u.ReduceSeveralURL(context.TODO(), tt.userID, tt.request)
+					assert.Equal(t, tt.wantResponse, got)
+				}
+			}
+		})
+		testutils.AfterTest()
+	}
+}

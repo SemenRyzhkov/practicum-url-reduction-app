@@ -27,6 +27,23 @@ const (
 	expectedReduceURL = "http://localhost:8080/1f67218b4bfbc6af9e52d502c3e5ef3d"
 )
 
+var (
+	reduceSeveralURLRequest = []entity.URLWithIDRequest{
+		{CorrelationID: "test1", OriginalURL: "yandex1.ru"},
+		{CorrelationID: "test2", OriginalURL: "yandex2.ru"},
+	}
+	reduceSeveralURLResponse = []entity.URLWithIDResponse{
+		{
+			CorrelationID: "test1",
+			ShortURL:      "http://localhost:8080/b6ad61b613c33a6d62e6d14198e465b8",
+		},
+		{
+			CorrelationID: "test2",
+			ShortURL:      "http://localhost:8080/50754651b2f907807de0b789248f1f1b",
+		},
+	}
+)
+
 func setupTestServer() *httptest.Server {
 	utils.LoadEnvironments("../../.env")
 	repo := utils.CreateMemoryOrFileRepository(utils.GetFilePath())
@@ -60,6 +77,17 @@ func testJSONRequest(t *testing.T, ts *httptest.Server) *http.Request {
 		log.Fatal(err)
 	}
 	req, err := http.NewRequest(http.MethodPost, ts.URL+"/api/shorten", &buf)
+	require.NoError(t, err)
+	return req
+}
+
+func testSeveralJSONRequest(t *testing.T, ts *httptest.Server) *http.Request {
+	var buf bytes.Buffer
+	err := json.NewEncoder(&buf).Encode(reduceSeveralURLRequest)
+	if err != nil {
+		log.Fatal(err)
+	}
+	req, err := http.NewRequest(http.MethodPost, ts.URL+"/api/shorten/batch", &buf)
 	require.NoError(t, err)
 	return req
 }
@@ -142,5 +170,23 @@ func TestNewRouterGetAll(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, expectedURLsList, actualURLsList)
 	defer resp.Body.Close()
+	testutils.AfterTest()
+}
+
+func TestNewRouterReducingSeveralURLToJSON(t *testing.T) {
+	ts := setupTestServer()
+	defer ts.Close()
+
+	req := testSeveralJSONRequest(t, ts)
+	resp, err := http.DefaultClient.Do(req)
+	require.NoError(t, err)
+
+	var actualResponse []entity.URLWithIDResponse
+	err = json.NewDecoder(resp.Body).Decode(&actualResponse)
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusCreated, resp.StatusCode)
+	assert.Equal(t, reduceSeveralURLResponse, actualResponse)
+	defer resp.Body.Close()
+
 	testutils.AfterTest()
 }
