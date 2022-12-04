@@ -183,6 +183,7 @@ func TestNewRouterReducingSeveralURLToJSON(t *testing.T) {
 
 	var actualResponse []entity.URLWithIDResponse
 	err = json.NewDecoder(resp.Body).Decode(&actualResponse)
+
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusCreated, resp.StatusCode)
 	assert.Equal(t, reduceSeveralURLResponse, actualResponse)
