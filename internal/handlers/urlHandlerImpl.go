@@ -73,6 +73,7 @@ func (h *urlHandlerImpl) ReduceURLTOJSON(writer http.ResponseWriter, request *ht
 		if err != nil {
 			http.Error(writer, err.Error(), http.StatusBadRequest)
 		}
+		return
 	} else {
 		writer.WriteHeader(http.StatusCreated)
 		err = json.NewEncoder(writer).Encode(urlResponse)
@@ -96,6 +97,7 @@ func (h *urlHandlerImpl) ReduceURL(writer http.ResponseWriter, request *http.Req
 	if err != nil {
 		writer.WriteHeader(http.StatusConflict)
 		writer.Write([]byte(reduceURL))
+		return
 	}
 	writer.WriteHeader(http.StatusCreated)
 	writer.Write([]byte(reduceURL))
