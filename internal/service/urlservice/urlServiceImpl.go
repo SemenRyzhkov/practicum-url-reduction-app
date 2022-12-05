@@ -53,6 +53,7 @@ func (u *urlServiceImpl) ReduceAndSaveURL(ctx context.Context, userID, url strin
 
 func (u *urlServiceImpl) ReduceSeveralURL(ctx context.Context, userID string, list []entity.URLWithIDRequest) ([]entity.URLWithIDResponse, error) {
 	var urlWithIDResponseList []entity.URLWithIDResponse
+	//TODO by statement solution
 	for _, urlReq := range list {
 		correlationID := urlReq.CorrelationID
 		reduceURL := reducing(urlReq.OriginalURL)
