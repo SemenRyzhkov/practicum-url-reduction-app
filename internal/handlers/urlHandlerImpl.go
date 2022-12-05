@@ -66,9 +66,13 @@ func (h *urlHandlerImpl) ReduceURLTOJSON(writer http.ResponseWriter, request *ht
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 	}
 	urlResponse, err := h.urlService.ReduceURLToJSON(request.Context(), userID, urlRequest)
+
 	if err != nil {
-		http.Error(writer, err.Error(), http.StatusBadRequest)
-		return
+		writer.WriteHeader(http.StatusConflict)
+		err = json.NewEncoder(writer).Encode(urlResponse)
+		if err != nil {
+			http.Error(writer, err.Error(), http.StatusBadRequest)
+		}
 	} else {
 		writer.WriteHeader(http.StatusCreated)
 		err = json.NewEncoder(writer).Encode(urlResponse)
@@ -90,7 +94,8 @@ func (h *urlHandlerImpl) ReduceURL(writer http.ResponseWriter, request *http.Req
 	}
 	reduceURL, err := h.urlService.ReduceAndSaveURL(request.Context(), userID, string(b))
 	if err != nil {
-		http.Error(writer, err.Error(), http.StatusBadRequest)
+		writer.WriteHeader(http.StatusConflict)
+		writer.Write([]byte(reduceURL))
 	}
 	writer.WriteHeader(http.StatusCreated)
 	writer.Write([]byte(reduceURL))
@@ -108,6 +113,7 @@ func (h *urlHandlerImpl) ReduceSeveralURL(writer http.ResponseWriter, request *h
 	err := json.NewDecoder(request.Body).Decode(&urlWithIDRequestList)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
+		return
 	}
 	urlWithIDResponseList, err := h.urlService.ReduceSeveralURL(request.Context(), userID, urlWithIDRequestList)
 	if err != nil {
@@ -118,6 +124,7 @@ func (h *urlHandlerImpl) ReduceSeveralURL(writer http.ResponseWriter, request *h
 		err = json.NewEncoder(writer).Encode(urlWithIDResponseList)
 		if err != nil {
 			http.Error(writer, err.Error(), http.StatusBadRequest)
+			return
 		}
 	}
 }

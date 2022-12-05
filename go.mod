@@ -11,6 +11,7 @@ require (
 require (
 	github.com/golang/mock v1.6.0
 	github.com/lib/pq v1.10.7
+	github.com/omeid/pgerror v0.0.0-20201018020948-42c66c4d27d4
 )
 
 require (
