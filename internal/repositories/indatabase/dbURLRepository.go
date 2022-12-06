@@ -3,7 +3,6 @@ package indatabase
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"log"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
@@ -91,7 +90,6 @@ func initDB(dbAddress string) *sql.DB {
 	if connectionErr != nil {
 		log.Fatal(connectionErr)
 	}
-	fmt.Println("1Successful")
 
 	createTableIfNotExists(db)
 	return db
@@ -101,8 +99,6 @@ func createTableIfNotExists(db *sql.DB) {
 	_, err := db.Exec(initDBQuery)
 
 	if err != nil {
-		fmt.Println("create err " + err.Error())
 		log.Fatal(err)
 	}
-	fmt.Println("2Successful")
 }

@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -22,16 +21,10 @@ func New(cfg config.Config) (*App, error) {
 	log.Println("creating router")
 	urlRepository := utils.CreateRepository(cfg.FilePath, cfg.DataBaseAddress)
 	urlService := urlservice.New(urlRepository)
-	fmt.Println("service success")
-
 	cookieService := cookieservice.New(cfg.Key)
-	fmt.Println("cookie service success")
 	urlHandler := handlers.NewHandler(urlService, cookieService)
-	fmt.Println("cookie  handler success")
 	dbHandler := dbhandler.NewDBHandler(cfg.DataBaseAddress)
-	fmt.Println("db  handler success")
 	urlRouter := router.NewRouter(urlHandler, dbHandler)
-	fmt.Println("rou success")
 
 	server := &http.Server{
 		Addr:    cfg.Host,
