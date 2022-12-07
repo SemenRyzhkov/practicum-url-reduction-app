@@ -7,7 +7,7 @@ import (
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/url_mapper"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/urlmapper"
 )
 
 var _ repositories.URLRepository = &urlMemoryRepository{}
@@ -25,7 +25,7 @@ func (u *urlMemoryRepository) GetAllByUserID(_ context.Context, userID string) (
 	if !ok {
 		return nil, fmt.Errorf("user with id %s has not URL's", userID)
 	}
-	return url_mapper.FromMapToSliceOfFullURL(userURLMap), nil
+	return urlmapper.FromMapToSliceOfFullURL(userURLMap), nil
 }
 
 func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string) error {
