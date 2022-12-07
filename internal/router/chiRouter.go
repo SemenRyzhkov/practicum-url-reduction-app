@@ -4,7 +4,6 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers/dbhandler"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/router/middleware"
 )
 
@@ -17,10 +16,10 @@ const (
 	reduceSeveralURLPath = "/api/shorten/batch"
 )
 
-func NewRouter(h handlers.URLHandler, db dbhandler.DBHandler) chi.Router {
+func NewRouter(h handlers.URLHandler) chi.Router {
 	r := chi.NewRouter()
 	r.Use(middleware.DecompressRequest, middleware.CompressResponse)
-	r.Get(pingPath, db.PingConnection)
+	r.Get(pingPath, h.PingConnection)
 	r.Get(getURLPath, h.GetURLByID)
 	r.Get(allURLPath, h.GetAllURL)
 	r.Post(reduceURLPath, h.ReduceURL)

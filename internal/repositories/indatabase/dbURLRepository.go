@@ -33,6 +33,14 @@ type dbURLRepository struct {
 	db *sql.DB
 }
 
+func (d dbURLRepository) Ping() error {
+	pingErr := d.db.Ping()
+	if pingErr != nil {
+		return pingErr
+	}
+	return nil
+}
+
 func New(dbAddress string) repositories.URLRepository {
 	return &dbURLRepository{
 		db: initDB(dbAddress),

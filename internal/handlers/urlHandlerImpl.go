@@ -129,4 +129,16 @@ func (h *urlHandlerImpl) ReduceSeveralURL(writer http.ResponseWriter, request *h
 			return
 		}
 	}
+
+}
+
+func (u *urlHandlerImpl) PingConnection(writer http.ResponseWriter, request *http.Request) {
+	err := u.urlService.PingConnection()
+
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	writer.WriteHeader(http.StatusOK)
 }

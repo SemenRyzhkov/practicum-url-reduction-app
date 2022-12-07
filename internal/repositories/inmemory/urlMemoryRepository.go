@@ -52,6 +52,10 @@ func (u *urlMemoryRepository) FindByID(_ context.Context, urlID string) (string,
 	return url, nil
 }
 
+func (u *urlMemoryRepository) Ping() error {
+	return nil
+}
+
 func New() repositories.URLRepository {
 	return &urlMemoryRepository{
 		commonURLStorage: make(map[string]string),

@@ -62,6 +62,10 @@ func (u *urlFileRepository) FindByID(_ context.Context, urlID string) (string, e
 	return url, nil
 }
 
+func (u *urlFileRepository) Ping() error {
+	return nil
+}
+
 func New(filePath string) repositories.URLRepository {
 	producer, producerErr := NewProducer(filePath)
 	if producerErr != nil {

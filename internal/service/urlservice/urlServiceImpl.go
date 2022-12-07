@@ -70,6 +70,10 @@ func (u *urlServiceImpl) ReduceSeveralURL(ctx context.Context, userID string, li
 	return urlWithIDResponseList, nil
 }
 
+func (u *urlServiceImpl) PingConnection() error {
+	return u.urlRepository.Ping()
+}
+
 func reducing(url string) string {
 	hash := md5.Sum([]byte(url))
 	return hex.EncodeToString(hash[:])
