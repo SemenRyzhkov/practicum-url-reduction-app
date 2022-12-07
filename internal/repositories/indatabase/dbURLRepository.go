@@ -33,7 +33,7 @@ type dbURLRepository struct {
 	db *sql.DB
 }
 
-func (d dbURLRepository) Ping() error {
+func (d *dbURLRepository) Ping() error {
 	pingErr := d.db.Ping()
 	if pingErr != nil {
 		return pingErr
@@ -47,7 +47,7 @@ func New(dbAddress string) repositories.URLRepository {
 	}
 }
 
-func (d dbURLRepository) Save(ctx context.Context, userID, urlID, url string) error {
+func (d *dbURLRepository) Save(ctx context.Context, userID, urlID, url string) error {
 	_, err := d.db.ExecContext(ctx, insertURLQuery, urlID, url, userID)
 	if err != nil {
 		return err
@@ -56,7 +56,7 @@ func (d dbURLRepository) Save(ctx context.Context, userID, urlID, url string) er
 	return nil
 }
 
-func (d dbURLRepository) FindByID(ctx context.Context, urlID string) (string, error) {
+func (d *dbURLRepository) FindByID(ctx context.Context, urlID string) (string, error) {
 	var originalURL string
 	row := d.db.QueryRowContext(ctx, getReduceURLQuery, urlID)
 	err := row.Scan(&originalURL)
@@ -66,7 +66,7 @@ func (d dbURLRepository) FindByID(ctx context.Context, urlID string) (string, er
 	return originalURL, nil
 }
 
-func (d dbURLRepository) GetAllByUserID(ctx context.Context, userID string) ([]entity.FullURL, error) {
+func (d *dbURLRepository) GetAllByUserID(ctx context.Context, userID string) ([]entity.FullURL, error) {
 	urls := make([]entity.FullURL, 0)
 
 	rows, err := d.db.QueryContext(ctx, getAllQuery, userID)

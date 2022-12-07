@@ -20,7 +20,10 @@ func New(cfg config.Config) (*App, error) {
 	log.Println("creating router")
 	urlRepository := utils.CreateRepository(cfg.FilePath, cfg.DataBaseAddress)
 	urlService := urlservice.New(urlRepository)
-	cookieService := cookieservice.New(cfg.Key)
+	cookieService, err := cookieservice.New(cfg.Key)
+	if err != nil {
+		return nil, err
+	}
 	urlHandler := handlers.NewHandler(urlService, cookieService)
 	urlRouter := router.NewRouter(urlHandler)
 

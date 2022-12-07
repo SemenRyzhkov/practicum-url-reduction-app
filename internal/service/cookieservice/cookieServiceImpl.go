@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
-	"log"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -14,23 +13,23 @@ import (
 
 var (
 	_               CookieService = &cookieServiceImpl{}
-	ErrValueTooLong               = errors.New("cookieservice value too long")
-	ErrInvalidValue               = errors.New("invalid cookieservice value")
+	ErrValueTooLong               = errors.New("cookie value too long")
+	ErrInvalidValue               = errors.New("invalid cookie value")
 )
 
 type cookieServiceImpl struct {
 	secretKey []byte
 }
 
-func New(key string) CookieService {
+func New(key string) (CookieService, error) {
 	secretKey, err := hex.DecodeString(key)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
-	return &cookieServiceImpl{secretKey}
+	return &cookieServiceImpl{secretKey}, nil
 }
 
-func (c cookieServiceImpl) GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(
+func (c *cookieServiceImpl) GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(
 	w http.ResponseWriter,
 	r *http.Request, name string) (string, error) {
 	userID, err := c.readSigned(r, name)
@@ -48,7 +47,7 @@ func (c cookieServiceImpl) GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingO
 	return "", err
 }
 
-func (c cookieServiceImpl) writeSigned(w http.ResponseWriter) (string, error) {
+func (c *cookieServiceImpl) writeSigned(w http.ResponseWriter) (string, error) {
 	userID := uuid.New().String()
 	cookie := http.Cookie{
 		Name:     "userID",
@@ -67,7 +66,7 @@ func (c cookieServiceImpl) writeSigned(w http.ResponseWriter) (string, error) {
 	return userID, write(w, cookie)
 }
 
-func (c cookieServiceImpl) readSigned(r *http.Request, name string) (string, error) {
+func (c *cookieServiceImpl) readSigned(r *http.Request, name string) (string, error) {
 	// {signature}{original value}
 	signedValue, err := read(r, name)
 	if err != nil {

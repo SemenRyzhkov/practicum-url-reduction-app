@@ -8,7 +8,7 @@ import (
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/mapper"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/url_mapper"
 )
 
 var _ repositories.URLRepository = &urlFileRepository{}
@@ -22,11 +22,13 @@ type urlFileRepository struct {
 }
 
 func (u *urlFileRepository) GetAllByUserID(_ context.Context, userID string) ([]entity.FullURL, error) {
+	u.mx.Lock()
 	userURLMap, ok := u.urlStorage[userID]
+	u.mx.Unlock()
 	if !ok {
 		return nil, fmt.Errorf("user with id %s has not URL's", userID)
 	}
-	return mapper.FromMapToSliceOfFullURL(userURLMap), nil
+	return url_mapper.FromMapToSliceOfFullURL(userURLMap), nil
 }
 
 func (u *urlFileRepository) Save(_ context.Context, userID, urlID, url string) error {
@@ -35,14 +37,13 @@ func (u *urlFileRepository) Save(_ context.Context, userID, urlID, url string) e
 	if !ok {
 		userURLStorage = make(map[string]string)
 	}
-	if isExist(userURLStorage, urlID) {
+	if exists(userURLStorage, urlID) {
 		u.mx.Unlock()
 		return fmt.Errorf("urlservice %s already exist", url)
 	}
 	userURLStorage[urlID] = url
 	u.urlStorage[userID] = userURLStorage
 	u.commonURLStorage[urlID] = url
-	fmt.Println(u.urlStorage)
 	u.mx.Unlock()
 	savingURL := savingURL{
 		UserID: userID,
@@ -85,7 +86,7 @@ func New(filePath string) repositories.URLRepository {
 	}
 }
 
-func isExist(urlStorage map[string]string, urlID string) bool {
+func exists(urlStorage map[string]string, urlID string) bool {
 	_, ok := urlStorage[urlID]
 	return ok
 }

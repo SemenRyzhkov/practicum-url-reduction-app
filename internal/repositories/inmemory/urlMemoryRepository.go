@@ -7,7 +7,7 @@ import (
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/mapper"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/url_mapper"
 )
 
 var _ repositories.URLRepository = &urlMemoryRepository{}
@@ -19,11 +19,13 @@ type urlMemoryRepository struct {
 }
 
 func (u *urlMemoryRepository) GetAllByUserID(_ context.Context, userID string) ([]entity.FullURL, error) {
+	u.mx.Lock()
 	userURLMap, ok := u.urlStorage[userID]
+	u.mx.Unlock()
 	if !ok {
 		return nil, fmt.Errorf("user with id %s has not URL's", userID)
 	}
-	return mapper.FromMapToSliceOfFullURL(userURLMap), nil
+	return url_mapper.FromMapToSliceOfFullURL(userURLMap), nil
 }
 
 func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string) error {
@@ -33,7 +35,7 @@ func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string)
 	if !ok {
 		userURLStorage = make(map[string]string)
 	}
-	if isExist(userURLStorage, urlID) {
+	if exists(userURLStorage, urlID) {
 		return fmt.Errorf("urlservice %s already exist", url)
 	}
 	userURLStorage[urlID] = url
@@ -44,8 +46,8 @@ func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string)
 
 func (u *urlMemoryRepository) FindByID(_ context.Context, urlID string) (string, error) {
 	u.mx.Lock()
-	defer u.mx.Unlock()
 	url, ok := u.commonURLStorage[urlID]
+	u.mx.Unlock()
 	if !ok {
 		return "", fmt.Errorf("urlservice with id %s not found", urlID)
 	}
@@ -63,7 +65,7 @@ func New() repositories.URLRepository {
 	}
 }
 
-func isExist(urlStorage map[string]string, urlID string) bool {
+func exists(urlStorage map[string]string, urlID string) bool {
 	_, ok := urlStorage[urlID]
 	return ok
 }

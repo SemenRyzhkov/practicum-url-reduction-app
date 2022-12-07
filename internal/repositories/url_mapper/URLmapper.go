@@ -1,4 +1,4 @@
-package mapper
+package url_mapper
 
 import (
 	"fmt"
