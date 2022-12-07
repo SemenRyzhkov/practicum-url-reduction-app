@@ -47,7 +47,7 @@ func setupTestServer() *httptest.Server {
 	utils.LoadEnvironments("../../.env")
 	repo := utils.CreateMemoryOrFileRepository(utils.GetFilePath())
 	us := urlservice.New(repo)
-	cs := cookieservice.New(utils.GetKey())
+	cs, _ := cookieservice.New(utils.GetKey())
 	h := handlers.NewHandler(us, cs)
 	router := NewRouter(h)
 	return httptest.NewServer(router)
