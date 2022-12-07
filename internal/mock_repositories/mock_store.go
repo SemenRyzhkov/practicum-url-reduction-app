@@ -35,7 +35,7 @@ func (m *MockURLRepository) EXPECT() *MockURLRepositoryMockRecorder {
 	return m.recorder
 }
 
-// FindByID mock_repositories base method.
+// FindByID mocks base method.
 func (m *MockURLRepository) FindByID(ctx context.Context, urlID string) (string, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindByID", ctx, urlID)
@@ -50,7 +50,7 @@ func (mr *MockURLRepositoryMockRecorder) FindByID(ctx, urlID interface{}) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockURLRepository)(nil).FindByID), ctx, urlID)
 }
 
-// GetAllByUserID mock_repositories base method.
+// GetAllByUserID mocks base method.
 func (m *MockURLRepository) GetAllByUserID(ctx context.Context, userID string) ([]entity.FullURL, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAllByUserID", ctx, userID)
@@ -65,7 +65,21 @@ func (mr *MockURLRepositoryMockRecorder) GetAllByUserID(ctx, userID interface{})
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllByUserID", reflect.TypeOf((*MockURLRepository)(nil).GetAllByUserID), ctx, userID)
 }
 
-// Save mock_repositories base method.
+// Ping mocks base method.
+func (m *MockURLRepository) Ping() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Ping")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Ping indicates an expected call of Ping.
+func (mr *MockURLRepositoryMockRecorder) Ping() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockURLRepository)(nil).Ping))
+}
+
+// Save mocks base method.
 func (m *MockURLRepository) Save(ctx context.Context, userID, urlID, url string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Save", ctx, userID, urlID, url)
