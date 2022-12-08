@@ -3,7 +3,6 @@ package indatabase
 import (
 	"context"
 	"database/sql"
-	"log"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
@@ -17,6 +16,9 @@ const (
 		"id varchar(45) primary key, " +
 		"original_url text, " +
 		"user_id varchar(45))"
+	createUserIDIndex = "" +
+		"CREATE INDEX IF NOT EXISTS user_id_index " +
+		"ON public.urls (user_id)"
 	getAllQuery = "" +
 		"SELECT id, original_url " +
 		"FROM public.urls " +
@@ -33,18 +35,14 @@ type dbURLRepository struct {
 	db *sql.DB
 }
 
-func (d *dbURLRepository) Ping() error {
-	pingErr := d.db.Ping()
-	if pingErr != nil {
-		return pingErr
+func New(dbAddress string) (repositories.URLRepository, error) {
+	db, err := initDB(dbAddress)
+	if err != nil {
+		return nil, err
 	}
-	return nil
-}
-
-func New(dbAddress string) repositories.URLRepository {
 	return &dbURLRepository{
-		db: initDB(dbAddress),
-	}
+		db: db,
+	}, nil
 }
 
 func (d *dbURLRepository) Save(ctx context.Context, userID, urlID, url string) error {
@@ -93,20 +91,35 @@ func (d *dbURLRepository) GetAllByUserID(ctx context.Context, userID string) ([]
 	return urls, nil
 }
 
-func initDB(dbAddress string) *sql.DB {
-	db, connectionErr := sql.Open("postgres", dbAddress)
-	if connectionErr != nil {
-		log.Fatal(connectionErr)
+func (d *dbURLRepository) Ping() error {
+	pingErr := d.db.Ping()
+	if pingErr != nil {
+		return pingErr
 	}
-
-	createTableIfNotExists(db)
-	return db
+	return nil
 }
 
-func createTableIfNotExists(db *sql.DB) {
-	_, err := db.Exec(initDBQuery)
-
-	if err != nil {
-		log.Fatal(err)
+func initDB(dbAddress string) (*sql.DB, error) {
+	db, connectionErr := sql.Open("postgres", dbAddress)
+	if connectionErr != nil {
+		return nil, connectionErr
 	}
+
+	createTableErr := createTableIfNotExists(db)
+	if createTableErr != nil {
+		return nil, createTableErr
+	}
+	return db, nil
+}
+
+func createTableIfNotExists(db *sql.DB) error {
+	_, createTableErr := db.Exec(initDBQuery)
+	if createTableErr != nil {
+		return createTableErr
+	}
+	_, createIndexErr := db.Exec(createUserIDIndex)
+	if createIndexErr != nil {
+		return createIndexErr
+	}
+	return nil
 }

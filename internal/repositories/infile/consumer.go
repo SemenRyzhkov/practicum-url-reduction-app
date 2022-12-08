@@ -39,7 +39,6 @@ func (c *consumer) initializeStorage() map[string]map[string]string {
 		userURLStorage[reduceURL.URLID] = reduceURL.URL
 		initializedStorage[reduceURL.UserID] = userURLStorage
 		initializedCommonStorage[reduceURL.URLID] = reduceURL.URL
-		//fmt.Println(initializedCommonStorage)
 	}
 	if err := c.scanner.Err(); err != nil {
 		log.Fatal(err)

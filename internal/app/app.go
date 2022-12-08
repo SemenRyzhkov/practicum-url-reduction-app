@@ -18,7 +18,10 @@ type App struct {
 
 func New(cfg config.Config) (*App, error) {
 	log.Println("creating router")
-	urlRepository := utils.CreateRepository(cfg.FilePath, cfg.DataBaseAddress)
+	urlRepository, err := utils.CreateRepository(cfg.FilePath, cfg.DataBaseAddress)
+	if err != nil {
+		return nil, err
+	}
 	urlService := urlservice.New(urlRepository)
 	cookieService, err := cookieservice.New(cfg.Key)
 	if err != nil {

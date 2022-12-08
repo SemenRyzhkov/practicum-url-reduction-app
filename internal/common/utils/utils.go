@@ -47,13 +47,17 @@ func CreateMemoryOrFileRepository(filePath string) repositories.URLRepository {
 	return inmemory.New()
 }
 
-func CreateRepository(filePath, dbAddress string) repositories.URLRepository {
+func CreateRepository(filePath, dbAddress string) (repositories.URLRepository, error) {
 	var repo repositories.URLRepository
+	var err error
 	if len(strings.TrimSpace(dbAddress)) != 0 {
 		log.Println("in dataBase")
-		repo = indatabase.New(dbAddress)
+		repo, err = indatabase.New(dbAddress)
+		if err != nil {
+			return nil, err
+		}
 	} else {
 		repo = CreateMemoryOrFileRepository(filePath)
 	}
-	return repo
+	return repo, nil
 }
