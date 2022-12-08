@@ -28,14 +28,14 @@ func Test_urlServiceImpl_GetUrlById(t *testing.T) {
 		userID  string
 	}{
 		{
-			repo:    utils.CreateRepository(utils.GetFilePath(), utils.GetDBAddress()),
+			repo:    utils.CreateMemoryOrFileRepository(utils.GetFilePath()),
 			name:    "positive test #1",
 			want:    "yandex.com",
 			urlID:   "31aa70fc8589c52a763a2df36f304d28",
 			wantErr: false,
 		},
 		{
-			repo:    utils.CreateRepository(utils.GetFilePath(), utils.GetDBAddress()),
+			repo:    utils.CreateMemoryOrFileRepository(utils.GetFilePath()),
 			name:    "not found test #2",
 			want:    "yandex.com",
 			urlID:   "31aa70fc8589c52a763a2df36f304d29",
@@ -92,7 +92,7 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 		urlID   string
 	}{
 		{
-			repo:    utils.CreateRepository(utils.GetFilePath(), utils.GetDBAddress()),
+			repo:    utils.CreateMemoryOrFileRepository(utils.GetFilePath()),
 			name:    "positive test #1",
 			saveURL: "yandex1.com",
 			want:    "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b",
@@ -101,7 +101,7 @@ func Test_urlServiceImpl_ReduceAndSaveUrl(t *testing.T) {
 			urlID:   "dc605989f530a3dfe9f7edacf1b3965b",
 		},
 		{
-			repo:    utils.CreateRepository(utils.GetFilePath(), utils.GetDBAddress()),
+			repo:    utils.CreateMemoryOrFileRepository(utils.GetFilePath()),
 			name:    "duplicate test #2",
 			saveURL: "yandex.com",
 			want:    "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b",
@@ -158,7 +158,7 @@ func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
 		urlID   string
 	}{
 		{
-			repo:    utils.CreateRepository(utils.GetFilePath(), utils.GetDBAddress()),
+			repo:    utils.CreateMemoryOrFileRepository(utils.GetFilePath()),
 			name:    "reducing JSON test #1",
 			want:    entity.URLResponse{Result: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b"},
 			request: entity.URLRequest{URL: "yandex1.com"},
@@ -167,7 +167,7 @@ func Test_urlServiceImpl_ReduceUrlToJSON(t *testing.T) {
 			urlID:   "dc605989f530a3dfe9f7edacf1b3965b",
 		},
 		{
-			repo:    utils.CreateRepository(utils.GetFilePath(), utils.GetDBAddress()),
+			repo:    utils.CreateMemoryOrFileRepository(utils.GetFilePath()),
 			name:    "duplicate test #2",
 			want:    entity.URLResponse{Result: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b"},
 			request: entity.URLRequest{URL: "yandex.com"},
@@ -224,7 +224,7 @@ func Test_urlServiceImpl_GetAllByUserID(t *testing.T) {
 		userID  string
 	}{
 		{
-			repo:    utils.CreateRepository(utils.GetFilePath(), utils.GetDBAddress()),
+			repo:    utils.CreateMemoryOrFileRepository(utils.GetFilePath()),
 			name:    "get all test #1",
 			want:    []entity.FullURL{{ShortURL: "http://localhost:8080/dc605989f530a3dfe9f7edacf1b3965b", OriginalURL: "yandex1.com"}},
 			url:     "yandex1.com",
@@ -232,7 +232,7 @@ func Test_urlServiceImpl_GetAllByUserID(t *testing.T) {
 			userID:  "dec27dda-6249-4f49-be71-4f56fc5ee540",
 		},
 		{
-			repo:    utils.CreateRepository(utils.GetFilePath(), utils.GetDBAddress()),
+			repo:    utils.CreateMemoryOrFileRepository(utils.GetFilePath()),
 			name:    "not found test #2",
 			url:     "yandex1.com",
 			wantErr: true,
@@ -291,7 +291,7 @@ func Test_urlServiceImpl_ReduceSeveralURL(t *testing.T) {
 		urlID        []string
 	}{
 		{
-			repo: utils.CreateRepository(utils.GetFilePath(), utils.GetDBAddress()),
+			repo: utils.CreateMemoryOrFileRepository(utils.GetFilePath()),
 			name: "reduce several url test #1",
 			request: []entity.URLWithIDRequest{
 				{CorrelationID: "test1", OriginalURL: "yandex1.ru"},
@@ -312,7 +312,7 @@ func Test_urlServiceImpl_ReduceSeveralURL(t *testing.T) {
 			userID:  "dec27dda-6249-4f49-be71-4f56fc5ee540",
 		},
 		{
-			repo: utils.CreateRepository(utils.GetFilePath(), utils.GetDBAddress()),
+			repo: utils.CreateMemoryOrFileRepository(utils.GetFilePath()),
 			name: "duplicate error test #2",
 			request: []entity.URLWithIDRequest{
 				{CorrelationID: "test1", OriginalURL: "yandex1.ru"},
