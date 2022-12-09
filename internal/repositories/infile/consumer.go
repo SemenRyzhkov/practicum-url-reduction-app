@@ -24,14 +24,21 @@ func NewConsumer(filename string) (*consumer, error) {
 	}, nil
 }
 
-func (c *consumer) initializeStorage() map[string]string {
-	initializedStorage := make(map[string]string)
+func (c *consumer) initializeStorage() map[string]map[string]string {
+	initializedStorage := make(map[string]map[string]string)
+	initializedCommonStorage := make(map[string]string)
 	for c.scanner.Scan() {
 		reduceURL, readErr := readURL(c)
 		if readErr != nil {
 			log.Fatal(readErr)
 		}
-		initializedStorage[reduceURL.URLID] = reduceURL.URL
+		userURLStorage, ok := initializedStorage[reduceURL.UserID]
+		if !ok {
+			userURLStorage = make(map[string]string)
+		}
+		userURLStorage[reduceURL.URLID] = reduceURL.URL
+		initializedStorage[reduceURL.UserID] = userURLStorage
+		initializedCommonStorage[reduceURL.URLID] = reduceURL.URL
 	}
 	if err := c.scanner.Err(); err != nil {
 		log.Fatal(err)

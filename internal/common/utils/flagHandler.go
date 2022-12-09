@@ -17,4 +17,8 @@ func HandleFlag() {
 	flag.Func("f", "Path of file storage", func(fFlagValue string) error {
 		return os.Setenv("FILE_STORAGE_PATH", fFlagValue)
 	})
+
+	flag.Func("d", "Address of db connection", func(dFlagValue string) error {
+		return os.Setenv("DATABASE_DSN", dFlagValue)
+	})
 }
