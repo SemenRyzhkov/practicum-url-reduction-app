@@ -12,5 +12,6 @@ type URLService interface {
 	ReduceAndSaveURL(ctx context.Context, userID, url string) (string, error)
 	ReduceURLToJSON(ctx context.Context, userID string, request entity.URLRequest) (entity.URLResponse, error)
 	ReduceSeveralURL(ctx context.Context, userID string, list []entity.URLWithIDRequest) ([]entity.URLWithIDResponse, error)
+	RemoveAll(ctx context.Context, userID string, removingList []string) error
 	PingConnection() error
 }

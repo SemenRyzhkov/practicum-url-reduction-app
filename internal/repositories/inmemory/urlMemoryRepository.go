@@ -18,6 +18,10 @@ type urlMemoryRepository struct {
 	urlStorage       map[string]map[string]string
 }
 
+func (u *urlMemoryRepository) RemoveAll(ctx context.Context, removingList []entity.URLDTO) error {
+	return nil
+}
+
 func (u *urlMemoryRepository) GetAllByUserID(_ context.Context, userID string) ([]entity.FullURL, error) {
 	u.mx.Lock()
 	userURLMap, ok := u.urlStorage[userID]

@@ -21,6 +21,10 @@ type urlFileRepository struct {
 	producer         *producer
 }
 
+func (u *urlFileRepository) RemoveAll(ctx context.Context, removingList []entity.URLDTO) error {
+	return nil
+}
+
 func (u *urlFileRepository) GetAllByUserID(_ context.Context, userID string) ([]entity.FullURL, error) {
 	u.mx.Lock()
 	userURLMap, ok := u.urlStorage[userID]

@@ -70,6 +70,19 @@ func (u *urlServiceImpl) ReduceSeveralURL(ctx context.Context, userID string, li
 	return urlWithIDResponseList, nil
 }
 
+func (u *urlServiceImpl) RemoveAll(ctx context.Context, userID string, removingList []string) error {
+	var removingDTOList = make([]entity.URLDTO, len(removingList))
+	for _, u := range removingList {
+		ud := entity.URLDTO{
+			ID:      u,
+			UserID:  userID,
+			Deleted: true,
+		}
+		removingDTOList = append(removingDTOList, ud)
+	}
+	return u.urlRepository.RemoveAll(ctx, removingDTOList)
+}
+
 func (u *urlServiceImpl) PingConnection() error {
 	return u.urlRepository.Ping()
 }

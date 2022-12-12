@@ -52,6 +52,11 @@ func (u *urlHandlerImpl) GetURLByID(writer http.ResponseWriter, request *http.Re
 		http.Error(writer, err.Error(), http.StatusNotFound)
 		return
 	}
+	if url == "deleted" {
+		writer.WriteHeader(http.StatusGone)
+		return
+	}
+
 	writer.Header().Add("Location", url)
 	writer.WriteHeader(http.StatusTemporaryRedirect)
 }
@@ -132,7 +137,27 @@ func (u *urlHandlerImpl) ReduceSeveralURL(writer http.ResponseWriter, request *h
 			return
 		}
 	}
+}
 
+func (u *urlHandlerImpl) RemoveAll(writer http.ResponseWriter, request *http.Request) {
+	userID, cookieErr := u.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
+	if cookieErr != nil {
+		http.Error(writer, cookieErr.Error(), http.StatusBadRequest)
+		return
+	}
+	writer.Header().Set("Content-Type", "application/json")
+	var urlIDList []string
+	err := json.NewDecoder(request.Body).Decode(&urlIDList)
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusBadRequest)
+		return
+	}
+	removingErr := u.urlService.RemoveAll(request.Context(), userID, urlIDList)
+	if removingErr != nil {
+		http.Error(writer, err.Error(), http.StatusBadRequest)
+		return
+	}
+	writer.WriteHeader(http.StatusAccepted)
 }
 
 func (u *urlHandlerImpl) PingConnection(writer http.ResponseWriter, request *http.Request) {

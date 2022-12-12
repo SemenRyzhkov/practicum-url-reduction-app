@@ -14,6 +14,7 @@ const (
 	allURLPath           = "/api/user/urls"
 	pingPath             = "/ping"
 	reduceSeveralURLPath = "/api/shorten/batch"
+	removeAllPath        = "/api/user/urls"
 )
 
 func NewRouter(h handlers.URLHandler) chi.Router {
@@ -25,5 +26,6 @@ func NewRouter(h handlers.URLHandler) chi.Router {
 	r.Post(reduceURLPath, h.ReduceURL)
 	r.Post(reduceURLToJSONPath, h.ReduceURLTOJSON)
 	r.Post(reduceSeveralURLPath, h.ReduceSeveralURL)
+	r.Delete(removeAllPath, h.RemoveAll)
 	return r
 }
