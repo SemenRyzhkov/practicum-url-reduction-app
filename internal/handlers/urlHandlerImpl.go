@@ -167,10 +167,6 @@ func (u *urlHandlerImpl) RemoveAll(writer http.ResponseWriter, request *http.Req
 		return
 	}
 
-	//go func() {
-	//	removingErr := u.urlService.RemoveAll(request.Context(), userID, urlIDList)
-	//	log.Println(removingErr)
-	//}()
 	removingErr := u.urlService.RemoveAll(request.Context(), userID, urlIDList)
 	if removingErr != nil {
 		http.Error(writer, removingErr.Error(), http.StatusBadRequest)
