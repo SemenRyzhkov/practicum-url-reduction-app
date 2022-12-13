@@ -45,9 +45,9 @@ const (
 )
 
 type dbURLRepository struct {
-	db     *sql.DB
-	buffer []entity.URLDTO
-	//deleteQueue chan *entity.URLDTO
+	db          *sql.DB
+	buffer      []entity.URLDTO
+	deleteQueue chan *entity.URLDTO
 }
 
 func (d *dbURLRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
@@ -56,14 +56,14 @@ func (d *dbURLRepository) RemoveAll(_ context.Context, removingList []entity.URL
 		if err != nil {
 			return err
 		}
-		//d.deleteQueue <- &ud
+		d.deleteQueue <- &ud
 	}
-	//for {
-	//	select {
-	//	case ud := <-d.deleteQueue:
-	//		d.AddURLToBuffer(ud)
-	//	}
-	//}
+	for {
+		select {
+		case ud := <-d.deleteQueue:
+			d.AddURLToBuffer(ud)
+		}
+	}
 	return d.Flush()
 }
 
