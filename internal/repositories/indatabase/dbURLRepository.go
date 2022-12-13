@@ -110,7 +110,7 @@ func New(dbAddress string) (repositories.URLRepository, error) {
 	}
 	return &dbURLRepository{
 		db:     db,
-		buffer: make([]entity.URLDTO, 0, 16),
+		buffer: make([]entity.URLDTO, 0, 17),
 		//deleteQueue: make(chan entity.URLDTO),
 	}, nil
 }
