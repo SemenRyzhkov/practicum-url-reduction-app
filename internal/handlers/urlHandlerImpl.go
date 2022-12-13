@@ -173,7 +173,7 @@ func (u *urlHandlerImpl) RemoveAll(writer http.ResponseWriter, request *http.Req
 	//}()
 	removingErr := u.urlService.RemoveAll(request.Context(), userID, urlIDList)
 	if removingErr != nil {
-		http.Error(writer, err.Error(), http.StatusBadRequest)
+		http.Error(writer, removingErr.Error(), http.StatusBadRequest)
 		return
 	}
 	writer.WriteHeader(http.StatusAccepted)
