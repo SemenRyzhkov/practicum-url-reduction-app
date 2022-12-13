@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sync"
 
 	"github.com/omeid/pgerror"
 
@@ -51,17 +50,15 @@ type dbURLRepository struct {
 }
 
 func (d *dbURLRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
-	wg := &sync.WaitGroup{}
-
 	for _, ud := range removingList {
-		wg.Add(1)
-
 		go func(ud entity.URLDTO) {
 			err := d.AddURLToBuffer(&ud)
-			log.Println(err)
+			if err != nil {
+				log.Println(err)
+			}
 		}(ud)
 	}
-	wg.Wait()
+
 	return d.Flush()
 }
 
