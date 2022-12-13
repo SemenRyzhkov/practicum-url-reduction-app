@@ -56,7 +56,6 @@ func (d *dbURLRepository) RemoveAll(_ context.Context, removingList []entity.URL
 		for _, ud := range removingList {
 			d.deleteQueue <- &ud
 		}
-
 		d.done <- struct{}{}
 	}()
 	go func() {
@@ -122,7 +121,7 @@ func New(dbAddress string) (repositories.URLRepository, error) {
 	}
 	return &dbURLRepository{
 		db:          db,
-		buffer:      make([]entity.URLDTO, 0, 5),
+		buffer:      make([]entity.URLDTO, 0, 30),
 		deleteQueue: make(chan *entity.URLDTO),
 	}, nil
 }
