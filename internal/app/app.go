@@ -3,6 +3,7 @@ package app
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/config"
@@ -31,8 +32,10 @@ func New(cfg config.Config) (*App, error) {
 	urlRouter := router.NewRouter(urlHandler)
 
 	server := &http.Server{
-		Addr:    cfg.Host,
-		Handler: urlRouter,
+		Addr:         cfg.Host,
+		Handler:      urlRouter,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	return &App{
