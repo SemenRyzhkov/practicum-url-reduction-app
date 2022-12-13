@@ -34,8 +34,8 @@ func New(cfg config.Config) (*App, error) {
 	server := &http.Server{
 		Addr:         cfg.Host,
 		Handler:      urlRouter,
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 10 * time.Second,
+		ReadTimeout:  20 * time.Second,
+		WriteTimeout: 20 * time.Second,
 	}
 
 	return &App{
