@@ -16,6 +16,7 @@ import (
 )
 
 var _ repositories.URLRepository = &dbURLRepository{}
+var count int
 
 const (
 	initDBQuery = "" +
@@ -121,7 +122,8 @@ func (d *dbURLRepository) Save(ctx context.Context, userID, urlID, url string) e
 			return myerrors.NewViolationError(fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), urlID), err)
 		}
 	}
-
+	count++
+	log.Printf("url %d add ", count)
 	return nil
 }
 
