@@ -4,9 +4,14 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
+	"os"
+
+	"github.com/omeid/pgerror"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity/myerrors"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 )
 
@@ -110,7 +115,9 @@ func New(dbAddress string) (repositories.URLRepository, error) {
 func (d *dbURLRepository) Save(ctx context.Context, userID, urlID, url string) error {
 	_, err := d.db.ExecContext(ctx, insertURLQuery, urlID, url, userID, false)
 	if err != nil {
-		return err
+		if e := pgerror.UniqueViolation(err); e != nil {
+			return myerrors.NewViolationError(fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), urlID), err)
+		}
 	}
 
 	return nil
@@ -125,7 +132,8 @@ func (d *dbURLRepository) FindByID(ctx context.Context, urlID string) (string, e
 	}
 
 	if ud.Deleted {
-		return "deleted", nil
+		deletedErr := myerrors.NewDeletedError(ud, nil)
+		return "", deletedErr
 	}
 
 	return ud.OriginalURL, nil

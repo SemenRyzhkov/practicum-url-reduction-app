@@ -35,9 +35,7 @@ func (u *urlServiceImpl) ReduceURLToJSON(ctx context.Context, userID string, req
 	reduceURL := reducing(request.URL)
 	duplicateErr := u.urlRepository.Save(ctx, userID, reduceURL, request.URL)
 	if duplicateErr != nil {
-		return entity.URLResponse{
-			Result: fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL),
-		}, duplicateErr
+		return entity.URLResponse{}, duplicateErr
 	}
 	return entity.URLResponse{Result: fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL)}, nil
 }
@@ -46,7 +44,7 @@ func (u *urlServiceImpl) ReduceAndSaveURL(ctx context.Context, userID, url strin
 	reduceURL := reducing(url)
 	duplicateErr := u.urlRepository.Save(ctx, userID, reduceURL, url)
 	if duplicateErr != nil {
-		return fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL), duplicateErr
+		return "", duplicateErr
 	}
 	return fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL), nil
 }
