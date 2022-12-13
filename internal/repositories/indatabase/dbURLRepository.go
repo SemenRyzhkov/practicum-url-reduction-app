@@ -51,12 +51,10 @@ type dbURLRepository struct {
 
 func (d *dbURLRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
 	for _, ud := range removingList {
-		go func(ud entity.URLDTO) {
-			err := d.AddURLToBuffer(&ud)
-			if err != nil {
-				log.Println(err)
-			}
-		}(ud)
+		err := d.AddURLToBuffer(&ud)
+		if err != nil {
+			return err
+		}
 	}
 
 	return d.Flush()
