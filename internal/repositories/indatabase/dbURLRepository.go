@@ -52,13 +52,13 @@ type dbURLRepository struct {
 }
 
 func (d *dbURLRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
-	for _, ud := range removingList {
-		err := d.AddURLToBuffer(&ud)
-		if err != nil {
-			return err
+	go func() {
+		for _, ud := range removingList {
+			d.deleteQueue <- &ud
 		}
-		d.deleteQueue <- &ud
-	}
+
+		d.done <- struct{}{}
+	}()
 	go func() {
 		for {
 			select {
