@@ -64,6 +64,7 @@ func (d *dbURLRepository) RemoveAll(_ context.Context, removingList []entity.URL
 	//		d.AddURLToBuffer(ud)
 	//	}
 	//}
+
 	return d.Flush()
 }
 
