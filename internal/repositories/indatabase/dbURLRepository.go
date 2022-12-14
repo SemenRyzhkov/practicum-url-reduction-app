@@ -121,7 +121,8 @@ func New(dbAddress string) (repositories.URLRepository, error) {
 	}
 	return &dbURLRepository{
 		db:     db,
-		buffer: make([]entity.URLDTO, 0, 20),
+		buffer: make([]entity.URLDTO, 0, 11),
+
 		//deleteQueue: make(chan entity.URLDTO),
 	}, nil
 }
