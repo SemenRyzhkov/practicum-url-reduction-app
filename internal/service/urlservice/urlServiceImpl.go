@@ -6,6 +6,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"sync"
+	"time"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
@@ -68,17 +70,54 @@ func (u *urlServiceImpl) ReduceSeveralURL(ctx context.Context, userID string, li
 	return urlWithIDResponseList, nil
 }
 
+//func (u *urlServiceImpl) RemoveAll(ctx context.Context, userID string, removingList []string) error {
+//	now := time.Now()
+//	defer func() {
+//		fmt.Println(time.Since(now))
+//	}()
+//
+//	var removingDTOList = make([]entity.URLDTO, len(removingList))
+//	for _, u := range removingList {
+//		ud := entity.URLDTO{
+//			ID:      u,
+//			UserID:  userID,
+//			Deleted: true,
+//		}
+//		removingDTOList = append(removingDTOList, ud)
+//	}
+//	return u.urlRepository.RemoveAll(ctx, removingDTOList)
+//}
+
 func (u *urlServiceImpl) RemoveAll(ctx context.Context, userID string, removingList []string) error {
-	var removingDTOList = make([]entity.URLDTO, len(removingList))
-	for _, u := range removingList {
-		ud := entity.URLDTO{
-			ID:      u,
-			UserID:  userID,
-			Deleted: true,
+	now := time.Now()
+	defer func() {
+		fmt.Println(time.Since(now))
+	}()
+
+	outCh := make(chan entity.URLDTO)
+
+	go func() {
+		wg := &sync.WaitGroup{}
+
+		for _, reduceURL := range removingList {
+			wg.Add(1)
+
+			go func(reduceURL string) {
+				defer wg.Done()
+				ud := entity.URLDTO{
+					ID:      reduceURL,
+					UserID:  userID,
+					Deleted: true,
+				}
+				outCh <- ud
+			}(reduceURL)
 		}
-		removingDTOList = append(removingDTOList, ud)
-	}
-	return u.urlRepository.RemoveAll(ctx, removingDTOList)
+
+		wg.Wait()
+		close(outCh)
+	}()
+
+	return u.urlRepository.RemoveAll(ctx, outCh)
 }
 
 func (u *urlServiceImpl) PingConnection() error {

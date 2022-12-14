@@ -10,6 +10,6 @@ type URLRepository interface {
 	Save(ctx context.Context, userID, urlID, url string) error
 	FindByID(ctx context.Context, urlID string) (string, error)
 	GetAllByUserID(ctx context.Context, userID string) ([]entity.FullURL, error)
-	RemoveAll(ctx context.Context, removingList []entity.URLDTO) error
+	RemoveAll(ctx context.Context, removingListChannel chan entity.URLDTO) error
 	Ping() error
 }

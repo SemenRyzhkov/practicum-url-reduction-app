@@ -50,8 +50,8 @@ type dbURLRepository struct {
 	buffer []entity.URLDTO
 }
 
-func (d *dbURLRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
-	for _, ud := range removingList {
+func (d *dbURLRepository) RemoveAll(_ context.Context, removingListChannel chan entity.URLDTO) error {
+	for ud := range removingListChannel {
 		err := d.AddURLToBuffer(&ud)
 		if err != nil {
 			return err
