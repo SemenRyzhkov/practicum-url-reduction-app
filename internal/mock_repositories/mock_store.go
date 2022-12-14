@@ -80,17 +80,17 @@ func (mr *MockURLRepositoryMockRecorder) Ping() *gomock.Call {
 }
 
 // RemoveAll mocks base method.
-func (m *MockURLRepository) RemoveAll(ctx context.Context, removingList []entity.URLDTO) error {
+func (m *MockURLRepository) RemoveAll(ctx context.Context, removingListChannel chan entity.URLDTO) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RemoveAll", ctx, removingList)
+	ret := m.ctrl.Call(m, "RemoveAll", ctx, removingListChannel)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // RemoveAll indicates an expected call of RemoveAll.
-func (mr *MockURLRepositoryMockRecorder) RemoveAll(ctx, removingList interface{}) *gomock.Call {
+func (mr *MockURLRepositoryMockRecorder) RemoveAll(ctx, removingListChannel interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveAll", reflect.TypeOf((*MockURLRepository)(nil).RemoveAll), ctx, removingList)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveAll", reflect.TypeOf((*MockURLRepository)(nil).RemoveAll), ctx, removingListChannel)
 }
 
 // Save mocks base method.
