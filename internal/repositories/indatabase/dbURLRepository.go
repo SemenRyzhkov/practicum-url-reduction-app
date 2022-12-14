@@ -58,6 +58,17 @@ func (d *dbURLRepository) RemoveAll(_ context.Context, removingListChannel chan 
 		}
 	}
 
+	//for {
+	//	select {
+	//	case u := <-removingListChannel:
+	//		err := d.AddURLToBuffer(&u)
+	//		if err != nil {
+	//			return err
+	//		}
+	//
+	//	}
+	//}
+
 	return d.Flush()
 }
 
@@ -110,7 +121,7 @@ func New(dbAddress string) (repositories.URLRepository, error) {
 	}
 	return &dbURLRepository{
 		db:     db,
-		buffer: make([]entity.URLDTO, 0, 100),
+		buffer: make([]entity.URLDTO, 0, 20),
 		//deleteQueue: make(chan entity.URLDTO),
 	}, nil
 }
