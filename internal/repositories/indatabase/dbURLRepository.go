@@ -4,7 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"log"
+	"os"
+
+	"github.com/omeid/pgerror"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity/myerrors"
@@ -147,7 +151,9 @@ func (d *dbURLRepository) Save(ctx context.Context, userID, urlID, url string) e
 	defer stmt.Close()
 
 	if _, err = stmt.ExecContext(ctx, urlID, url, userID, false); err != nil {
-		return err
+		if e := pgerror.UniqueViolation(err); e != nil {
+			return myerrors.NewViolationError(fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), urlID), err)
+		}
 	}
 	return tx.Commit()
 }
