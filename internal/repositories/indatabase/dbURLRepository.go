@@ -4,11 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 	"log"
-	"os"
-
-	"github.com/omeid/pgerror"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity/myerrors"
@@ -130,15 +126,30 @@ func New(dbAddress string) (repositories.URLRepository, error) {
 }
 
 func (d *dbURLRepository) Save(ctx context.Context, userID, urlID, url string) error {
-	_, err := d.db.ExecContext(ctx, insertURLQuery, urlID, url, userID, false)
+	//_, err := d.db.ExecContext(ctx, insertURLQuery, urlID, url, userID, false)
+	//if err != nil {
+	//	if e := pgerror.UniqueViolation(err); e != nil {
+	//		return myerrors.NewViolationError(fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), urlID), err)
+	//	}
+	//}
+
+	tx, err := d.db.Begin()
 	if err != nil {
-		if e := pgerror.UniqueViolation(err); e != nil {
-			return myerrors.NewViolationError(fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), urlID), err)
-		}
+		return err
 	}
-	count++
-	log.Printf("url %s add, count %d ", urlID, count)
-	return nil
+	defer tx.Rollback()
+
+	stmt, err := tx.PrepareContext(ctx, insertURLQuery)
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+
+	if _, err = stmt.ExecContext(ctx, urlID, url, userID, false); err != nil {
+		return err
+	}
+	return tx.Commit()
 }
 
 func (d *dbURLRepository) FindByID(ctx context.Context, urlID string) (string, error) {
