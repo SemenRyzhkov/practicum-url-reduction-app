@@ -198,6 +198,11 @@ func initDB(dbAddress string) (*sql.DB, error) {
 		return nil, connectionErr
 	}
 
+	db.SetConnMaxIdleTime(0)
+	db.SetConnMaxLifetime(0)
+	db.SetMaxIdleConns(10)
+	db.SetMaxOpenConns(10)
+
 	createTableErr := createTableIfNotExists(db)
 	if createTableErr != nil {
 		return nil, createTableErr
