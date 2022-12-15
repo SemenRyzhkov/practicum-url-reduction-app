@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -167,11 +168,14 @@ func (u *urlHandlerImpl) RemoveAll(writer http.ResponseWriter, request *http.Req
 		return
 	}
 
-	removingErr := u.urlService.RemoveAll(request.Context(), userID, urlIDList)
-	if removingErr != nil {
-		http.Error(writer, removingErr.Error(), http.StatusBadRequest)
-		return
-	}
+	go func() {
+		removingErr := u.urlService.RemoveAll(request.Context(), userID, urlIDList)
+		if removingErr != nil {
+			//http.Error(writer, removingErr.Error(), http.StatusBadRequest)
+			log.Println(removingErr)
+			return
+		}
+	}()
 	writer.WriteHeader(http.StatusAccepted)
 }
 
