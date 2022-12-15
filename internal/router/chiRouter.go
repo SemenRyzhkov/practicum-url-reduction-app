@@ -19,7 +19,7 @@ const (
 
 func NewRouter(h handlers.URLHandler) chi.Router {
 	r := chi.NewRouter()
-	r.Use(middleware.DecompressRequest, middleware.CompressResponse)
+	r.Use(middleware.DecompressRequest, middleware.CompressResponse, middleware.LoggingMiddleware)
 	r.Get(pingPath, h.PingConnection)
 	r.Get(getURLPath, h.GetURLByID)
 	r.Get(allURLPath, h.GetAllURL)
