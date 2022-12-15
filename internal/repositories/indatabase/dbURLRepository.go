@@ -51,6 +51,7 @@ type dbURLRepository struct {
 }
 
 func (d *dbURLRepository) RemoveAll(_ context.Context, removingListChannel chan entity.URLDTO) error {
+	log.Printf("Channel contains %d elements", len(removingListChannel))
 	for ud := range removingListChannel {
 		err := d.AddURLToBuffer(&ud)
 		if err != nil {
@@ -73,6 +74,7 @@ func (d *dbURLRepository) RemoveAll(_ context.Context, removingListChannel chan 
 }
 
 func (d *dbURLRepository) AddURLToBuffer(u *entity.URLDTO) error {
+	log.Printf("Add url to buffer %s", u.ID)
 	d.buffer = append(d.buffer, *u)
 
 	if cap(d.buffer) == len(d.buffer) {
@@ -95,7 +97,7 @@ func (d *dbURLRepository) Flush() error {
 		return err
 	}
 	defer stmt.Close()
-
+	log.Printf("Buffer contains %d elements", len(d.buffer))
 	for _, u := range d.buffer {
 		if _, err = stmt.Exec(u.Deleted, u.ID, u.UserID); err != nil {
 			if err = tx.Rollback(); err != nil {
@@ -135,7 +137,7 @@ func (d *dbURLRepository) Save(ctx context.Context, userID, urlID, url string) e
 		}
 	}
 	count++
-	log.Printf("url %d add ", count)
+	log.Printf("url %s add, count %d ", urlID, count)
 	return nil
 }
 
