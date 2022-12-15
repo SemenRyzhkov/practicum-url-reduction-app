@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/omeid/pgerror"
 
@@ -198,9 +199,9 @@ func initDB(dbAddress string) (*sql.DB, error) {
 		return nil, connectionErr
 	}
 
-	db.SetConnMaxIdleTime(0)
-	db.SetConnMaxLifetime(0)
-	db.SetMaxIdleConns(10)
+	db.SetConnMaxIdleTime(100 * time.Microsecond)
+	db.SetConnMaxLifetime(100 * time.Microsecond)
+	db.SetMaxIdleConns(2)
 	db.SetMaxOpenConns(10)
 
 	createTableErr := createTableIfNotExists(db)
