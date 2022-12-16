@@ -94,7 +94,7 @@ func (u *urlServiceImpl) RemoveAll(ctx context.Context, userID string, removingL
 		fmt.Println(time.Since(now))
 	}()
 
-	outCh := make(chan entity.URLDTO)
+	outCh := make(chan entity.URLDTO, len(removingList))
 
 	go func() {
 		wg := &sync.WaitGroup{}
