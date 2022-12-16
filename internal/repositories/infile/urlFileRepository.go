@@ -21,7 +21,7 @@ type urlFileRepository struct {
 	producer         *producer
 }
 
-func (u *urlFileRepository) RemoveAll(ctx context.Context, removingListChannel chan entity.URLDTO) error {
+func (u *urlFileRepository) RemoveAll(ctx context.Context, _ chan entity.URLDTO) error {
 	return nil
 }
 
