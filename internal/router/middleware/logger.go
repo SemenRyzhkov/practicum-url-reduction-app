@@ -33,7 +33,6 @@ func (rw *responseWriter) WriteHeader(code int) {
 	rw.ResponseWriter.WriteHeader(code)
 	rw.wroteHeader = true
 
-	return
 }
 
 func getLogger() log.Logger {
