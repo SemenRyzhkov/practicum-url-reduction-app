@@ -201,6 +201,7 @@ func initDB(dbAddress string) (*sql.DB, error) {
 	//db.SetConnMaxIdleTime(100 * time.Microsecond)
 	//db.SetConnMaxLifetime(100 * time.Microsecond)
 	//db.SetConnMaxLifetime(100 * time.Microsecond)
+	//db.SetConnMaxLifetime(100 * time.Microsecond)
 	db.SetMaxIdleConns(2)
 	db.SetMaxOpenConns(10)
 
