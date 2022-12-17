@@ -59,17 +59,6 @@ func (d *dbURLRepository) RemoveAll(_ context.Context, removingListChannel chan 
 		}
 	}
 
-	//for {
-	//	select {
-	//	case u := <-removingListChannel:
-	//		err := d.AddURLToBuffer(&u)
-	//		if err != nil {
-	//			return err
-	//		}
-	//
-	//	}
-	//}
-
 	return d.Flush()
 }
 
@@ -195,18 +184,13 @@ func (d *dbURLRepository) Ping() error {
 func initDB(dbAddress string) (*sql.DB, error) {
 	db, connectionErr := sql.Open("postgres", dbAddress)
 	if connectionErr != nil {
+		log.Println(connectionErr)
 		return nil, connectionErr
 	}
-
-	//db.SetConnMaxIdleTime(100 * time.Microsecond)
-	//db.SetConnMaxLifetime(100 * time.Microsecond)
-	//db.SetConnMaxLifetime(100 * time.Microsecond)
-	//db.SetConnMaxLifetime(100 * time.Microsecond)
-	db.SetMaxIdleConns(2)
-	db.SetMaxOpenConns(10)
-
+	log.Printf("Connect success %s", dbAddress)
 	createTableErr := createTableIfNotExists(db)
 	if createTableErr != nil {
+		log.Println(createTableErr)
 		return nil, createTableErr
 	}
 	return db, nil
