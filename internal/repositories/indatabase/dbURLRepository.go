@@ -57,6 +57,17 @@ type dbURLRepository struct {
 	mx            sync.Mutex
 }
 
+func (d *dbURLRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
+	d.fromQueueToBuffer()
+	for _, ud := range removingList {
+		err := d.addURLToDeletionQueue(ud)
+		if err != nil {
+			return err
+		}
+	}
+	return d.Stop()
+}
+
 func (d *dbURLRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
 	select {
 	case <-d.done:
@@ -104,17 +115,6 @@ func (d *dbURLRepository) Stop() error {
 		return err
 	}
 	return nil
-}
-
-func (d *dbURLRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
-	d.fromQueueToBuffer()
-	for _, ud := range removingList {
-		err := d.addURLToDeletionQueue(ud)
-		if err != nil {
-			return err
-		}
-	}
-	return d.Stop()
 }
 
 func (d *dbURLRepository) AddURLToBuffer(u *entity.URLDTO) error {
