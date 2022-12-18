@@ -130,7 +130,7 @@ func (d *dbURLRepository) AddURLToBuffer(u *entity.URLDTO) error {
 		err := d.Flush()
 		d.mx.Unlock()
 		if err != nil {
-			return errors.New("cannot add records to the database")
+			return errors.New("cannot add records to the databasse")
 		}
 	}
 	return nil
