@@ -98,10 +98,9 @@ func (d *dbURLRepository) fromQueueToBuffer(ctx context.Context) {
 					}
 					_, err := d.db.ExecContext(ctx, deleteQuery, ud.Deleted, ud.ID, ud.UserID)
 					if err != nil {
+						log.Printf("Delete error %v", err)
 						return
-						//if e := pgerror.UniqueViolation(err); e != nil {
-						//	return myerrors.NewViolationError(fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), urlID), err)
-						//}
+
 					}
 				}
 			}
