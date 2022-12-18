@@ -58,12 +58,12 @@ type dbURLRepository struct {
 	deletionQueue chan entity.URLDTO
 	done          chan struct{}
 	wg            sync.WaitGroup
-	buffer        buffer
-	once          sync.Once
+	//buffer        buffer
+	once sync.Once
 }
 
-func (d *dbURLRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
-	d.fromQueueToBuffer()
+func (d *dbURLRepository) RemoveAll(ctx context.Context, removingList []entity.URLDTO) error {
+	d.fromQueueToBuffer(ctx)
 	for _, ud := range removingList {
 		err := d.addURLToDeletionQueue(ud)
 		if err != nil {
@@ -82,7 +82,7 @@ func (d *dbURLRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
 	}
 }
 
-func (d *dbURLRepository) fromQueueToBuffer() {
+func (d *dbURLRepository) fromQueueToBuffer(ctx context.Context) {
 	for i := 0; i < 10; i++ { // создаем 10 горутин-воркеров
 		d.wg.Add(1)
 		go func() {
@@ -96,12 +96,13 @@ func (d *dbURLRepository) fromQueueToBuffer() {
 					if !ok {
 						return
 					}
-					err := d.AddURLToBuffer(&ud)
-					log.Printf("In queque %v", ud)
+					_, err := d.db.ExecContext(ctx, deleteQuery, ud.Deleted, ud.ID, ud.UserID)
 					if err != nil {
-						log.Printf("error is %v", err)
 						return
-					} // добавляем в буфер
+						//if e := pgerror.UniqueViolation(err); e != nil {
+						//	return myerrors.NewViolationError(fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), urlID), err)
+						//}
+					}
 				}
 			}
 		}()
@@ -118,60 +119,60 @@ func (d *dbURLRepository) Stop() error {
 
 	close(d.deletionQueue)
 	d.wg.Wait()
-	d.buffer.mx.Lock()
-	err := d.Flush()
-	d.buffer.mx.Unlock()
-	if err != nil {
-		return err
-	}
+	//d.buffer.mx.Lock()
+	//err := d.Flush()
+	//d.buffer.mx.Unlock()
+	//if err != nil {
+	//	return err
+	//}
 	return nil
 }
 
-func (d *dbURLRepository) AddURLToBuffer(u *entity.URLDTO) error {
-	log.Printf("Add url to buffer %s", u.ID)
-	d.buffer.mx.Lock()
-	d.buffer.buf = append(d.buffer.buf, *u)
-	d.buffer.mx.Unlock()
-	if cap(d.buffer.buf) == len(d.buffer.buf) {
-		d.buffer.mx.Lock()
-		err := d.Flush()
-		d.buffer.mx.Unlock()
-		if err != nil {
-			return errors.New("cannot add records to the databasse")
-		}
-	}
-	return nil
-}
+//func (d *dbURLRepository) AddURLToBuffer(u *entity.URLDTO) error {
+//	log.Printf("Add url to buffer %s", u.ID)
+//	d.buffer.mx.Lock()
+//	d.buffer.buf = append(d.buffer.buf, *u)
+//	d.buffer.mx.Unlock()
+//	if cap(d.buffer.buf) == len(d.buffer.buf) {
+//		d.buffer.mx.Lock()
+//		err := d.Flush()
+//		d.buffer.mx.Unlock()
+//		if err != nil {
+//			return errors.New("cannot add records to the databasse")
+//		}
+//	}
+//	return nil
+//}
 
-func (d *dbURLRepository) Flush() error {
-	tx, err := d.db.Begin()
-	if err != nil {
-		return err
-	}
-
-	stmt, err := tx.Prepare(deleteQuery)
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-	log.Printf("Buffer contains %d elements", len(d.buffer.buf))
-	for _, u := range d.buffer.buf {
-		if _, err = stmt.Exec(u.Deleted, u.ID, u.UserID); err != nil {
-			if err = tx.Rollback(); err != nil {
-				log.Fatalf("update drivers: unable to rollback: %v", err)
-			}
-			return err
-		}
-	}
-
-	if err := tx.Commit(); err != nil {
-		log.Fatalf("update drivers: unable to commit: %v", err)
-		return err
-	}
-
-	d.buffer.buf = d.buffer.buf[:0]
-	return nil
-}
+//func (d *dbURLRepository) Flush() error {
+//	tx, err := d.db.Begin()
+//	if err != nil {
+//		return err
+//	}
+//
+//	stmt, err := tx.Prepare(deleteQuery)
+//	if err != nil {
+//		return err
+//	}
+//	defer stmt.Close()
+//	log.Printf("Buffer contains %d elements", len(d.buffer.buf))
+//	for _, u := range d.buffer.buf {
+//		if _, err = stmt.Exec(u.Deleted, u.ID, u.UserID); err != nil {
+//			if err = tx.Rollback(); err != nil {
+//				log.Fatalf("update drivers: unable to rollback: %v", err)
+//			}
+//			return err
+//		}
+//	}
+//
+//	if err := tx.Commit(); err != nil {
+//		log.Fatalf("update drivers: unable to commit: %v", err)
+//		return err
+//	}
+//
+//	d.buffer.buf = d.buffer.buf[:0]
+//	return nil
+//}
 
 func New(dbAddress string) (repositories.URLRepository, error) {
 	db, err := initDB(dbAddress)
@@ -179,8 +180,8 @@ func New(dbAddress string) (repositories.URLRepository, error) {
 		return nil, err
 	}
 	return &dbURLRepository{
-		db:            db,
-		buffer:        buffer{buf: make([]entity.URLDTO, 10, 100)},
+		db: db,
+		//buffer:        buffer{buf: make([]entity.URLDTO, 10, 100)},
 		deletionQueue: make(chan entity.URLDTO),
 		done:          make(chan struct{}),
 	}, nil
