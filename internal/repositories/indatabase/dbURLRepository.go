@@ -48,13 +48,17 @@ const (
 		"WHERE id = $2 AND user_id = $3"
 )
 
+type buffer struct {
+	buf []entity.URLDTO
+	mx  sync.Mutex
+}
+
 type dbURLRepository struct {
 	db            *sql.DB
 	deletionQueue chan entity.URLDTO
 	done          chan struct{}
 	wg            sync.WaitGroup
-	buffer        []entity.URLDTO
-	mx            sync.Mutex
+	buffer        buffer
 	once          sync.Once
 }
 
@@ -74,7 +78,6 @@ func (d *dbURLRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
 	case <-d.done:
 		return ErrRepositoryIsClosing
 	case d.deletionQueue <- ud:
-		log.Println(d.deletionQueue)
 		return nil
 	}
 }
@@ -109,13 +112,15 @@ func (d *dbURLRepository) Stop() error {
 	d.once.Do(func() {
 		close(d.done)
 	})
-	d.once.Do(func() {
-		close(d.deletionQueue)
-	})
+	//d.once.Do(func() {
+	//	close(d.deletionQueue)
+	//})
+
+	close(d.deletionQueue)
 	d.wg.Wait()
-	d.mx.Lock()
+	d.buffer.mx.Lock()
 	err := d.Flush()
-	d.mx.Unlock()
+	d.buffer.mx.Unlock()
 	if err != nil {
 		return err
 	}
@@ -124,13 +129,13 @@ func (d *dbURLRepository) Stop() error {
 
 func (d *dbURLRepository) AddURLToBuffer(u *entity.URLDTO) error {
 	log.Printf("Add url to buffer %s", u.ID)
-	d.mx.Lock()
-	d.buffer = append(d.buffer, *u)
-	d.mx.Unlock()
-	if cap(d.buffer) == len(d.buffer) {
-		d.mx.Lock()
+	d.buffer.mx.Lock()
+	d.buffer.buf = append(d.buffer.buf, *u)
+	d.buffer.mx.Unlock()
+	if cap(d.buffer.buf) == len(d.buffer.buf) {
+		d.buffer.mx.Lock()
 		err := d.Flush()
-		d.mx.Unlock()
+		d.buffer.mx.Unlock()
 		if err != nil {
 			return errors.New("cannot add records to the databasse")
 		}
@@ -149,8 +154,8 @@ func (d *dbURLRepository) Flush() error {
 		return err
 	}
 	defer stmt.Close()
-	log.Printf("Buffer contains %d elements", len(d.buffer))
-	for _, u := range d.buffer {
+	log.Printf("Buffer contains %d elements", len(d.buffer.buf))
+	for _, u := range d.buffer.buf {
 		if _, err = stmt.Exec(u.Deleted, u.ID, u.UserID); err != nil {
 			if err = tx.Rollback(); err != nil {
 				log.Fatalf("update drivers: unable to rollback: %v", err)
@@ -164,7 +169,7 @@ func (d *dbURLRepository) Flush() error {
 		return err
 	}
 
-	d.buffer = d.buffer[:0]
+	d.buffer.buf = d.buffer.buf[:0]
 	return nil
 }
 
@@ -175,7 +180,7 @@ func New(dbAddress string) (repositories.URLRepository, error) {
 	}
 	return &dbURLRepository{
 		db:            db,
-		buffer:        make([]entity.URLDTO, 10, 100),
+		buffer:        buffer{buf: make([]entity.URLDTO, 10, 100)},
 		deletionQueue: make(chan entity.URLDTO),
 		done:          make(chan struct{}),
 	}, nil
