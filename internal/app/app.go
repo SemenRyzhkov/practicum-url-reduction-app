@@ -45,9 +45,15 @@ func New(cfg config.Config, urlService urlservice.URLService) (*App, error) {
 func (app *App) Close(service urlservice.URLService) {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-	<-sigs
-	app.HTTPServer.Close()
-	service.Stop()
+
+	for {
+		select {
+		case <-sigs:
+			app.HTTPServer.Close()
+			service.Stop()
+		}
+	}
+
 }
 
 func (app *App) Run() error {
