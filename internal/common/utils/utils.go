@@ -7,12 +7,10 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/config"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/indatabase"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/infile"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/inmemory"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/urlservice"
 )
 
 func GetFilePath() string {
@@ -62,12 +60,4 @@ func CreateRepository(filePath, dbAddress string) (repositories.URLRepository, e
 		repo = CreateMemoryOrFileRepository(filePath)
 	}
 	return repo, nil
-}
-
-func CreateService(cfg config.Config) (urlservice.URLService, error) {
-	urlRepository, err := CreateRepository(cfg.FilePath, cfg.DataBaseAddress)
-	if err != nil {
-		return nil, err
-	}
-	return urlservice.New(urlRepository), nil
 }

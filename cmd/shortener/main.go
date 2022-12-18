@@ -24,7 +24,7 @@ func main() {
 	filePath := utils.GetFilePath()
 	key := utils.GetKey()
 	cfg := config.New(serverAddress, filePath, key, dbAddress)
-	service, err := utils.CreateService(cfg)
+	service, err := app.CreateService(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}

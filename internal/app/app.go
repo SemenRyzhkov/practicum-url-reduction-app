@@ -8,6 +8,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/config"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/router"
@@ -52,4 +53,12 @@ func (app *App) Close(service urlservice.URLService) {
 func (app *App) Run() error {
 	log.Println("run server")
 	return app.HTTPServer.ListenAndServe()
+}
+
+func CreateService(cfg config.Config) (urlservice.URLService, error) {
+	urlRepository, err := utils.CreateRepository(cfg.FilePath, cfg.DataBaseAddress)
+	if err != nil {
+		return nil, err
+	}
+	return urlservice.New(urlRepository), nil
 }
