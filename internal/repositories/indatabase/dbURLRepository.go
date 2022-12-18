@@ -16,8 +16,10 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 )
 
-var _ repositories.URLRepository = &dbURLRepository{}
-var count int
+var (
+	_                      repositories.URLRepository = &dbURLRepository{}
+	ErrRepositoryIsClosing                            = errors.New("repository is closing")
+)
 
 const (
 	initDBQuery = "" +
@@ -47,27 +49,71 @@ const (
 )
 
 type dbURLRepository struct {
-	db     *sql.DB
-	buffer []entity.URLDTO
-	mx     sync.Mutex
+	db            *sql.DB
+	deletionQueue chan entity.URLDTO
+	done          chan struct{}
+	wg            sync.WaitGroup
+	buffer        []entity.URLDTO
 }
 
-func (d *dbURLRepository) RemoveAll(_ context.Context, removingListChannel chan entity.URLDTO) error {
-	log.Printf("Channel contains %d elements", len(removingListChannel))
-	for ud := range removingListChannel {
-		err := d.AddURLToBuffer(&ud)
+func (d *dbURLRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
+	select {
+	case <-d.done:
+		return ErrRepositoryIsClosing
+	case d.deletionQueue <- ud:
+		log.Println(d.deletionQueue)
+		return nil
+	}
+}
+
+func (d *dbURLRepository) fromQueueToBuffer() {
+	for i := 0; i < 10; i++ { // создаем 10 горутин-воркеров
+		d.wg.Add(1)
+		go func() {
+			defer d.wg.Done()
+			for {
+				select {
+				case <-d.done:
+					log.Println("Exiting")
+					return // если поступает, сигнал из канала done, завершаем
+				case ud, ok := <-d.deletionQueue: // вычитываем из очереди
+					if !ok {
+						return
+					}
+					err := d.AddURLToBuffer(&ud)
+					log.Printf("In queque %v", ud)
+					if err != nil {
+						log.Println(err)
+						return
+					} // добавляем в буфер
+				}
+			}
+		}()
+	}
+}
+
+func (d *dbURLRepository) Stop() error {
+	close(d.done) // todo: do it in sync.Once
+	close(d.deletionQueue)
+	d.wg.Wait()
+	return d.Flush()
+
+}
+
+func (d *dbURLRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
+	d.fromQueueToBuffer()
+	for _, ud := range removingList {
+		err := d.addURLToDeletionQueue(ud)
 		if err != nil {
 			return err
 		}
 	}
-
-	return d.Flush()
+	return d.Stop()
 }
 
 func (d *dbURLRepository) AddURLToBuffer(u *entity.URLDTO) error {
 	log.Printf("Add url to buffer %s", u.ID)
-	d.mx.Lock()
-	defer d.mx.Unlock()
+
 	d.buffer = append(d.buffer, *u)
 
 	if cap(d.buffer) == len(d.buffer) {
@@ -115,10 +161,10 @@ func New(dbAddress string) (repositories.URLRepository, error) {
 		return nil, err
 	}
 	return &dbURLRepository{
-		db:     db,
-		buffer: make([]entity.URLDTO, 0, 11),
-
-		//deleteQueue: make(chan entity.URLDTO),
+		db:            db,
+		buffer:        make([]entity.URLDTO, 100),
+		deletionQueue: make(chan entity.URLDTO),
+		done:          make(chan struct{}),
 	}, nil
 }
 

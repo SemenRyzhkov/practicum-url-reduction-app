@@ -18,7 +18,7 @@ type urlMemoryRepository struct {
 	urlStorage       map[string]map[string]string
 }
 
-func (u *urlMemoryRepository) RemoveAll(ctx context.Context, removingListChannel chan entity.URLDTO) error {
+func (u *urlMemoryRepository) RemoveAll(ctx context.Context, removingListChannel []entity.URLDTO) error {
 	return nil
 }
 
