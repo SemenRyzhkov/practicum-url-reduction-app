@@ -97,8 +97,13 @@ func (d *dbURLRepository) Stop() error {
 	close(d.done) // todo: do it in sync.Once
 	close(d.deletionQueue)
 	d.wg.Wait()
-	return d.Flush()
-
+	d.mx.Lock()
+	err := d.Flush()
+	d.mx.Unlock()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d *dbURLRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
@@ -115,11 +120,12 @@ func (d *dbURLRepository) RemoveAll(_ context.Context, removingList []entity.URL
 func (d *dbURLRepository) AddURLToBuffer(u *entity.URLDTO) error {
 	log.Printf("Add url to buffer %s", u.ID)
 	d.mx.Lock()
-	defer d.mx.Unlock()
-
 	d.buffer = append(d.buffer, *u)
+	d.mx.Unlock()
 	if cap(d.buffer) == len(d.buffer) {
+		d.mx.Lock()
 		err := d.Flush()
+		d.mx.Unlock()
 		if err != nil {
 			return errors.New("cannot add records to the database")
 		}
