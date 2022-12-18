@@ -3,12 +3,8 @@ package main
 import (
 	"errors"
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
 
 	_ "github.com/lib/pq"
 
@@ -37,23 +33,13 @@ func main() {
 		log.Fatal(err)
 	}
 
+	//sigs := make(chan os.Signal, 1)
+	//signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	a.Close(service)
 	err = a.Run()
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal(err)
 	}
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-	done := make(chan bool, 1)
 
-	go func() {
-		sig := <-sigs
-		fmt.Println(sig)
-		log.Println("Closeeeeeeeeeee")
-		a.HTTPServer.Close()
-		service.Stop()
-		done <- true
-	}()
-	fmt.Println("awaiting signal")
-	<-done
-	fmt.Println("exiting")
 }
