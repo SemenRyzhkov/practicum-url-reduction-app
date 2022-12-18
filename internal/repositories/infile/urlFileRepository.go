@@ -21,6 +21,11 @@ type urlFileRepository struct {
 	producer         *producer
 }
 
+func (u *urlFileRepository) StopWorkerPool() {
+	////TODO implement me
+	//panic("implement me")
+}
+
 func (u *urlFileRepository) RemoveAll(_ context.Context, _ []entity.URLDTO) error {
 	return nil
 }

@@ -18,6 +18,10 @@ type urlServiceImpl struct {
 	urlRepository repositories.URLRepository
 }
 
+func (u *urlServiceImpl) Stop() {
+	u.urlRepository.StopWorkerPool()
+}
+
 func New(urlRepository repositories.URLRepository) URLService {
 	return &urlServiceImpl{
 		urlRepository,

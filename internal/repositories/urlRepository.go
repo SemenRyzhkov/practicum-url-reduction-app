@@ -11,5 +11,6 @@ type URLRepository interface {
 	FindByID(ctx context.Context, urlID string) (string, error)
 	GetAllByUserID(ctx context.Context, userID string) ([]entity.FullURL, error)
 	RemoveAll(ctx context.Context, removingListChannel []entity.URLDTO) error
+	StopWorkerPool()
 	Ping() error
 }

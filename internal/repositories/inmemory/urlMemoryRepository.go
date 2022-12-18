@@ -18,6 +18,11 @@ type urlMemoryRepository struct {
 	urlStorage       map[string]map[string]string
 }
 
+func (u *urlMemoryRepository) StopWorkerPool() {
+	////TODO implement me
+	//panic("implement me")
+}
+
 func (u *urlMemoryRepository) RemoveAll(ctx context.Context, removingListChannel []entity.URLDTO) error {
 	return nil
 }

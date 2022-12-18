@@ -166,7 +166,6 @@ func (u *urlHandlerImpl) RemoveAll(writer http.ResponseWriter, request *http.Req
 		http.Error(writer, err.Error(), http.StatusBadRequest)
 		return
 	}
-
 	removingErr := u.urlService.RemoveAll(request.Context(), userID, urlIDList)
 	if removingErr != nil {
 		http.Error(writer, removingErr.Error(), http.StatusBadRequest)

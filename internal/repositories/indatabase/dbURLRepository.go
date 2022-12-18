@@ -48,18 +48,22 @@ const (
 		"WHERE id = $2 AND user_id = $3"
 )
 
-type buffer struct {
-	buf []entity.URLDTO
-	mx  sync.Mutex
-}
-
 type dbURLRepository struct {
 	db            *sql.DB
 	deletionQueue chan entity.URLDTO
 	done          chan struct{}
 	wg            sync.WaitGroup
-	//buffer        buffer
-	once sync.Once
+	once          sync.Once
+}
+
+func (d *dbURLRepository) StopWorkerPool() {
+	d.once.Do(func() {
+		close(d.done)
+	})
+
+	close(d.deletionQueue)
+	d.wg.Wait()
+
 }
 
 func (d *dbURLRepository) RemoveAll(ctx context.Context, removingList []entity.URLDTO) error {
@@ -70,7 +74,8 @@ func (d *dbURLRepository) RemoveAll(ctx context.Context, removingList []entity.U
 			return err
 		}
 	}
-	return d.Stop()
+	//d.Stop()
+	return nil
 }
 
 func (d *dbURLRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
@@ -80,13 +85,15 @@ func (d *dbURLRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
 	case d.deletionQueue <- ud:
 		return nil
 	}
+
 }
 
-func (d *dbURLRepository) fromQueueToBuffer(ctx context.Context) {
+func (d *dbURLRepository) fromQueueToBuffer(_ context.Context) {
 	for i := 0; i < 10; i++ { // создаем 10 горутин-воркеров
 		d.wg.Add(1)
 		go func() {
 			defer d.wg.Done()
+			ctx := context.Background()
 			for {
 				select {
 				case <-d.done:
@@ -106,25 +113,17 @@ func (d *dbURLRepository) fromQueueToBuffer(ctx context.Context) {
 			}
 		}()
 	}
+
 }
 
-func (d *dbURLRepository) Stop() error {
+func (d *dbURLRepository) Stop() {
 	d.once.Do(func() {
 		close(d.done)
 	})
-	//d.once.Do(func() {
-	//	close(d.deletionQueue)
-	//})
 
 	close(d.deletionQueue)
 	d.wg.Wait()
-	//d.buffer.mx.Lock()
-	//err := d.Flush()
-	//d.buffer.mx.Unlock()
-	//if err != nil {
-	//	return err
-	//}
-	return nil
+
 }
 
 //func (d *dbURLRepository) AddURLToBuffer(u *entity.URLDTO) error {
