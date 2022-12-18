@@ -55,6 +55,7 @@ type dbURLRepository struct {
 	wg            sync.WaitGroup
 	buffer        []entity.URLDTO
 	mx            sync.Mutex
+	once          sync.Once
 }
 
 func (d *dbURLRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
@@ -105,7 +106,9 @@ func (d *dbURLRepository) fromQueueToBuffer() {
 }
 
 func (d *dbURLRepository) Stop() error {
-	close(d.done) // todo: do it in sync.Once
+	d.once.Do(func() {
+		close(d.done)
+	}) // todo: do it in sync.Once
 	close(d.deletionQueue)
 	d.wg.Wait()
 	d.mx.Lock()
