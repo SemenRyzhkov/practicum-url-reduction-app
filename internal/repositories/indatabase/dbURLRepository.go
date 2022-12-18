@@ -96,7 +96,7 @@ func (d *dbURLRepository) fromQueueToBuffer() {
 					err := d.AddURLToBuffer(&ud)
 					log.Printf("In queque %v", ud)
 					if err != nil {
-						log.Println(err)
+						log.Printf("error is %v", err)
 						return
 					} // добавляем в буфер
 				}
