@@ -116,15 +116,15 @@ func (d *dbURLRepository) fromQueueToBuffer(_ context.Context) {
 
 }
 
-func (d *dbURLRepository) Stop() {
-	d.once.Do(func() {
-		close(d.done)
-	})
-
-	close(d.deletionQueue)
-	d.wg.Wait()
-
-}
+//func (d *dbURLRepository) Stop() {
+//	d.once.Do(func() {
+//		close(d.done)
+//	})
+//
+//	close(d.deletionQueue)
+//	d.wg.Wait()
+//
+//}
 
 //func (d *dbURLRepository) AddURLToBuffer(u *entity.URLDTO) error {
 //	log.Printf("Add url to buffer %s", u.ID)

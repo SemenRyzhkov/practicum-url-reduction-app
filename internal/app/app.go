@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -45,14 +46,13 @@ func New(cfg config.Config, urlService urlservice.URLService) (*App, error) {
 func (app *App) Close(service urlservice.URLService) {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-
-	for {
-		select {
-		case <-sigs:
-			app.HTTPServer.Close()
-			service.Stop()
-		}
-	}
+	go func() {
+		sig := <-sigs
+		fmt.Println(sig)
+		log.Println("Closeeeeeeeeeee")
+		app.HTTPServer.Close()
+		service.Stop()
+	}()
 
 }
 
