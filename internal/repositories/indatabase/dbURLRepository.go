@@ -54,6 +54,7 @@ type dbURLRepository struct {
 	done          chan struct{}
 	wg            sync.WaitGroup
 	buffer        []entity.URLDTO
+	mx            sync.Mutex
 }
 
 func (d *dbURLRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
@@ -113,9 +114,10 @@ func (d *dbURLRepository) RemoveAll(_ context.Context, removingList []entity.URL
 
 func (d *dbURLRepository) AddURLToBuffer(u *entity.URLDTO) error {
 	log.Printf("Add url to buffer %s", u.ID)
+	d.mx.Lock()
+	defer d.mx.Unlock()
 
 	d.buffer = append(d.buffer, *u)
-
 	if cap(d.buffer) == len(d.buffer) {
 		err := d.Flush()
 		if err != nil {
