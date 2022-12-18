@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 
 	"github.com/omeid/pgerror"
 
@@ -48,6 +49,7 @@ const (
 type dbURLRepository struct {
 	db     *sql.DB
 	buffer []entity.URLDTO
+	mx     sync.Mutex
 }
 
 func (d *dbURLRepository) RemoveAll(_ context.Context, removingListChannel chan entity.URLDTO) error {
@@ -64,6 +66,8 @@ func (d *dbURLRepository) RemoveAll(_ context.Context, removingListChannel chan 
 
 func (d *dbURLRepository) AddURLToBuffer(u *entity.URLDTO) error {
 	log.Printf("Add url to buffer %s", u.ID)
+	d.mx.Lock()
+	defer d.mx.Unlock()
 	d.buffer = append(d.buffer, *u)
 
 	if cap(d.buffer) == len(d.buffer) {
