@@ -23,10 +23,12 @@ func main() {
 	dbAddress := utils.GetDBAddress()
 	filePath := utils.GetFilePath()
 	key := utils.GetKey()
-
 	cfg := config.New(serverAddress, filePath, key, dbAddress)
-
-	a, err := app.New(cfg)
+	service, err := utils.CreateService(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	a, err := app.New(cfg, service)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,4 +37,5 @@ func main() {
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal(err)
 	}
+	a.Close(service)
 }

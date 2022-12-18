@@ -3,9 +3,11 @@ package app
 import (
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/config"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/router"
@@ -17,13 +19,9 @@ type App struct {
 	HTTPServer *http.Server
 }
 
-func New(cfg config.Config) (*App, error) {
+func New(cfg config.Config, urlService urlservice.URLService) (*App, error) {
 	log.Println("creating router")
-	urlRepository, err := utils.CreateRepository(cfg.FilePath, cfg.DataBaseAddress)
-	if err != nil {
-		return nil, err
-	}
-	urlService := urlservice.New(urlRepository)
+
 	cookieService, err := cookieservice.New(cfg.Key)
 	if err != nil {
 		return nil, err
@@ -41,6 +39,14 @@ func New(cfg config.Config) (*App, error) {
 	return &App{
 		HTTPServer: server,
 	}, nil
+}
+
+func (app *App) Close(service urlservice.URLService) {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	<-sigs
+	app.HTTPServer.Close()
+	service.Stop()
 }
 
 func (app *App) Run() error {
