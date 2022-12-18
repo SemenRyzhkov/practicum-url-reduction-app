@@ -80,7 +80,7 @@ func (mr *MockURLRepositoryMockRecorder) Ping() *gomock.Call {
 }
 
 // RemoveAll mocks base method.
-func (m *MockURLRepository) RemoveAll(ctx context.Context, removingListChannel chan entity.URLDTO) error {
+func (m *MockURLRepository) RemoveAll(ctx context.Context, removingListChannel []entity.URLDTO) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "RemoveAll", ctx, removingListChannel)
 	ret0, _ := ret[0].(error)
