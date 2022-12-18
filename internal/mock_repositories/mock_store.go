@@ -106,3 +106,15 @@ func (mr *MockURLRepositoryMockRecorder) Save(ctx, userID, urlID, url interface{
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockURLRepository)(nil).Save), ctx, userID, urlID, url)
 }
+
+// StopWorkerPool mocks base method.
+func (m *MockURLRepository) StopWorkerPool() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "StopWorkerPool")
+}
+
+// StopWorkerPool indicates an expected call of StopWorkerPool.
+func (mr *MockURLRepositoryMockRecorder) StopWorkerPool() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopWorkerPool", reflect.TypeOf((*MockURLRepository)(nil).StopWorkerPool))
+}
