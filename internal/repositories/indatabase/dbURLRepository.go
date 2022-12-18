@@ -109,7 +109,9 @@ func (d *dbURLRepository) Stop() error {
 	d.once.Do(func() {
 		close(d.done)
 	})
-	close(d.deletionQueue)
+	d.once.Do(func() {
+		close(d.deletionQueue)
+	})
 	d.wg.Wait()
 	d.mx.Lock()
 	err := d.Flush()
