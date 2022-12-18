@@ -108,7 +108,7 @@ func (d *dbURLRepository) fromQueueToBuffer() {
 func (d *dbURLRepository) Stop() error {
 	d.once.Do(func() {
 		close(d.done)
-	}) // todo: do it in sync.Once
+	})
 	close(d.deletionQueue)
 	d.wg.Wait()
 	d.mx.Lock()
