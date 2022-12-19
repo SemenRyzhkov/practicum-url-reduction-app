@@ -63,9 +63,11 @@ func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
 					}
 					for ind, dto := range u.urlStorage {
 						if ud.ID == dto.ID && ud.UserID == dto.UserID {
+							u.mx.Lock()
 							u.urlStorage = append(u.urlStorage[:ind], u.urlStorage[ind+1:]...)
 							dto.Deleted = true
 							u.urlStorage = append(u.urlStorage, dto)
+							u.mx.Unlock()
 						}
 					}
 				}
@@ -75,8 +77,7 @@ func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
 }
 
 func (u *urlMemoryRepository) RemoveAll(ctx context.Context, removingList []entity.URLDTO) error {
-	u.mx.Lock()
-	defer u.mx.Unlock()
+
 	u.fromQueueToBuffer(ctx)
 	for _, ud := range removingList {
 		err := u.addURLToDeletionQueue(ud)
