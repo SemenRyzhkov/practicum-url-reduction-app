@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -47,10 +46,9 @@ func (app *App) StopWorkerPool(service urlservice.URLService) {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
-		sig := <-sigs
-		fmt.Println(sig)
-		log.Println("Closeeeeeeeeeee")
-		time.Sleep(10 * time.Second)
+		<-sigs
+		log.Println("Stop workerPool")
+		//time.Sleep(10 * time.Second)
 		app.HTTPServer.Close()
 		service.Stop()
 	}()
