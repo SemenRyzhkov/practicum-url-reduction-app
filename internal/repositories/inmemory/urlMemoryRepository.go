@@ -77,31 +77,30 @@ func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
 }
 
 func (u *urlMemoryRepository) RemoveAll(ctx context.Context, removingList []entity.URLDTO) error {
-	u.mx.Lock()
-	defer u.mx.Unlock()
+	//u.mx.Lock()
+	//defer u.mx.Unlock()
 
-	for ind, dto := range u.urlStorage {
-		for _, ud := range removingList {
-			if ud.ID == dto.ID && ud.UserID == dto.UserID {
-				u.urlStorage = append(u.urlStorage[:ind], u.urlStorage[ind+1:]...)
-				dto.Deleted = true
-				u.urlStorage = append(u.urlStorage, dto)
-			}
-		}
-
-	}
-	log.Printf("Repo after delete %v", u.urlStorage)
-
-	//u.fromQueueToBuffer(ctx)
-	//for _, ud := range removingList {
-	//	err := u.addURLToDeletionQueue(ud)
-	//	if err != nil {
-	//		return err
+	//for ind, dto := range u.urlStorage {
+	//	for _, ud := range removingList {
+	//		if ud.ID == dto.ID && ud.UserID == dto.UserID {
+	//			u.urlStorage = append(u.urlStorage[:ind], u.urlStorage[ind+1:]...)
+	//			dto.Deleted = true
+	//			u.urlStorage = append(u.urlStorage, dto)
+	//		}
 	//	}
+	//
 	//}
 	//log.Printf("Repo after delete %v", u.urlStorage)
-	////d.Stop()
-	//return nil
+
+	u.fromQueueToBuffer(ctx)
+	for _, ud := range removingList {
+		err := u.addURLToDeletionQueue(ud)
+		if err != nil {
+			return err
+		}
+	}
+	log.Printf("Repo after delete %v", u.urlStorage)
+	//d.Stop()
 	return nil
 }
 
