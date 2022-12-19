@@ -75,6 +75,8 @@ func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
 }
 
 func (u *urlMemoryRepository) RemoveAll(ctx context.Context, removingList []entity.URLDTO) error {
+	u.mx.Lock()
+	defer u.mx.Unlock()
 	u.fromQueueToBuffer(ctx)
 	for _, ud := range removingList {
 		err := u.addURLToDeletionQueue(ud)
