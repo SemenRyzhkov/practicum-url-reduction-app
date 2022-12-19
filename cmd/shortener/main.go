@@ -33,9 +33,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//sigs := make(chan os.Signal, 1)
-	//signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-
 	a.Close(service)
 	err = a.Run()
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {

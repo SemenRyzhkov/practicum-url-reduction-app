@@ -50,6 +50,7 @@ func (app *App) Close(service urlservice.URLService) {
 		sig := <-sigs
 		fmt.Println(sig)
 		log.Println("Closeeeeeeeeeee")
+		time.Sleep(10 * time.Second)
 		app.HTTPServer.Close()
 		service.Stop()
 	}()
