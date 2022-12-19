@@ -33,7 +33,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	a.Close(service)
+	a.StopWorkerPool(service)
 	err = a.Run()
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal(err)

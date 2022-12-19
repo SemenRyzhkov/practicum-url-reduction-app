@@ -152,7 +152,7 @@ func (d *dbURLRepository) fromQueueToBuffer(_ context.Context) {
 //	if err != nil {
 //		return err
 //	}
-//	defer stmt.Close()
+//	defer stmt.StopWorkerPool()
 //	log.Printf("Buffer contains %d elements", len(d.buffer.buf))
 //	for _, u := range d.buffer.buf {
 //		if _, err = stmt.Exec(u.Deleted, u.ID, u.UserID); err != nil {

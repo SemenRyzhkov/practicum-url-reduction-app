@@ -33,8 +33,9 @@ func (u *urlMemoryRepository) StopWorkerPool() {
 	u.once.Do(func() {
 		close(u.done)
 	})
-
-	close(u.deletionQueue)
+	u.once.Do(func() {
+		close(u.deletionQueue)
+	})
 	u.wg.Wait()
 }
 
@@ -61,15 +62,18 @@ func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
 					if !ok {
 						return
 					}
+					u.mx.Lock()
+
 					for ind, dto := range u.urlStorage {
 						if ud.ID == dto.ID && ud.UserID == dto.UserID {
-							u.mx.Lock()
+							//u.mx.Lock()
 							u.urlStorage = append(u.urlStorage[:ind], u.urlStorage[ind+1:]...)
 							dto.Deleted = true
 							u.urlStorage = append(u.urlStorage, dto)
-							u.mx.Unlock()
 						}
 					}
+					u.mx.Unlock()
+
 				}
 			}
 		}()
