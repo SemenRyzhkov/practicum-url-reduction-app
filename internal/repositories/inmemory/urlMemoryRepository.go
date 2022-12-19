@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity/myerrors"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 )
 
@@ -126,6 +127,10 @@ func (u *urlMemoryRepository) FindByID(_ context.Context, urlID string) (string,
 
 	for _, ud := range u.urlStorage {
 		if ud.ID == urlID {
+			if ud.Deleted {
+				deletedErr := myerrors.NewDeletedError(ud, nil)
+				return "", deletedErr
+			}
 			originalURL = ud.OriginalURL
 		}
 	}
