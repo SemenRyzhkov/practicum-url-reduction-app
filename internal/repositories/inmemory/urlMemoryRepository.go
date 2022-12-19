@@ -62,7 +62,7 @@ func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
 					if !ok {
 						return
 					}
-					u.mx.Lock()
+					//u.mx.Lock()
 
 					for ind, dto := range u.urlStorage {
 						if ud.ID == dto.ID && ud.UserID == dto.UserID {
@@ -72,7 +72,7 @@ func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
 							u.urlStorage = append(u.urlStorage, dto)
 						}
 					}
-					u.mx.Unlock()
+					//u.mx.Unlock()
 
 				}
 			}
@@ -81,8 +81,8 @@ func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
 }
 
 func (u *urlMemoryRepository) RemoveAll(ctx context.Context, removingList []entity.URLDTO) error {
-	//u.mx.Lock()
-	//defer u.mx.Unlock()
+	u.mx.Lock()
+	defer u.mx.Unlock()
 
 	//for ind, dto := range u.urlStorage {
 	//	for _, ud := range removingList {
@@ -103,7 +103,7 @@ func (u *urlMemoryRepository) RemoveAll(ctx context.Context, removingList []enti
 			return err
 		}
 	}
-	log.Printf("Repo after delete %v", u.urlStorage)
+	//log.Printf("Repo after delete %v", u.urlStorage)
 	//d.Stop()
 	return nil
 }
