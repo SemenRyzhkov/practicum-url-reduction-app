@@ -61,9 +61,11 @@ func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
 					if !ok {
 						return
 					}
-					for _, dto := range u.urlStorage {
+					for ind, dto := range u.urlStorage {
 						if ud.ID == dto.ID && ud.UserID == dto.UserID {
+							u.urlStorage = append(u.urlStorage[:ind], u.urlStorage[ind+1:]...)
 							dto.Deleted = true
+							u.urlStorage = append(u.urlStorage, dto)
 						}
 					}
 				}
@@ -112,12 +114,14 @@ func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string)
 		ID:          urlID,
 		UserID:      userID,
 		OriginalURL: url,
-		Deleted:     true,
+		Deleted:     false,
 	}
 	if exists(u.urlStorage, urlID) {
 		return fmt.Errorf("urlservice %s already exist", url)
 	}
 	u.urlStorage = append(u.urlStorage, ud)
+	log.Printf("Repo after save %v", u.urlStorage)
+
 	return nil
 }
 
