@@ -28,7 +28,7 @@ type urlValue struct {
 }
 
 type urlMemoryRepository struct {
-	mx         sync.Mutex
+	mx         sync.RWMutex
 	urlStorage map[urlKey]urlValue
 	keyList    []urlKey
 }
@@ -38,7 +38,7 @@ func (u *urlMemoryRepository) StopWorkerPool() {
 
 func (u *urlMemoryRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
 	u.mx.Lock()
-	u.mx.Unlock()
+	defer u.mx.Unlock()
 
 	for _, dto := range removingList {
 		uk := urlKey{
@@ -59,7 +59,7 @@ func (u *urlMemoryRepository) RemoveAll(_ context.Context, removingList []entity
 
 func (u *urlMemoryRepository) GetAllByUserID(_ context.Context, userID string) ([]entity.FullURL, error) {
 	listFullURL := make([]entity.FullURL, 0)
-	u.mx.Lock()
+	u.mx.RLock()
 
 	for key, value := range u.urlStorage {
 		if key.UserID == userID {
@@ -70,7 +70,7 @@ func (u *urlMemoryRepository) GetAllByUserID(_ context.Context, userID string) (
 			listFullURL = append(listFullURL, fullURL)
 		}
 	}
-	u.mx.Unlock()
+	u.mx.RUnlock()
 	if len(listFullURL) == 0 {
 		return nil, fmt.Errorf("user with id %s has not URL's", userID)
 	}
@@ -100,7 +100,7 @@ func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string)
 
 func (u *urlMemoryRepository) FindByID(_ context.Context, urlID string) (string, error) {
 	var originalURL string
-	u.mx.Lock()
+	u.mx.RLock()
 
 	for key, value := range u.urlStorage {
 		if key.ID == urlID {
@@ -111,7 +111,7 @@ func (u *urlMemoryRepository) FindByID(_ context.Context, urlID string) (string,
 			originalURL = value.OriginalURL
 		}
 	}
-	u.mx.Unlock()
+	u.mx.RUnlock()
 	if len(originalURL) == 0 {
 		return "", fmt.Errorf("urlservice with id %s not found", urlID)
 	}
