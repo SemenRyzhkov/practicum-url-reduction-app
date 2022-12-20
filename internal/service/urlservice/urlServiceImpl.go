@@ -92,38 +92,6 @@ func (u *urlServiceImpl) RemoveAll(ctx context.Context, userID string, removingL
 	return u.urlRepository.RemoveAll(ctx, removingDTOList)
 }
 
-//func (u *urlServiceImpl) RemoveAll(ctx context.Context, userID string, removingList []string) error {
-//	now := time.Now()
-//	defer func() {
-//		fmt.Println(time.Since(now))
-//	}()
-//
-//	outCh := make(chan entity.URLDTO)
-//
-//	go func() {
-//		wg := &sync.WaitGroup{}
-//
-//		for _, reduceURL := range removingList {
-//			wg.Add(1)
-//
-//			go func(reduceURL string) {
-//				defer wg.Done()
-//				ud := entity.URLDTO{
-//					ID:      reduceURL,
-//					UserID:  userID,
-//					Deleted: true,
-//				}
-//				outCh <- ud
-//			}(reduceURL)
-//		}
-//
-//		wg.Wait()
-//		close(outCh)
-//	}()
-//
-//	return u.urlRepository.RemoveAll(ctx, outCh)
-//}
-
 func (u *urlServiceImpl) PingConnection() error {
 	return u.urlRepository.Ping()
 }
