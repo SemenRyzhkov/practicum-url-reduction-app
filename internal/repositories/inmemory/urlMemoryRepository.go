@@ -98,7 +98,11 @@ func (u *urlMemoryRepository) RemoveAll(ctx context.Context, removingList []enti
 	//		return err
 	//	}
 	//}
-	log.Printf("Repo after delete %v", u.urlStorage)
+	//log.Printf("Repo after delete %v", u.urlStorage)
+	for _, ud := range u.urlStorage {
+		fmt.Printf("Id %s deleted %v", ud.ID, ud.Deleted)
+
+	}
 	return nil
 }
 
