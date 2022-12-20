@@ -110,6 +110,8 @@ func (u *urlMemoryRepository) RemoveAll(ctx context.Context, removingList []enti
 
 func (u *urlMemoryRepository) GetAllByUserID(_ context.Context, userID string) ([]entity.FullURL, error) {
 	u.mx.Lock()
+	defer u.mx.Unlock()
+
 	listFullURL := make([]entity.FullURL, 0)
 	for _, ud := range u.urlStorage {
 		if ud.UserID == userID {
@@ -120,7 +122,6 @@ func (u *urlMemoryRepository) GetAllByUserID(_ context.Context, userID string) (
 			listFullURL = append(listFullURL, fullURL)
 		}
 	}
-	u.mx.Unlock()
 	if len(listFullURL) == 0 {
 		return nil, fmt.Errorf("user with id %s has not URL's", userID)
 	}
@@ -147,6 +148,8 @@ func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string)
 
 func (u *urlMemoryRepository) FindByID(_ context.Context, urlID string) (string, error) {
 	u.mx.Lock()
+	defer u.mx.Unlock()
+
 	var originalURL string
 
 	for _, ud := range u.urlStorage {
@@ -158,7 +161,6 @@ func (u *urlMemoryRepository) FindByID(_ context.Context, urlID string) (string,
 			originalURL = ud.OriginalURL
 		}
 	}
-	u.mx.Unlock()
 	if len(originalURL) == 0 {
 		return "", fmt.Errorf("urlservice with id %s not found", urlID)
 	}
