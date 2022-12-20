@@ -36,8 +36,10 @@ func (u *urlMemoryRepository) StopWorkerPool() {
 }
 
 func (u *urlMemoryRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
+	u.mx.Lock()
+	defer u.mx.Unlock()
+
 	for _, dto := range removingList {
-		u.mx.Lock()
 		uk := urlKey{
 			ID:     dto.ID,
 			UserID: dto.UserID,
@@ -45,7 +47,6 @@ func (u *urlMemoryRepository) RemoveAll(_ context.Context, removingList []entity
 		uv := u.urlStorage[uk]
 		uv.Deleted = true
 		u.urlStorage[uk] = uv
-		u.mx.Unlock()
 	}
 
 	fmt.Printf("storage after delete %v", u.urlStorage)
