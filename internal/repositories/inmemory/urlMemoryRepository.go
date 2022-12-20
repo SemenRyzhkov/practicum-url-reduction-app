@@ -81,6 +81,9 @@ func (u *urlMemoryRepository) GetAllByUserID(_ context.Context, userID string) (
 }
 
 func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string) error {
+	u.mx.Lock()
+	defer u.mx.Unlock()
+
 	uk := urlKey{
 		UserID: userID,
 		ID:     urlID,
@@ -90,12 +93,10 @@ func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string)
 		OriginalURL: url,
 		Deleted:     false,
 	}
-	u.mx.Lock()
 	if exists(u.urlStorage, uk) {
 		return fmt.Errorf("url %s already exists", uv.OriginalURL)
 	}
 	u.urlStorage[uk] = uv
-	u.mx.Unlock()
 
 	return nil
 }
