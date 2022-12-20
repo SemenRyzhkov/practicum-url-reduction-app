@@ -61,7 +61,6 @@ func (d *dbURLRepository) StopWorkerPool() {
 	d.once.Do(func() {
 		close(d.done)
 	})
-
 	close(d.deletionQueue)
 	d.wg.Wait()
 
@@ -77,7 +76,6 @@ func (d *dbURLRepository) RemoveAll(ctx context.Context, removingList []entity.U
 			return err
 		}
 	}
-	//d.Stop()
 	return nil
 }
 
@@ -119,70 +117,13 @@ func (d *dbURLRepository) fromQueueToBuffer(_ context.Context) {
 
 }
 
-//func (d *dbURLRepository) Stop() {
-//	d.once.Do(func() {
-//		close(d.done)
-//	})
-//
-//	close(d.deletionQueue)
-//	d.wg.Wait()
-//
-//}
-
-//func (d *dbURLRepository) AddURLToBuffer(u *entity.URLDTO) error {
-//	log.Printf("Add url to buffer %s", u.ID)
-//	d.buffer.mx.Lock()
-//	d.buffer.buf = append(d.buffer.buf, *u)
-//	d.buffer.mx.Unlock()
-//	if cap(d.buffer.buf) == len(d.buffer.buf) {
-//		d.buffer.mx.Lock()
-//		err := d.Flush()
-//		d.buffer.mx.Unlock()
-//		if err != nil {
-//			return errors.New("cannot add records to the databasse")
-//		}
-//	}
-//	return nil
-//}
-
-//func (d *dbURLRepository) Flush() error {
-//	tx, err := d.db.Begin()
-//	if err != nil {
-//		return err
-//	}
-//
-//	stmt, err := tx.Prepare(deleteQuery)
-//	if err != nil {
-//		return err
-//	}
-//	defer stmt.StopWorkerPool()
-//	log.Printf("Buffer contains %d elements", len(d.buffer.buf))
-//	for _, u := range d.buffer.buf {
-//		if _, err = stmt.Exec(u.Deleted, u.ID, u.UserID); err != nil {
-//			if err = tx.Rollback(); err != nil {
-//				log.Fatalf("update drivers: unable to rollback: %v", err)
-//			}
-//			return err
-//		}
-//	}
-//
-//	if err := tx.Commit(); err != nil {
-//		log.Fatalf("update drivers: unable to commit: %v", err)
-//		return err
-//	}
-//
-//	d.buffer.buf = d.buffer.buf[:0]
-//	return nil
-//}
-
 func New(dbAddress string) (repositories.URLRepository, error) {
 	db, err := initDB(dbAddress)
 	if err != nil {
 		return nil, err
 	}
 	return &dbURLRepository{
-		db: db,
-		//buffer:        buffer{buf: make([]entity.URLDTO, 10, 100)},
+		db:            db,
 		deletionQueue: make(chan entity.URLDTO),
 		done:          make(chan struct{}),
 	}, nil
@@ -221,7 +162,6 @@ func (d *dbURLRepository) FindByID(ctx context.Context, urlID string) (string, e
 }
 
 func (d *dbURLRepository) GetAllByUserID(ctx context.Context, userID string) ([]entity.FullURL, error) {
-
 	d.mx.Lock()
 	defer d.mx.Unlock()
 	urls := make([]entity.FullURL, 0)

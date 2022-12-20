@@ -33,9 +33,8 @@ func (u *urlMemoryRepository) StopWorkerPool() {
 	u.once.Do(func() {
 		close(u.done)
 	})
-	u.once.Do(func() {
-		close(u.deletionQueue)
-	})
+	close(u.deletionQueue)
+
 	u.wg.Wait()
 }
 
