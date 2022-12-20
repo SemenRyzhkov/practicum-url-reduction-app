@@ -30,13 +30,13 @@ type urlMemoryRepository struct {
 }
 
 func (u *urlMemoryRepository) StopWorkerPool() {
-	//u.once.Do(func() {
-	//	close(u.done)
-	//})
-	//u.once.Do(func() {
-	//	close(u.deletionQueue)
-	//})
-	//u.wg.Wait()
+	u.once.Do(func() {
+		close(u.done)
+	})
+	u.once.Do(func() {
+		close(u.deletionQueue)
+	})
+	u.wg.Wait()
 }
 
 func (u *urlMemoryRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
