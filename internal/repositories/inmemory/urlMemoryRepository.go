@@ -30,9 +30,7 @@ type urlValue struct {
 type urlMemoryRepository struct {
 	mx         sync.Mutex
 	urlStorage map[urlKey]urlValue
-
-	wg   sync.WaitGroup
-	once sync.Once
+	keyList    []urlKey
 }
 
 func (u *urlMemoryRepository) StopWorkerPool() {
@@ -42,15 +40,14 @@ func (u *urlMemoryRepository) RemoveAll(_ context.Context, removingList []entity
 	u.mx.Lock()
 	u.mx.Unlock()
 
-	keyList := make([]urlKey, 0)
 	for _, dto := range removingList {
 		uk := urlKey{
 			ID:     dto.ID,
 			UserID: dto.UserID,
 		}
-		keyList = append(keyList, uk)
+		u.keyList = append(u.keyList, uk)
 	}
-	for _, uk := range keyList {
+	for _, uk := range u.keyList {
 		uv := u.urlStorage[uk]
 		uv.Deleted = true
 		u.urlStorage[uk] = uv
@@ -128,6 +125,7 @@ func (u *urlMemoryRepository) Ping() error {
 func New() repositories.URLRepository {
 	return &urlMemoryRepository{
 		urlStorage: make(map[urlKey]urlValue),
+		keyList:    make([]urlKey, 0),
 	}
 }
 
