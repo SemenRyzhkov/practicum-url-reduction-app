@@ -31,7 +31,10 @@ func (u *urlMemoryRepository) StopWorkerPool() {
 	u.once.Do(func() {
 		close(u.done)
 	})
-	close(u.deletionQueue)
+
+	u.once.Do(func() {
+		close(u.deletionQueue)
+	})
 
 	u.wg.Wait()
 }
@@ -46,7 +49,7 @@ func (u *urlMemoryRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
 }
 
 func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
-	for i := 0; i < 10; i++ { // создаем 10 горутин-воркеров
+	for i := 0; i < 10; i++ {
 		u.wg.Add(1)
 		go func() {
 			defer u.wg.Done()
@@ -54,11 +57,12 @@ func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
 				select {
 				case <-u.done:
 					log.Println("Exiting")
-					return // если поступает, сигнал из канала done, завершаем
-				case ud, ok := <-u.deletionQueue: // вычитываем из очереди
+					return
+				case ud, ok := <-u.deletionQueue:
 					if !ok {
 						return
 					}
+					u.mx.Lock()
 					for ind, dto := range u.urlStorage {
 						if ud.ID == dto.ID && ud.UserID == dto.UserID {
 							u.urlStorage = append(u.urlStorage[:ind], u.urlStorage[ind+1:]...)
@@ -66,6 +70,7 @@ func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
 							u.urlStorage = append(u.urlStorage, dto)
 						}
 					}
+					u.mx.Unlock()
 				}
 			}
 		}()
@@ -76,26 +81,14 @@ func (u *urlMemoryRepository) RemoveAll(ctx context.Context, removingList []enti
 	u.mx.Lock()
 	defer u.mx.Unlock()
 
-	for ind, dto := range u.urlStorage {
-		for _, ud := range removingList {
-			if ud.ID == dto.ID && ud.UserID == dto.UserID {
-				u.urlStorage = append(u.urlStorage[:ind], u.urlStorage[ind+1:]...)
-				dto.Deleted = true
-				u.urlStorage = append(u.urlStorage, dto)
-			}
+	u.fromQueueToBuffer(ctx)
+	for _, ud := range removingList {
+		err := u.addURLToDeletionQueue(ud)
+		if err != nil {
+			return err
 		}
-
 	}
 	log.Printf("Repo after delete %v", u.urlStorage)
-
-	//u.fromQueueToBuffer(ctx)
-	//for _, ud := range removingList {
-	//	err := u.addURLToDeletionQueue(ud)
-	//	if err != nil {
-	//		return err
-	//	}
-	//}
-	//log.Printf("Repo after delete %v", u.urlStorage)
 	return nil
 }
 
