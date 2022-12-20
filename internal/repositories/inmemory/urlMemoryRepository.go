@@ -146,8 +146,8 @@ func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string)
 }
 
 func (u *urlMemoryRepository) FindByID(_ context.Context, urlID string) (string, error) {
-	u.mx.Lock()
-	defer u.mx.Unlock()
+	u.mx.RLock()
+	defer u.mx.RUnlock()
 
 	var originalURL string
 
