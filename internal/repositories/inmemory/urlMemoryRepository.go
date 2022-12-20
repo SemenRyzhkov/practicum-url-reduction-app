@@ -19,9 +19,7 @@ var (
 )
 
 type urlMemoryRepository struct {
-	mx sync.Mutex
-	//commonURLStorage map[string]string
-	//urlStorage       map[string]map[string]string
+	mx            sync.Mutex
 	urlStorage    []entity.URLDTO
 	deletionQueue chan entity.URLDTO
 	done          chan struct{}
@@ -61,18 +59,13 @@ func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
 					if !ok {
 						return
 					}
-					//u.mx.Lock()
-
 					for ind, dto := range u.urlStorage {
 						if ud.ID == dto.ID && ud.UserID == dto.UserID {
-							//u.mx.Lock()
 							u.urlStorage = append(u.urlStorage[:ind], u.urlStorage[ind+1:]...)
 							dto.Deleted = true
 							u.urlStorage = append(u.urlStorage, dto)
 						}
 					}
-					//u.mx.Unlock()
-
 				}
 			}
 		}()
@@ -83,27 +76,26 @@ func (u *urlMemoryRepository) RemoveAll(ctx context.Context, removingList []enti
 	u.mx.Lock()
 	defer u.mx.Unlock()
 
-	//for ind, dto := range u.urlStorage {
-	//	for _, ud := range removingList {
-	//		if ud.ID == dto.ID && ud.UserID == dto.UserID {
-	//			u.urlStorage = append(u.urlStorage[:ind], u.urlStorage[ind+1:]...)
-	//			dto.Deleted = true
-	//			u.urlStorage = append(u.urlStorage, dto)
-	//		}
-	//	}
-	//
-	//}
-	//log.Printf("Repo after delete %v", u.urlStorage)
-
-	u.fromQueueToBuffer(ctx)
-	for _, ud := range removingList {
-		err := u.addURLToDeletionQueue(ud)
-		if err != nil {
-			return err
+	for ind, dto := range u.urlStorage {
+		for _, ud := range removingList {
+			if ud.ID == dto.ID && ud.UserID == dto.UserID {
+				u.urlStorage = append(u.urlStorage[:ind], u.urlStorage[ind+1:]...)
+				dto.Deleted = true
+				u.urlStorage = append(u.urlStorage, dto)
+			}
 		}
+
 	}
 	log.Printf("Repo after delete %v", u.urlStorage)
-	//d.Stop()
+
+	//u.fromQueueToBuffer(ctx)
+	//for _, ud := range removingList {
+	//	err := u.addURLToDeletionQueue(ud)
+	//	if err != nil {
+	//		return err
+	//	}
+	//}
+	//log.Printf("Repo after delete %v", u.urlStorage)
 	return nil
 }
 
@@ -172,18 +164,11 @@ func (u *urlMemoryRepository) Ping() error {
 
 func New() repositories.URLRepository {
 	return &urlMemoryRepository{
-		//commonURLStorage: make(map[string]string),
-		//urlStorage:       make(map[string]map[string]string),
 		urlStorage:    make([]entity.URLDTO, 0),
 		deletionQueue: make(chan entity.URLDTO),
 		done:          make(chan struct{}),
 	}
 }
-
-//func exists(urlStorage map[string]string, urlID string) bool {
-//	_, ok := urlStorage[urlID]
-//	return ok
-//}
 
 func exists(urlStorage []entity.URLDTO, urlID string) bool {
 	for _, ud := range urlStorage {
