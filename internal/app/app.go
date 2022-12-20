@@ -33,8 +33,8 @@ func New(cfg config.Config, urlService urlservice.URLService) (*App, error) {
 	server := &http.Server{
 		Addr:         cfg.Host,
 		Handler:      urlRouter,
-		ReadTimeout:  20 * time.Second,
-		WriteTimeout: 20 * time.Second,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	return &App{

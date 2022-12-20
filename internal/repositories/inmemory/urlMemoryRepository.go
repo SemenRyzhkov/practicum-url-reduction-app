@@ -85,10 +85,11 @@ func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string)
 	}
 	u.mx.Lock()
 	if exists(u.urlStorage, uk) {
+		u.mx.Unlock()
 		return fmt.Errorf("url %s already exists", uv.OriginalURL)
 	}
 	u.urlStorage[uk] = uv
-	defer u.mx.Unlock()
+	u.mx.Unlock()
 
 	return nil
 }
