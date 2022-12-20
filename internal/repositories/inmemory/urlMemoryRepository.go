@@ -30,30 +30,25 @@ type urlValue struct {
 type urlMemoryRepository struct {
 	mx         sync.RWMutex
 	urlStorage map[urlKey]urlValue
-	keyList    []urlKey
 }
 
 func (u *urlMemoryRepository) StopWorkerPool() {
 }
 
 func (u *urlMemoryRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
-	//u.mx.Lock()
-	//defer u.mx.Unlock()
-	//
-	//for _, dto := range removingList {
-	//	uk := urlKey{
-	//		ID:     dto.ID,
-	//		UserID: dto.UserID,
-	//	}
-	//	u.keyList = append(u.keyList, uk)
-	//}
-	//for _, uk := range u.keyList {
-	//	uv := u.urlStorage[uk]
-	//	uv.Deleted = true
-	//	u.urlStorage[uk] = uv
-	//}
-	//
-	//fmt.Printf("storage after delete %v", u.urlStorage)
+	for _, dto := range removingList {
+		u.mx.Lock()
+		uk := urlKey{
+			ID:     dto.ID,
+			UserID: dto.UserID,
+		}
+		uv := u.urlStorage[uk]
+		uv.Deleted = true
+		u.urlStorage[uk] = uv
+		u.mx.Unlock()
+	}
+
+	fmt.Printf("storage after delete %v", u.urlStorage)
 	return nil
 }
 
@@ -78,9 +73,6 @@ func (u *urlMemoryRepository) GetAllByUserID(_ context.Context, userID string) (
 }
 
 func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string) error {
-	u.mx.Lock()
-	defer u.mx.Unlock()
-
 	uk := urlKey{
 		UserID: userID,
 		ID:     urlID,
@@ -90,10 +82,12 @@ func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string)
 		OriginalURL: url,
 		Deleted:     false,
 	}
+	u.mx.Lock()
 	if exists(u.urlStorage, uk) {
 		return fmt.Errorf("url %s already exists", uv.OriginalURL)
 	}
 	u.urlStorage[uk] = uv
+	defer u.mx.Unlock()
 
 	return nil
 }
@@ -125,7 +119,6 @@ func (u *urlMemoryRepository) Ping() error {
 func New() repositories.URLRepository {
 	return &urlMemoryRepository{
 		urlStorage: make(map[urlKey]urlValue),
-		keyList:    make([]urlKey, 0),
 	}
 }
 
