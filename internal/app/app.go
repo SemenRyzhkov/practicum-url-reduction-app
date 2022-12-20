@@ -48,8 +48,8 @@ func (app *App) StopWorkerPool(service urlservice.URLService) {
 	go func() {
 		<-sigs
 		log.Println("Stop workerPool")
-		service.Stop()
 		app.HTTPServer.Close()
+		service.Stop()
 	}()
 
 }
