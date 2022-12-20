@@ -55,6 +55,8 @@ func (u *urlMemoryRepository) RemoveAll(_ context.Context, removingList []entity
 		uv.Deleted = true
 		u.urlStorage[uk] = uv
 	}
+
+	fmt.Printf("storage after delete %v", u.urlStorage)
 	return nil
 }
 
