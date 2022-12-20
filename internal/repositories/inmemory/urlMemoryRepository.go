@@ -78,6 +78,7 @@ func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
 }
 
 func (u *urlMemoryRepository) RemoveAll(ctx context.Context, removingList []entity.URLDTO) error {
+	fmt.Printf("List to delete %v", removingList)
 
 	for _, dto := range removingList {
 		for ind, ud := range u.urlStorage {
