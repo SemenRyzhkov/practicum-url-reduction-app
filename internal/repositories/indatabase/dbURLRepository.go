@@ -156,7 +156,7 @@ func (d *dbURLRepository) FindByID(ctx context.Context, urlID string) (string, e
 	}
 
 	if ud.Deleted {
-		deletedErr := myerrors.NewDeletedError(ud, nil)
+		deletedErr := myerrors.NewDeletedError(ud.OriginalURL, nil)
 		return "", deletedErr
 	}
 

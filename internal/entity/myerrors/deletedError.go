@@ -2,26 +2,24 @@ package myerrors
 
 import (
 	"fmt"
-
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 )
 
 type DeletedError struct {
-	Err      error
-	Response entity.URLDTO
+	Err error
+	URL string
 }
 
-func (ve *DeletedError) Error() string {
-	return fmt.Sprintf("URL %s is deleted", ve.Response.OriginalURL)
+func (de *DeletedError) Error() string {
+	return fmt.Sprintf("URL %s is deleted", de.URL)
 }
 
-func (ve *DeletedError) Unwrap() error {
-	return ve.Err
+func (de *DeletedError) Unwrap() error {
+	return de.Err
 }
 
-func NewDeletedError(URL entity.URLDTO, err error) error {
+func NewDeletedError(URL string, err error) error {
 	return &DeletedError{
-		Response: URL,
-		Err:      err,
+		URL: URL,
+		Err: err,
 	}
 }

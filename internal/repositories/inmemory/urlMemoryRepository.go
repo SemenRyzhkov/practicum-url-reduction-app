@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"sync"
 
@@ -18,110 +17,60 @@ var (
 	ErrRepositoryIsClosing                            = errors.New("repository is closing")
 )
 
+type urlKey struct {
+	UserID string
+	ID     string
+}
+
+type urlValue struct {
+	OriginalURL string
+	Deleted     bool
+}
+
 type urlMemoryRepository struct {
-	mx            sync.RWMutex
-	urlStorage    []entity.URLDTO
-	deletionQueue chan entity.URLDTO
-	done          chan struct{}
-	wg            sync.WaitGroup
-	once          sync.Once
+	mx         sync.Mutex
+	urlStorage map[urlKey]urlValue
+
+	wg   sync.WaitGroup
+	once sync.Once
 }
 
 func (u *urlMemoryRepository) StopWorkerPool() {
-	u.once.Do(func() {
-		close(u.done)
-	})
-
-	u.once.Do(func() {
-		close(u.deletionQueue)
-	})
-
-	u.wg.Wait()
 }
 
-func (u *urlMemoryRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
-	select {
-	case <-u.done:
-		return ErrRepositoryIsClosing
-	case u.deletionQueue <- ud:
-		return nil
-	}
-}
-
-func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
-	for i := 0; i < 10; i++ {
-		u.wg.Add(1)
-		go func() {
-			defer u.wg.Done()
-			for {
-				select {
-				case <-u.done:
-					log.Println("Exiting")
-					return
-				case ud, ok := <-u.deletionQueue:
-					if !ok {
-						return
-					}
-					//u.mx.Lock()
-					for ind, dto := range u.urlStorage {
-						if ud.ID == dto.ID && ud.UserID == dto.UserID {
-							u.urlStorage = append(u.urlStorage[:ind], u.urlStorage[ind+1:]...)
-							ud.Deleted = true
-							fmt.Printf("Deleted url %v", ud)
-							u.urlStorage = append(u.urlStorage, ud)
-						}
-					}
-					//u.mx.Unlock()
-				}
-			}
-		}()
-	}
-}
-
-func (u *urlMemoryRepository) RemoveAll(ctx context.Context, removingList []entity.URLDTO) error {
-	fmt.Printf("List to delete %v", removingList)
-	u.mx.Lock()
-	defer u.mx.Unlock()
-	//for _, dto := range removingList {
-	//	for ind, ud := range u.urlStorage {
-	//		if (ud.ID == dto.ID) && (ud.UserID == dto.UserID) {
-	//			u.urlStorage = append(u.urlStorage[:ind], u.urlStorage[ind+1:]...)
-	//			ud.Deleted = true
-	//			fmt.Printf("Deleted url %v", ud)
-	//			u.urlStorage = append(u.urlStorage, ud)
-	//		}
-	//	}
-	//}
-	u.fromQueueToBuffer(ctx)
-	for _, ud := range removingList {
-		err := u.addURLToDeletionQueue(ud)
-		if err != nil {
-			return err
+func (u *urlMemoryRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
+	keyList := make([]urlKey, 0)
+	for _, dto := range removingList {
+		uk := urlKey{
+			ID:     dto.ID,
+			UserID: dto.UserID,
 		}
+		keyList = append(keyList, uk)
 	}
-	log.Printf("Repo after delete %v", u.urlStorage)
-	for _, ud := range u.urlStorage {
-		fmt.Printf("Id %s deleted %v", ud.ID, ud.Deleted)
-		fmt.Printf(" ")
-
+	u.mx.Lock()
+	for _, uk := range keyList {
+		uv := u.urlStorage[uk]
+		uv.Deleted = true
+		u.urlStorage[uk] = uv
 	}
+	u.mx.Unlock()
 	return nil
 }
 
 func (u *urlMemoryRepository) GetAllByUserID(_ context.Context, userID string) ([]entity.FullURL, error) {
-	u.mx.Lock()
-	defer u.mx.Unlock()
-
 	listFullURL := make([]entity.FullURL, 0)
-	for _, ud := range u.urlStorage {
-		if ud.UserID == userID {
+	u.mx.Lock()
+
+	for key, value := range u.urlStorage {
+		if key.UserID == userID {
 			fullURL := entity.FullURL{
-				OriginalURL: ud.OriginalURL,
-				ShortURL:    fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), ud.ID),
+				OriginalURL: value.OriginalURL,
+				ShortURL:    fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), key.ID),
 			}
 			listFullURL = append(listFullURL, fullURL)
 		}
 	}
+	u.mx.Unlock()
 	if len(listFullURL) == 0 {
 		return nil, fmt.Errorf("user with id %s has not URL's", userID)
 	}
@@ -129,38 +78,39 @@ func (u *urlMemoryRepository) GetAllByUserID(_ context.Context, userID string) (
 }
 
 func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string) error {
-	u.mx.Lock()
-	defer u.mx.Unlock()
+	uk := urlKey{
+		UserID: userID,
+		ID:     urlID,
+	}
 
-	ud := entity.URLDTO{
-		ID:          urlID,
-		UserID:      userID,
+	uv := urlValue{
 		OriginalURL: url,
 		Deleted:     false,
 	}
-	if exists(u.urlStorage, urlID) {
-		return fmt.Errorf("urlservice %s already exist", url)
+	u.mx.Lock()
+	if exists(u.urlStorage, uk) {
+		return fmt.Errorf("url %s already exists", uv.OriginalURL)
 	}
-	u.urlStorage = append(u.urlStorage, ud)
+	u.urlStorage[uk] = uv
+	u.mx.Unlock()
 
 	return nil
 }
 
 func (u *urlMemoryRepository) FindByID(_ context.Context, urlID string) (string, error) {
-	u.mx.RLock()
-	defer u.mx.RUnlock()
-
 	var originalURL string
+	u.mx.Lock()
 
-	for _, ud := range u.urlStorage {
-		if ud.ID == urlID {
-			if ud.Deleted {
-				deletedErr := myerrors.NewDeletedError(ud, nil)
+	for key, value := range u.urlStorage {
+		if key.ID == urlID {
+			if value.Deleted {
+				deletedErr := myerrors.NewDeletedError(value.OriginalURL, nil)
 				return "", deletedErr
 			}
-			originalURL = ud.OriginalURL
+			originalURL = value.OriginalURL
 		}
 	}
+	u.mx.Unlock()
 	if len(originalURL) == 0 {
 		return "", fmt.Errorf("urlservice with id %s not found", urlID)
 	}
@@ -173,17 +123,11 @@ func (u *urlMemoryRepository) Ping() error {
 
 func New() repositories.URLRepository {
 	return &urlMemoryRepository{
-		urlStorage:    make([]entity.URLDTO, 0),
-		deletionQueue: make(chan entity.URLDTO),
-		done:          make(chan struct{}),
+		urlStorage: make(map[urlKey]urlValue),
 	}
 }
 
-func exists(urlStorage []entity.URLDTO, urlID string) bool {
-	for _, ud := range urlStorage {
-		if ud.ID == urlID {
-			return true
-		}
-	}
-	return false
+func exists(urlStorage map[urlKey]urlValue, urlKey urlKey) bool {
+	_, ok := urlStorage[urlKey]
+	return ok
 }
