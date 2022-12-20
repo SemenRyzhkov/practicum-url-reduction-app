@@ -28,15 +28,15 @@ type urlMemoryRepository struct {
 }
 
 func (u *urlMemoryRepository) StopWorkerPool() {
-	//u.once.Do(func() {
-	//	close(u.done)
-	//})
-	//
-	//u.once.Do(func() {
-	//	close(u.deletionQueue)
-	//})
-	//
-	//u.wg.Wait()
+	u.once.Do(func() {
+		close(u.done)
+	})
+
+	u.once.Do(func() {
+		close(u.deletionQueue)
+	})
+
+	u.wg.Wait()
 }
 
 func (u *urlMemoryRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
@@ -66,8 +66,9 @@ func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
 					for ind, dto := range u.urlStorage {
 						if ud.ID == dto.ID && ud.UserID == dto.UserID {
 							u.urlStorage = append(u.urlStorage[:ind], u.urlStorage[ind+1:]...)
-							dto.Deleted = true
-							u.urlStorage = append(u.urlStorage, dto)
+							ud.Deleted = true
+							fmt.Printf("Deleted url %v", ud)
+							u.urlStorage = append(u.urlStorage, ud)
 						}
 					}
 					//u.mx.Unlock()
@@ -81,24 +82,24 @@ func (u *urlMemoryRepository) RemoveAll(ctx context.Context, removingList []enti
 	fmt.Printf("List to delete %v", removingList)
 	u.mx.Lock()
 	defer u.mx.Unlock()
-	for _, dto := range removingList {
-		for ind, ud := range u.urlStorage {
-			if (ud.ID == dto.ID) && (ud.UserID == dto.UserID) {
-				u.urlStorage = append(u.urlStorage[:ind], u.urlStorage[ind+1:]...)
-				ud.Deleted = true
-				fmt.Printf("Deleted url %v", ud)
-				u.urlStorage = append(u.urlStorage, ud)
-			}
-		}
-	}
-	//u.fromQueueToBuffer(ctx)
-	//for _, ud := range removingList {
-	//	err := u.addURLToDeletionQueue(ud)
-	//	if err != nil {
-	//		return err
+	//for _, dto := range removingList {
+	//	for ind, ud := range u.urlStorage {
+	//		if (ud.ID == dto.ID) && (ud.UserID == dto.UserID) {
+	//			u.urlStorage = append(u.urlStorage[:ind], u.urlStorage[ind+1:]...)
+	//			ud.Deleted = true
+	//			fmt.Printf("Deleted url %v", ud)
+	//			u.urlStorage = append(u.urlStorage, ud)
+	//		}
 	//	}
 	//}
-	//log.Printf("Repo after delete %v", u.urlStorage)
+	u.fromQueueToBuffer(ctx)
+	for _, ud := range removingList {
+		err := u.addURLToDeletionQueue(ud)
+		if err != nil {
+			return err
+		}
+	}
+	log.Printf("Repo after delete %v", u.urlStorage)
 	for _, ud := range u.urlStorage {
 		fmt.Printf("Id %s deleted %v", ud.ID, ud.Deleted)
 		fmt.Printf(" ")
