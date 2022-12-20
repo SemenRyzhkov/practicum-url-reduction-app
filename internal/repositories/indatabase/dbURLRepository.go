@@ -61,7 +61,9 @@ func (d *dbURLRepository) StopWorkerPool() {
 	d.once.Do(func() {
 		close(d.done)
 	})
-	close(d.deletionQueue)
+	d.once.Do(func() {
+		close(d.deletionQueue)
+	})
 	d.wg.Wait()
 
 }
