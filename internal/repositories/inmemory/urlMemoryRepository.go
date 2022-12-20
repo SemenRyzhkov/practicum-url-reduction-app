@@ -79,15 +79,15 @@ func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
 
 func (u *urlMemoryRepository) RemoveAll(ctx context.Context, removingList []entity.URLDTO) error {
 	fmt.Printf("List to delete %v", removingList)
-	u.mx.Lock()
-	defer u.mx.Unlock()
 
 	for _, dto := range removingList {
 		for ind, ud := range u.urlStorage {
 			if (ud.ID == dto.ID) && (ud.UserID == dto.UserID) {
+				u.mx.Lock()
 				u.urlStorage = append(u.urlStorage[:ind], u.urlStorage[ind+1:]...)
 				ud.Deleted = true
 				u.urlStorage = append(u.urlStorage, ud)
+				u.mx.Unlock()
 			}
 		}
 	}
