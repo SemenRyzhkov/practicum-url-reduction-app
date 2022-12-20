@@ -62,7 +62,7 @@ func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
 					if !ok {
 						return
 					}
-					u.mx.Lock()
+					//u.mx.Lock()
 					for ind, dto := range u.urlStorage {
 						if ud.ID == dto.ID && ud.UserID == dto.UserID {
 							u.urlStorage = append(u.urlStorage[:ind], u.urlStorage[ind+1:]...)
@@ -70,7 +70,7 @@ func (u *urlMemoryRepository) fromQueueToBuffer(_ context.Context) {
 							u.urlStorage = append(u.urlStorage, dto)
 						}
 					}
-					u.mx.Unlock()
+					//u.mx.Unlock()
 				}
 			}
 		}()
