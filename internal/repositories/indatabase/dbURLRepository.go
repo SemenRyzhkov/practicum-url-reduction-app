@@ -71,7 +71,7 @@ func (d *dbURLRepository) StopWorkerPool() {
 func (d *dbURLRepository) RemoveAll(ctx context.Context, removingList []entity.URLDTO) error {
 	d.mx.Lock()
 	defer d.mx.Unlock()
-	d.fromQueueToBuffer(ctx)
+	d.runDeletionWorkerPool(ctx)
 	for _, ud := range removingList {
 		err := d.addURLToDeletionQueue(ud)
 		if err != nil {
@@ -88,11 +88,10 @@ func (d *dbURLRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
 	case d.deletionQueue <- ud:
 		return nil
 	}
-
 }
 
-func (d *dbURLRepository) fromQueueToBuffer(_ context.Context) {
-	for i := 0; i < 10; i++ { // создаем 10 горутин-воркеров
+func (d *dbURLRepository) runDeletionWorkerPool(_ context.Context) {
+	for i := 0; i < 10; i++ {
 		d.wg.Add(1)
 		go func() {
 			defer d.wg.Done()
@@ -101,8 +100,8 @@ func (d *dbURLRepository) fromQueueToBuffer(_ context.Context) {
 				select {
 				case <-d.done:
 					log.Println("Exiting")
-					return // если поступает, сигнал из канала done, завершаем
-				case ud, ok := <-d.deletionQueue: // вычитываем из очереди
+					return
+				case ud, ok := <-d.deletionQueue:
 					if !ok {
 						return
 					}
@@ -110,13 +109,11 @@ func (d *dbURLRepository) fromQueueToBuffer(_ context.Context) {
 					if err != nil {
 						log.Printf("Delete error %v", err)
 						return
-
 					}
 				}
 			}
 		}()
 	}
-
 }
 
 func New(dbAddress string) (repositories.URLRepository, error) {
