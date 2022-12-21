@@ -49,7 +49,6 @@ func (u *urlMemoryRepository) RemoveAll(_ context.Context, removingList []entity
 		u.urlStorage[uk] = uv
 	}
 
-	fmt.Printf("storage after delete %v", u.urlStorage)
 	return nil
 }
 
@@ -110,7 +109,7 @@ func (u *urlMemoryRepository) FindByID(_ context.Context, urlID string) (string,
 	}
 	u.mx.RUnlock()
 	if len(originalURL) == 0 {
-		return "", fmt.Errorf("urlservice with id %s not found", urlID)
+		return "", fmt.Errorf("url with id %s not found", urlID)
 	}
 	return originalURL, nil
 }

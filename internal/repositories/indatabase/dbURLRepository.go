@@ -147,7 +147,6 @@ func (d *dbURLRepository) FindByID(ctx context.Context, urlID string) (string, e
 	var ud entity.URLDTO
 	row := d.db.QueryRowContext(ctx, getURLQuery, urlID)
 	err := row.Scan(&ud.OriginalURL, &ud.Deleted)
-	log.Printf("ID %s deleted %v", urlID, ud.Deleted)
 	if err != nil {
 		return "", err
 	}
