@@ -101,6 +101,7 @@ func (u *urlMemoryRepository) FindByID(_ context.Context, urlID string) (string,
 	for key, value := range u.urlStorage {
 		if key.ID == urlID {
 			if value.Deleted {
+				u.mx.RUnlock()
 				deletedErr := myerrors.NewDeletedError(value.OriginalURL, nil)
 				return "", deletedErr
 			}
