@@ -21,6 +21,15 @@ type urlFileRepository struct {
 	producer         *producer
 }
 
+func (u *urlFileRepository) StopWorkerPool() {
+	////TODO implement me
+	//panic("implement me")
+}
+
+func (u *urlFileRepository) RemoveAll(_ context.Context, _ []entity.URLDTO) error {
+	return nil
+}
+
 func (u *urlFileRepository) GetAllByUserID(_ context.Context, userID string) ([]entity.FullURL, error) {
 	u.mx.Lock()
 	userURLMap, ok := u.urlStorage[userID]

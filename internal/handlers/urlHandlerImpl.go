@@ -2,12 +2,14 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity/myerrors"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/cookieservice"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/urlservice"
 )
@@ -49,9 +51,15 @@ func (u *urlHandlerImpl) GetURLByID(writer http.ResponseWriter, request *http.Re
 	}
 	url, err := u.urlService.GetURLByID(request.Context(), urlID)
 	if err != nil {
+		var de *myerrors.DeletedError
+		if errors.As(err, &de) {
+			writer.WriteHeader(http.StatusGone)
+			return
+		}
 		http.Error(writer, err.Error(), http.StatusNotFound)
 		return
 	}
+
 	writer.Header().Add("Location", url)
 	writer.WriteHeader(http.StatusTemporaryRedirect)
 }
@@ -70,16 +78,22 @@ func (u *urlHandlerImpl) ReduceURLTOJSON(writer http.ResponseWriter, request *ht
 	}
 	urlResponse, err := u.urlService.ReduceURLToJSON(request.Context(), userID, urlRequest)
 
-	if err == nil {
-		writer.WriteHeader(http.StatusCreated)
-		err = json.NewEncoder(writer).Encode(urlResponse)
-		if err != nil {
-			http.Error(writer, err.Error(), http.StatusBadRequest)
+	if err != nil {
+		var ve *myerrors.ViolationError
+		if errors.As(err, &ve) {
+			writer.WriteHeader(http.StatusConflict)
+			err = json.NewEncoder(writer).Encode(ve.Response)
+			if err != nil {
+				http.Error(writer, err.Error(), http.StatusBadRequest)
+				return
+			}
 			return
 		}
+		http.Error(writer, err.Error(), http.StatusBadRequest)
 		return
 	}
-	writer.WriteHeader(http.StatusConflict)
+
+	writer.WriteHeader(http.StatusCreated)
 	err = json.NewEncoder(writer).Encode(urlResponse)
 	if err != nil {
 		http.Error(writer, err.Error(), http.StatusBadRequest)
@@ -99,8 +113,13 @@ func (u *urlHandlerImpl) ReduceURL(writer http.ResponseWriter, request *http.Req
 	}
 	reduceURL, err := u.urlService.ReduceAndSaveURL(request.Context(), userID, string(b))
 	if err != nil {
-		writer.WriteHeader(http.StatusConflict)
-		writer.Write([]byte(reduceURL))
+		var ve *myerrors.ViolationError
+		if errors.As(err, &ve) {
+			writer.WriteHeader(http.StatusConflict)
+			writer.Write([]byte(ve.Response.Result))
+			return
+		}
+		http.Error(writer, err.Error(), http.StatusBadRequest)
 		return
 	}
 	writer.WriteHeader(http.StatusCreated)
@@ -132,7 +151,27 @@ func (u *urlHandlerImpl) ReduceSeveralURL(writer http.ResponseWriter, request *h
 			return
 		}
 	}
+}
 
+func (u *urlHandlerImpl) RemoveAll(writer http.ResponseWriter, request *http.Request) {
+	userID, cookieErr := u.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
+	if cookieErr != nil {
+		http.Error(writer, cookieErr.Error(), http.StatusBadRequest)
+		return
+	}
+	writer.Header().Set("Content-Type", "application/json")
+	var urlIDList []string
+	err := json.NewDecoder(request.Body).Decode(&urlIDList)
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusBadRequest)
+		return
+	}
+	removingErr := u.urlService.RemoveAll(request.Context(), userID, urlIDList)
+	if removingErr != nil {
+		http.Error(writer, removingErr.Error(), http.StatusBadRequest)
+		return
+	}
+	writer.WriteHeader(http.StatusAccepted)
 }
 
 func (u *urlHandlerImpl) PingConnection(writer http.ResponseWriter, request *http.Request) {

@@ -10,5 +10,7 @@ type URLHandler interface {
 	ReduceURLTOJSON(writer http.ResponseWriter, request *http.Request)
 	ReduceSeveralURL(writer http.ResponseWriter, request *http.Request)
 
+	RemoveAll(writer http.ResponseWriter, request *http.Request)
+
 	PingConnection(writer http.ResponseWriter, request *http.Request)
 }

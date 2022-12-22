@@ -25,7 +25,6 @@ func main() {
 	key := utils.GetKey()
 
 	cfg := config.New(serverAddress, filePath, key, dbAddress)
-
 	a, err := app.New(cfg)
 	if err != nil {
 		log.Fatal(err)
@@ -35,4 +34,5 @@ func main() {
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal(err)
 	}
+
 }
