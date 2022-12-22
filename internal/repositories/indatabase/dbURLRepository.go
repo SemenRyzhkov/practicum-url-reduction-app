@@ -54,7 +54,6 @@ type dbURLRepository struct {
 	done          chan struct{}
 	wg            sync.WaitGroup
 	once          sync.Once
-	mx            sync.Mutex
 }
 
 func (d *dbURLRepository) StopWorkerPool() {
@@ -67,8 +66,6 @@ func (d *dbURLRepository) StopWorkerPool() {
 }
 
 func (d *dbURLRepository) RemoveAll(ctx context.Context, removingList []entity.URLDTO) error {
-	d.mx.Lock()
-	defer d.mx.Unlock()
 	for _, ud := range removingList {
 		err := d.addURLToDeletionQueue(ud)
 		if err != nil {
@@ -128,8 +125,6 @@ func New(dbAddress string) (repositories.URLRepository, error) {
 }
 
 func (d *dbURLRepository) Save(ctx context.Context, userID, urlID, url string) error {
-	d.mx.Lock()
-	defer d.mx.Unlock()
 	_, err := d.db.ExecContext(ctx, insertURLQuery, urlID, url, userID, false)
 	if err != nil {
 		if e := pgerror.UniqueViolation(err); e != nil {
@@ -141,8 +136,6 @@ func (d *dbURLRepository) Save(ctx context.Context, userID, urlID, url string) e
 }
 
 func (d *dbURLRepository) FindByID(ctx context.Context, urlID string) (string, error) {
-	d.mx.Lock()
-	defer d.mx.Unlock()
 	var ud entity.URLDTO
 	row := d.db.QueryRowContext(ctx, getURLQuery, urlID)
 	err := row.Scan(&ud.OriginalURL, &ud.Deleted)
@@ -159,8 +152,6 @@ func (d *dbURLRepository) FindByID(ctx context.Context, urlID string) (string, e
 }
 
 func (d *dbURLRepository) GetAllByUserID(ctx context.Context, userID string) ([]entity.FullURL, error) {
-	d.mx.Lock()
-	defer d.mx.Unlock()
 	urls := make([]entity.FullURL, 0)
 
 	rows, err := d.db.QueryContext(ctx, getAllQuery, userID)
