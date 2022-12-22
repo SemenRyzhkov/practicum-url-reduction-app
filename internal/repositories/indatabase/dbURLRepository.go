@@ -60,8 +60,6 @@ type dbURLRepository struct {
 func (d *dbURLRepository) StopWorkerPool() {
 	d.once.Do(func() {
 		close(d.done)
-	})
-	d.once.Do(func() {
 		close(d.deletionQueue)
 	})
 	d.wg.Wait()
@@ -71,7 +69,6 @@ func (d *dbURLRepository) StopWorkerPool() {
 func (d *dbURLRepository) RemoveAll(ctx context.Context, removingList []entity.URLDTO) error {
 	d.mx.Lock()
 	defer d.mx.Unlock()
-	d.runDeletionWorkerPool(ctx)
 	for _, ud := range removingList {
 		err := d.addURLToDeletionQueue(ud)
 		if err != nil {
@@ -90,7 +87,7 @@ func (d *dbURLRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
 	}
 }
 
-func (d *dbURLRepository) runDeletionWorkerPool(_ context.Context) {
+func (d *dbURLRepository) runDeletionWorkerPool() {
 	for i := 0; i < 10; i++ {
 		d.wg.Add(1)
 		go func() {
@@ -121,11 +118,13 @@ func New(dbAddress string) (repositories.URLRepository, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &dbURLRepository{
+	dbRepository := dbURLRepository{
 		db:            db,
 		deletionQueue: make(chan entity.URLDTO),
 		done:          make(chan struct{}),
-	}, nil
+	}
+	dbRepository.runDeletionWorkerPool()
+	return &dbRepository, nil
 }
 
 func (d *dbURLRepository) Save(ctx context.Context, userID, urlID, url string) error {
