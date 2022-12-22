@@ -192,7 +192,6 @@ func initDB(dbAddress string) (*sql.DB, error) {
 		log.Println(connectionErr)
 		return nil, connectionErr
 	}
-	log.Printf("Connect success %s", dbAddress)
 	createTableErr := createTableIfNotExists(db)
 	if createTableErr != nil {
 		log.Println(createTableErr)

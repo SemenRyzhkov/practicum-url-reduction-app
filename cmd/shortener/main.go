@@ -23,17 +23,13 @@ func main() {
 	dbAddress := utils.GetDBAddress()
 	filePath := utils.GetFilePath()
 	key := utils.GetKey()
+
 	cfg := config.New(serverAddress, filePath, key, dbAddress)
-	service, err := app.CreateService(cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
-	a, err := app.New(cfg, service)
+	a, err := app.New(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	a.StopWorkerPool(service)
 	err = a.Run()
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal(err)

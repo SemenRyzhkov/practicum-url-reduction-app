@@ -11,6 +11,7 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/config"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/router"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/cookieservice"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/urlservice"
@@ -20,9 +21,13 @@ type App struct {
 	HTTPServer *http.Server
 }
 
-func New(cfg config.Config, urlService urlservice.URLService) (*App, error) {
+func New(cfg config.Config) (*App, error) {
 	log.Println("creating router")
-
+	urlRepository, err := utils.CreateRepository(cfg.FilePath, cfg.DataBaseAddress)
+	if err != nil {
+		return nil, err
+	}
+	urlService := urlservice.New(urlRepository)
 	cookieService, err := cookieservice.New(cfg.Key)
 	if err != nil {
 		return nil, err
@@ -36,20 +41,19 @@ func New(cfg config.Config, urlService urlservice.URLService) (*App, error) {
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
-
+	defer closeHTTPServerAndStopWorkerPool(server, urlRepository)
 	return &App{
 		HTTPServer: server,
 	}, nil
 }
 
-func (app *App) StopWorkerPool(service urlservice.URLService) {
+func closeHTTPServerAndStopWorkerPool(server *http.Server, repository repositories.URLRepository) {
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	go func() {
 		<-sigs
-		log.Println("Stop workerPool")
-		app.HTTPServer.Close()
-		service.Stop()
+		server.Close()
+		repository.StopWorkerPool()
 	}()
 
 }
@@ -57,12 +61,4 @@ func (app *App) StopWorkerPool(service urlservice.URLService) {
 func (app *App) Run() error {
 	log.Println("run server")
 	return app.HTTPServer.ListenAndServe()
-}
-
-func CreateService(cfg config.Config) (urlservice.URLService, error) {
-	urlRepository, err := utils.CreateRepository(cfg.FilePath, cfg.DataBaseAddress)
-	if err != nil {
-		return nil, err
-	}
-	return urlservice.New(urlRepository), nil
 }

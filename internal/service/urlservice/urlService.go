@@ -14,5 +14,5 @@ type URLService interface {
 	ReduceSeveralURL(ctx context.Context, userID string, list []entity.URLWithIDRequest) ([]entity.URLWithIDResponse, error)
 	RemoveAll(ctx context.Context, userID string, removingList []string) error
 	PingConnection() error
-	Stop()
+	//Stop()
 }
