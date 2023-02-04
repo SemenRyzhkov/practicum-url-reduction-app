@@ -65,34 +65,6 @@ func (mr *MockURLRepositoryMockRecorder) GetAllByUserID(ctx, userID interface{})
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllByUserID", reflect.TypeOf((*MockURLRepository)(nil).GetAllByUserID), ctx, userID)
 }
 
-// Ping mocks base method.
-func (m *MockURLRepository) Ping() error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Ping")
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Ping indicates an expected call of Ping.
-func (mr *MockURLRepositoryMockRecorder) Ping() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Ping", reflect.TypeOf((*MockURLRepository)(nil).Ping))
-}
-
-// RemoveAll mocks base method.
-func (m *MockURLRepository) RemoveAll(ctx context.Context, removingListChannel []entity.URLDTO) error {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RemoveAll", ctx, removingListChannel)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// RemoveAll indicates an expected call of RemoveAll.
-func (mr *MockURLRepositoryMockRecorder) RemoveAll(ctx, removingListChannel interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveAll", reflect.TypeOf((*MockURLRepository)(nil).RemoveAll), ctx, removingListChannel)
-}
-
 // Save mocks base method.
 func (m *MockURLRepository) Save(ctx context.Context, userID, urlID, url string) error {
 	m.ctrl.T.Helper()
@@ -105,16 +77,4 @@ func (m *MockURLRepository) Save(ctx context.Context, userID, urlID, url string)
 func (mr *MockURLRepositoryMockRecorder) Save(ctx, userID, urlID, url interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockURLRepository)(nil).Save), ctx, userID, urlID, url)
-}
-
-// StopWorkerPool mocks base method.
-func (m *MockURLRepository) StopWorkerPool() {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "StopWorkerPool")
-}
-
-// StopWorkerPool indicates an expected call of StopWorkerPool.
-func (mr *MockURLRepositoryMockRecorder) StopWorkerPool() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopWorkerPool", reflect.TypeOf((*MockURLRepository)(nil).StopWorkerPool))
 }

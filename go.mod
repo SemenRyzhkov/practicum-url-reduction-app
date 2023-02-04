@@ -9,9 +9,17 @@ require (
 )
 
 require (
+	github.com/go-kit/log v0.2.1
 	github.com/golang/mock v1.6.0
 	github.com/lib/pq v1.10.7
 	github.com/omeid/pgerror v0.0.0-20201018020948-42c66c4d27d4
+)
+
+require (
+	github.com/go-logfmt/logfmt v0.5.1 // indirect
+	github.com/kr/text v0.2.0 // indirect
+	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
+	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 )
 
 require (

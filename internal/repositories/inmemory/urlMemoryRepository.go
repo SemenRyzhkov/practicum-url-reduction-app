@@ -2,56 +2,116 @@ package inmemory
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"os"
 	"sync"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity/myerrors"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/urlmapper"
 )
 
-var _ repositories.URLRepository = &urlMemoryRepository{}
+var (
+	_                      repositories.URLRepository = &urlMemoryRepository{}
+	ErrRepositoryIsClosing                            = errors.New("repository is closing")
+)
+
+type urlKey struct {
+	UserID string
+	ID     string
+}
+
+type urlValue struct {
+	OriginalURL string
+	Deleted     bool
+}
 
 type urlMemoryRepository struct {
-	mx               sync.Mutex
-	commonURLStorage map[string]string
-	urlStorage       map[string]map[string]string
+	mx         sync.RWMutex
+	urlStorage map[urlKey]urlValue
+}
+
+func (u *urlMemoryRepository) StopWorkerPool() {
+}
+
+func (u *urlMemoryRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
+	u.mx.Lock()
+	defer u.mx.Unlock()
+
+	for _, dto := range removingList {
+		uk := urlKey{
+			ID:     dto.ID,
+			UserID: dto.UserID,
+		}
+		uv := u.urlStorage[uk]
+		uv.Deleted = true
+		u.urlStorage[uk] = uv
+	}
+
+	return nil
 }
 
 func (u *urlMemoryRepository) GetAllByUserID(_ context.Context, userID string) ([]entity.FullURL, error) {
-	u.mx.Lock()
-	userURLMap, ok := u.urlStorage[userID]
-	u.mx.Unlock()
-	if !ok {
+	listFullURL := make([]entity.FullURL, 0)
+	u.mx.RLock()
+
+	for key, value := range u.urlStorage {
+		if key.UserID == userID {
+			fullURL := entity.FullURL{
+				OriginalURL: value.OriginalURL,
+				ShortURL:    fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), key.ID),
+			}
+			listFullURL = append(listFullURL, fullURL)
+		}
+	}
+	u.mx.RUnlock()
+	if len(listFullURL) == 0 {
 		return nil, fmt.Errorf("user with id %s has not URL's", userID)
 	}
-	return urlmapper.FromMapToSliceOfFullURL(userURLMap), nil
+	return listFullURL, nil
 }
 
 func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string) error {
+	uk := urlKey{
+		UserID: userID,
+		ID:     urlID,
+	}
+
+	uv := urlValue{
+		OriginalURL: url,
+		Deleted:     false,
+	}
 	u.mx.Lock()
-	defer u.mx.Unlock()
-	userURLStorage, ok := u.urlStorage[userID]
-	if !ok {
-		userURLStorage = make(map[string]string)
+	if exists(u.urlStorage, uk) {
+		u.mx.Unlock()
+		return fmt.Errorf("url %s already exists", uv.OriginalURL)
 	}
-	if exists(userURLStorage, urlID) {
-		return fmt.Errorf("urlservice %s already exist", url)
-	}
-	userURLStorage[urlID] = url
-	u.urlStorage[userID] = userURLStorage
-	u.commonURLStorage[urlID] = url
+	u.urlStorage[uk] = uv
+	u.mx.Unlock()
+
 	return nil
 }
 
 func (u *urlMemoryRepository) FindByID(_ context.Context, urlID string) (string, error) {
-	u.mx.Lock()
-	url, ok := u.commonURLStorage[urlID]
-	u.mx.Unlock()
-	if !ok {
-		return "", fmt.Errorf("urlservice with id %s not found", urlID)
+	var originalURL string
+	u.mx.RLock()
+
+	for key, value := range u.urlStorage {
+		if key.ID == urlID {
+			if value.Deleted {
+				u.mx.RUnlock()
+				deletedErr := myerrors.NewDeletedError(value.OriginalURL, nil)
+				return "", deletedErr
+			}
+			originalURL = value.OriginalURL
+		}
 	}
-	return url, nil
+	u.mx.RUnlock()
+	if len(originalURL) == 0 {
+		return "", fmt.Errorf("url with id %s not found", urlID)
+	}
+	return originalURL, nil
 }
 
 func (u *urlMemoryRepository) Ping() error {
@@ -60,12 +120,11 @@ func (u *urlMemoryRepository) Ping() error {
 
 func New() repositories.URLRepository {
 	return &urlMemoryRepository{
-		commonURLStorage: make(map[string]string),
-		urlStorage:       make(map[string]map[string]string),
+		urlStorage: make(map[urlKey]urlValue),
 	}
 }
 
-func exists(urlStorage map[string]string, urlID string) bool {
-	_, ok := urlStorage[urlID]
+func exists(urlStorage map[urlKey]urlValue, urlKey urlKey) bool {
+	_, ok := urlStorage[urlKey]
 	return ok
 }

@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
@@ -35,9 +36,7 @@ func (u *urlServiceImpl) ReduceURLToJSON(ctx context.Context, userID string, req
 	reduceURL := reducing(request.URL)
 	duplicateErr := u.urlRepository.Save(ctx, userID, reduceURL, request.URL)
 	if duplicateErr != nil {
-		return entity.URLResponse{
-			Result: fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL),
-		}, duplicateErr
+		return entity.URLResponse{}, duplicateErr
 	}
 	return entity.URLResponse{Result: fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL)}, nil
 }
@@ -46,7 +45,7 @@ func (u *urlServiceImpl) ReduceAndSaveURL(ctx context.Context, userID, url strin
 	reduceURL := reducing(url)
 	duplicateErr := u.urlRepository.Save(ctx, userID, reduceURL, url)
 	if duplicateErr != nil {
-		return fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL), duplicateErr
+		return "", duplicateErr
 	}
 	return fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL), nil
 }
@@ -68,6 +67,25 @@ func (u *urlServiceImpl) ReduceSeveralURL(ctx context.Context, userID string, li
 		urlWithIDResponseList = append(urlWithIDResponseList, urlWihIDResponse)
 	}
 	return urlWithIDResponseList, nil
+}
+
+func (u *urlServiceImpl) RemoveAll(ctx context.Context, userID string, removingList []string) error {
+	now := time.Now()
+	defer func() {
+		fmt.Println(time.Since(now))
+	}()
+
+	removingDTOList := make([]entity.URLDTO, 0)
+
+	for _, u := range removingList {
+		ud := entity.URLDTO{
+			ID:      u,
+			UserID:  userID,
+			Deleted: true,
+		}
+		removingDTOList = append(removingDTOList, ud)
+	}
+	return u.urlRepository.RemoveAll(ctx, removingDTOList)
 }
 
 func (u *urlServiceImpl) PingConnection() error {
