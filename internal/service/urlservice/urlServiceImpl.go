@@ -33,7 +33,7 @@ func (u *urlServiceImpl) GetURLByID(ctx context.Context, urlID string) (string, 
 }
 
 func (u *urlServiceImpl) ReduceURLToJSON(ctx context.Context, userID string, request entity.URLRequest) (entity.URLResponse, error) {
-	reduceURL := reducing(request.URL)
+	reduceURL := Reducing(request.URL)
 	duplicateErr := u.urlRepository.Save(ctx, userID, reduceURL, request.URL)
 	if duplicateErr != nil {
 		return entity.URLResponse{}, duplicateErr
@@ -42,7 +42,7 @@ func (u *urlServiceImpl) ReduceURLToJSON(ctx context.Context, userID string, req
 }
 
 func (u *urlServiceImpl) ReduceAndSaveURL(ctx context.Context, userID, url string) (string, error) {
-	reduceURL := reducing(url)
+	reduceURL := Reducing(url)
 	duplicateErr := u.urlRepository.Save(ctx, userID, reduceURL, url)
 	if duplicateErr != nil {
 		return "", duplicateErr
@@ -55,7 +55,7 @@ func (u *urlServiceImpl) ReduceSeveralURL(ctx context.Context, userID string, li
 	//TODO by statement solution
 	for _, urlReq := range list {
 		correlationID := urlReq.CorrelationID
-		reduceURL := reducing(urlReq.OriginalURL)
+		reduceURL := Reducing(urlReq.OriginalURL)
 		duplicateErr := u.urlRepository.Save(ctx, userID, reduceURL, urlReq.OriginalURL)
 		if duplicateErr != nil {
 			return nil, duplicateErr
@@ -92,7 +92,7 @@ func (u *urlServiceImpl) PingConnection() error {
 	return u.urlRepository.Ping()
 }
 
-func reducing(url string) string {
+func Reducing(url string) string {
 	hash := md5.Sum([]byte(url))
 	return hex.EncodeToString(hash[:])
 }
