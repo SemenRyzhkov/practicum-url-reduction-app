@@ -1,4 +1,4 @@
-package handlers
+package router
 
 import (
 	"bytes"
@@ -13,43 +13,22 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/testutils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/router"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/handlers"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/cookieservice"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/urlservice"
 )
 
-const (
-	expectedURL = "https://dzen.ru/?yredirect=true"
-)
-
-var (
-	reduceSeveralURLRequest = []entity.URLWithIDRequest{
-		{CorrelationID: "test1", OriginalURL: "yandex1.ru"},
-		{CorrelationID: "test2", OriginalURL: "yandex2.ru"},
-	}
-	reduceSeveralURLResponse = []entity.URLWithIDResponse{
-		{
-			CorrelationID: "test1",
-			ShortURL:      "http://localhost:8080/b6ad61b613c33a6d62e6d14198e465b8",
-		},
-		{
-			CorrelationID: "test2",
-			ShortURL:      "http://localhost:8080/50754651b2f907807de0b789248f1f1b",
-		},
-	}
-)
-
-func setupTestServer() *httptest.Server {
+func setupTestServerForExample() *httptest.Server {
 	utils.LoadEnvironments("../../.env")
 	repo := utils.CreateMemoryOrFileRepository(utils.GetFilePath())
 	us := urlservice.New(repo)
 	cs, _ := cookieservice.New(utils.GetKey())
-	h := NewHandler(us, cs)
-	router := router.NewRouter(h)
+	h := handlers.NewHandler(us, cs)
+	router := NewRouter(h)
 	return httptest.NewServer(router)
 }
 
-func testRequest(ts *httptest.Server, method, path, body string) *http.Request {
+func testRequestForExample(ts *httptest.Server, method, path, body string) *http.Request {
 	var req *http.Request
 
 	if method == http.MethodGet {
@@ -60,7 +39,7 @@ func testRequest(ts *httptest.Server, method, path, body string) *http.Request {
 	return req
 }
 
-func testJSONRequest(ts *httptest.Server) *http.Request {
+func testJSONRequestForExample(ts *httptest.Server) *http.Request {
 	request := entity.URLRequest{URL: expectedURL}
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(request)
@@ -71,7 +50,7 @@ func testJSONRequest(ts *httptest.Server) *http.Request {
 	return req
 }
 
-func testSeveralJSONRequest(ts *httptest.Server) *http.Request {
+func testSeveralJSONRequestForExample(ts *httptest.Server) *http.Request {
 	var buf bytes.Buffer
 	err := json.NewEncoder(&buf).Encode(reduceSeveralURLRequest)
 	if err != nil {
@@ -83,11 +62,11 @@ func testSeveralJSONRequest(ts *httptest.Server) *http.Request {
 
 func ExampleReduceURLAndGetURLByID() {
 	//настраиваем сервер
-	ts := setupTestServer()
+	ts := setupTestServerForExample()
 	defer ts.Close()
 
 	//выполняем запрос для сокращения url
-	req := testRequest(ts, "POST", "/", expectedURL)
+	req := testRequestForExample(ts, "POST", "/", expectedURL)
 	resp, _ := http.DefaultClient.Do(req)
 
 	//получаем значение ответа
@@ -96,7 +75,7 @@ func ExampleReduceURLAndGetURLByID() {
 	defer resp.Body.Close()
 
 	//выполняем запрос для получения оригинального URL
-	req = testRequest(ts, "GET", "/1f67218b4bfbc6af9e52d502c3e5ef3d", "")
+	req = testRequestForExample(ts, "GET", "/1f67218b4bfbc6af9e52d502c3e5ef3d", "")
 	req.Header["Cookie"] = append(req.Header["Cookie"], resp.Header.Get("Set-Cookie"))
 	transport := http.Transport{}
 	resp, _ = transport.RoundTrip(req)
@@ -114,11 +93,11 @@ func ExampleReduceURLAndGetURLByID() {
 
 func ExampleReduceURLTOJSON() {
 	//настраиваем сервер
-	ts := setupTestServer()
+	ts := setupTestServerForExample()
 	defer ts.Close()
 
 	//выполняем запрос для сокращения url
-	req := testJSONRequest(ts)
+	req := testJSONRequestForExample(ts)
 	resp, _ := http.DefaultClient.Do(req)
 
 	var actualResponse entity.URLResponse
@@ -126,7 +105,7 @@ func ExampleReduceURLTOJSON() {
 	defer resp.Body.Close()
 
 	//для проверки полученного результата выполняем Get запрос
-	req = testRequest(ts, "GET", "/1f67218b4bfbc6af9e52d502c3e5ef3d", "")
+	req = testRequestForExample(ts, "GET", "/1f67218b4bfbc6af9e52d502c3e5ef3d", "")
 	req.Header["Cookie"] = append(req.Header["Cookie"], resp.Header.Get("Set-Cookie"))
 	transport := http.Transport{}
 	resp, _ = transport.RoundTrip(req)
@@ -143,16 +122,16 @@ func ExampleReduceURLTOJSON() {
 
 func ExampleGetAll() {
 	//настраиваем сервер
-	ts := setupTestServer()
+	ts := setupTestServerForExample()
 	defer ts.Close()
 
 	//выполняем запрос для сокращения url
-	req := testJSONRequest(ts)
+	req := testJSONRequestForExample(ts)
 	resp, _ := http.DefaultClient.Do(req)
 	defer resp.Body.Close()
 
 	//выполняем запрос для получения всех URL по userID
-	req = testRequest(ts, "GET", "/api/user/urls", "")
+	req = testRequestForExample(ts, "GET", "/api/user/urls", "")
 	req.Header["Cookie"] = append(req.Header["Cookie"], resp.Header.Get("Set-Cookie"))
 	resp, _ = http.DefaultClient.Do(req)
 
@@ -172,11 +151,11 @@ func ExampleGetAll() {
 
 func ExampleReduceSeveralURL() {
 	//настраиваем сервер
-	ts := setupTestServer()
+	ts := setupTestServerForExample()
 	defer ts.Close()
 
 	//выполняем запрос для сокращения нескольких URL
-	req := testSeveralJSONRequest(ts)
+	req := testSeveralJSONRequestForExample(ts)
 	resp, _ := http.DefaultClient.Do(req)
 
 	//получаем значение из ответа
