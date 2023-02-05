@@ -56,6 +56,7 @@ type dbURLRepository struct {
 	once          sync.Once
 }
 
+// StopWorkerPool остановка воркер-пула
 func (d *dbURLRepository) StopWorkerPool() {
 	d.once.Do(func() {
 		close(d.done)
@@ -65,6 +66,7 @@ func (d *dbURLRepository) StopWorkerPool() {
 
 }
 
+// RemoveAll удаление всех URL
 func (d *dbURLRepository) RemoveAll(ctx context.Context, removingList []entity.URLDTO) error {
 	for _, ud := range removingList {
 		err := d.addURLToDeletionQueue(ud)
@@ -110,6 +112,7 @@ func (d *dbURLRepository) runDeletionWorkerPool() {
 	}
 }
 
+// New конструктор.
 func New(dbAddress string) (repositories.URLRepository, error) {
 	db, err := initDB(dbAddress)
 	if err != nil {
@@ -124,6 +127,7 @@ func New(dbAddress string) (repositories.URLRepository, error) {
 	return &dbRepository, nil
 }
 
+// Save сохранение URL.
 func (d *dbURLRepository) Save(ctx context.Context, userID, urlID, url string) error {
 	_, err := d.db.ExecContext(ctx, insertURLQuery, urlID, url, userID, false)
 	if err != nil {
@@ -135,6 +139,7 @@ func (d *dbURLRepository) Save(ctx context.Context, userID, urlID, url string) e
 	return nil
 }
 
+// FindByID поиск URL по ID.
 func (d *dbURLRepository) FindByID(ctx context.Context, urlID string) (string, error) {
 	var ud entity.URLDTO
 	row := d.db.QueryRowContext(ctx, getURLQuery, urlID)
@@ -151,6 +156,7 @@ func (d *dbURLRepository) FindByID(ctx context.Context, urlID string) (string, e
 	return ud.OriginalURL, nil
 }
 
+// GetAllByUserID поиск всех URL по ID юзера.
 func (d *dbURLRepository) GetAllByUserID(ctx context.Context, userID string) ([]entity.FullURL, error) {
 	urls := make([]entity.FullURL, 0)
 
@@ -178,6 +184,7 @@ func (d *dbURLRepository) GetAllByUserID(ctx context.Context, userID string) ([]
 	return urls, nil
 }
 
+// Ping проверка связи
 func (d *dbURLRepository) Ping() error {
 	pingErr := d.db.Ping()
 	if pingErr != nil {

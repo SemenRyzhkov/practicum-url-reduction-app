@@ -18,20 +18,24 @@ type urlServiceImpl struct {
 	urlRepository repositories.URLRepository
 }
 
+// New конструктор.
 func New(urlRepository repositories.URLRepository) URLService {
 	return &urlServiceImpl{
 		urlRepository,
 	}
 }
 
+// GetAllByUserID поиск всех URL по ID юзера.
 func (u *urlServiceImpl) GetAllByUserID(ctx context.Context, userID string) ([]entity.FullURL, error) {
 	return u.urlRepository.GetAllByUserID(ctx, userID)
 }
 
+// GetURLByID поиск URL по ID.
 func (u *urlServiceImpl) GetURLByID(ctx context.Context, urlID string) (string, error) {
 	return u.urlRepository.FindByID(ctx, urlID)
 }
 
+// ReduceURLToJSON сокращение и сохранение URL.
 func (u *urlServiceImpl) ReduceURLToJSON(ctx context.Context, userID string, request entity.URLRequest) (entity.URLResponse, error) {
 	reduceURL := Reducing(request.URL)
 	duplicateErr := u.urlRepository.Save(ctx, userID, reduceURL, request.URL)
@@ -41,6 +45,7 @@ func (u *urlServiceImpl) ReduceURLToJSON(ctx context.Context, userID string, req
 	return entity.URLResponse{Result: fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL)}, nil
 }
 
+// ReduceAndSaveURL сокращение и сохранение URL.
 func (u *urlServiceImpl) ReduceAndSaveURL(ctx context.Context, userID, url string) (string, error) {
 	reduceURL := Reducing(url)
 	duplicateErr := u.urlRepository.Save(ctx, userID, reduceURL, url)
@@ -50,6 +55,7 @@ func (u *urlServiceImpl) ReduceAndSaveURL(ctx context.Context, userID, url strin
 	return fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), reduceURL), nil
 }
 
+// ReduceSeveralURL сокращение и сохранение нескольких URL.
 func (u *urlServiceImpl) ReduceSeveralURL(ctx context.Context, userID string, list []entity.URLWithIDRequest) ([]entity.URLWithIDResponse, error) {
 	var urlWithIDResponseList []entity.URLWithIDResponse
 	//TODO by statement solution
@@ -69,6 +75,7 @@ func (u *urlServiceImpl) ReduceSeveralURL(ctx context.Context, userID string, li
 	return urlWithIDResponseList, nil
 }
 
+// RemoveAll удаление всех URL
 func (u *urlServiceImpl) RemoveAll(ctx context.Context, userID string, removingList []string) error {
 	now := time.Now()
 	defer func() {
@@ -88,6 +95,7 @@ func (u *urlServiceImpl) RemoveAll(ctx context.Context, userID string, removingL
 	return u.urlRepository.RemoveAll(ctx, removingDTOList)
 }
 
+// PingConnection проверка связи
 func (u *urlServiceImpl) PingConnection() error {
 	return u.urlRepository.Ping()
 }

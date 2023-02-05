@@ -32,9 +32,11 @@ type urlMemoryRepository struct {
 	urlStorage map[urlKey]urlValue
 }
 
+// StopWorkerPool остановка воркер-пула
 func (u *urlMemoryRepository) StopWorkerPool() {
 }
 
+// RemoveAll удаление всех URL
 func (u *urlMemoryRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
 	u.mx.Lock()
 	defer u.mx.Unlock()
@@ -52,6 +54,7 @@ func (u *urlMemoryRepository) RemoveAll(_ context.Context, removingList []entity
 	return nil
 }
 
+// GetAllByUserID поиск всех URL по ID юзера.
 func (u *urlMemoryRepository) GetAllByUserID(_ context.Context, userID string) ([]entity.FullURL, error) {
 	listFullURL := make([]entity.FullURL, 0)
 	u.mx.RLock()
@@ -72,6 +75,7 @@ func (u *urlMemoryRepository) GetAllByUserID(_ context.Context, userID string) (
 	return listFullURL, nil
 }
 
+// Save сохранение URL.
 func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string) error {
 	uk := urlKey{
 		UserID: userID,
@@ -93,6 +97,7 @@ func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string)
 	return nil
 }
 
+// FindByID поиск URL по ID.
 func (u *urlMemoryRepository) FindByID(_ context.Context, urlID string) (string, error) {
 	var originalURL string
 	u.mx.RLock()
@@ -114,10 +119,12 @@ func (u *urlMemoryRepository) FindByID(_ context.Context, urlID string) (string,
 	return originalURL, nil
 }
 
+// Ping проверка связи
 func (u *urlMemoryRepository) Ping() error {
 	return nil
 }
 
+// New конструктор.
 func New() repositories.URLRepository {
 	return &urlMemoryRepository{
 		urlStorage: make(map[urlKey]urlValue),

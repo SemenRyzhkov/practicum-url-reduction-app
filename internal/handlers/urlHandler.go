@@ -2,6 +2,7 @@ package handlers
 
 import "net/http"
 
+// URLHandler интерфейс для хэндлера
 type URLHandler interface {
 	GetAllURL(writer http.ResponseWriter, request *http.Request)
 	GetURLByID(writer http.ResponseWriter, r *http.Request)

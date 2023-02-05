@@ -20,10 +20,12 @@ func wrapResponseWriter(w http.ResponseWriter) *responseWriter {
 	return &responseWriter{ResponseWriter: w}
 }
 
+// Status статус
 func (rw *responseWriter) Status() int {
 	return rw.status
 }
 
+// WriteHeader врайтер хидера
 func (rw *responseWriter) WriteHeader(code int) {
 	if rw.wroteHeader {
 		return
@@ -42,6 +44,7 @@ func getLogger() log.Logger {
 	return logger
 }
 
+// LoggingMiddleware логирование для хэндлеров
 func LoggingMiddleware(next http.Handler) http.Handler {
 	loggerrr := getLogger()
 	fn := func(w http.ResponseWriter, r *http.Request) {

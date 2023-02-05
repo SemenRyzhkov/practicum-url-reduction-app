@@ -21,6 +21,7 @@ type cookieServiceImpl struct {
 	secretKey []byte
 }
 
+// New конструктор
 func New(key string) (CookieService, error) {
 	secretKey, err := hex.DecodeString(key)
 	if err != nil {
@@ -29,6 +30,7 @@ func New(key string) (CookieService, error) {
 	return &cookieServiceImpl{secretKey}, nil
 }
 
+// GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid метод получает ID юзера и выполняет проверку куки
 func (c *cookieServiceImpl) GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(
 	w http.ResponseWriter,
 	r *http.Request, name string) (string, error) {

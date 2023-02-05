@@ -12,6 +12,7 @@ type consumer struct {
 	scanner *bufio.Scanner
 }
 
+// NewConsumer конструктор для консюмера
 func NewConsumer(filename string) (*consumer, error) {
 	file, err := os.OpenFile(filename, os.O_RDONLY|os.O_CREATE, 0644)
 	if err != nil {
@@ -60,6 +61,7 @@ func readURL(c *consumer) (*savingURL, error) {
 	return &su, nil
 }
 
+// Close закрыватор для консюмера
 func (c *consumer) Close() error {
 	return c.file.Close()
 }

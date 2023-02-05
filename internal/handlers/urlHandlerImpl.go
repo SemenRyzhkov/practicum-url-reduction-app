@@ -20,6 +20,7 @@ type urlHandlerImpl struct {
 	cookieService cookieservice.CookieService
 }
 
+// NewHandler конструктор.
 func NewHandler(urlService urlservice.URLService, cookieService cookieservice.CookieService) URLHandler {
 	return &urlHandlerImpl{urlService, cookieService}
 }
