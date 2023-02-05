@@ -97,7 +97,7 @@ func (c *cookieServiceImpl) readSigned(r *http.Request, name string) (string, er
 	return value, nil
 }
 
-// write
+// write врайт
 func write(w http.ResponseWriter, cookie http.Cookie) error {
 	cookie.Value = base64.URLEncoding.EncodeToString([]byte(cookie.Value))
 
@@ -110,7 +110,7 @@ func write(w http.ResponseWriter, cookie http.Cookie) error {
 	return nil
 }
 
-// read
+// read рид
 func read(r *http.Request, name string) (string, error) {
 	cookie, err := r.Cookie(name)
 	if err != nil {

@@ -55,6 +55,7 @@ const (
 		"WHERE id = $2 AND user_id = $3"
 )
 
+// dbURLRepository репо
 type dbURLRepository struct {
 	db            *sql.DB
 	deletionQueue chan entity.URLDTO
@@ -201,6 +202,7 @@ func (d *dbURLRepository) Ping() error {
 	return nil
 }
 
+// initDB инициализация БД
 func initDB(dbAddress string) (*sql.DB, error) {
 	db, connectionErr := sql.Open("postgres", dbAddress)
 	if connectionErr != nil {
@@ -215,6 +217,7 @@ func initDB(dbAddress string) (*sql.DB, error) {
 	return db, nil
 }
 
+// createTableIfNotExists создание таблиц
 func createTableIfNotExists(db *sql.DB) error {
 	_, createTableErr := db.Exec(initDBQuery)
 	if createTableErr != nil {

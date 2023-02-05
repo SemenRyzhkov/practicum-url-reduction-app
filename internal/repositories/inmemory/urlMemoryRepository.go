@@ -30,6 +30,7 @@ type urlValue struct {
 	Deleted     bool
 }
 
+// urlMemoryRepository репо
 type urlMemoryRepository struct {
 	mx         sync.RWMutex
 	urlStorage map[urlKey]urlValue
@@ -134,7 +135,7 @@ func New() repositories.URLRepository {
 	}
 }
 
-// exists
+// exists существует ли урл
 func exists(urlStorage map[urlKey]urlValue, urlKey urlKey) bool {
 	_, ok := urlStorage[urlKey]
 	return ok
