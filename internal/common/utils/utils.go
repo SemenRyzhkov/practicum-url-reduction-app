@@ -13,22 +13,27 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/inmemory"
 )
 
+// GetFilePath геттер env переменной FILE_STORAGE_PATH
 func GetFilePath() string {
 	return os.Getenv("FILE_STORAGE_PATH")
 }
 
+// GetServerAddress геттер env переменной SERVER_ADDRESS
 func GetServerAddress() string {
 	return os.Getenv("SERVER_ADDRESS")
 }
 
+// GetKey геттер env переменной SECRET_KEY
 func GetKey() string {
 	return os.Getenv("SECRET_KEY")
 }
 
+// GetDBAddress геттер env переменной DATABASE_DSN
 func GetDBAddress() string {
 	return os.Getenv("DATABASE_DSN")
 }
 
+// LoadEnvironments загрузка env переменных
 func LoadEnvironments(envFilePath string) {
 	err := godotenv.Load(envFilePath)
 
@@ -37,6 +42,7 @@ func LoadEnvironments(envFilePath string) {
 	}
 }
 
+// CreateMemoryOrFileRepository создание репозитория в зависимости от переменной
 func CreateMemoryOrFileRepository(filePath string) repositories.URLRepository {
 	if len(strings.TrimSpace(filePath)) != 0 {
 		log.Println("in File")
@@ -47,6 +53,7 @@ func CreateMemoryOrFileRepository(filePath string) repositories.URLRepository {
 	return inmemory.New()
 }
 
+// CreateRepository создание репозитория в зависимости от переменной
 func CreateRepository(filePath, dbAddress string) (repositories.URLRepository, error) {
 	var repo repositories.URLRepository
 	var err error

@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// HandleFlag обработчик флагов
 func HandleFlag() {
 	flag.Func("a", "HTTP server address", func(aFlagValue string) error {
 		return os.Setenv("SERVER_ADDRESS", aFlagValue)

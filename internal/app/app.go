@@ -22,6 +22,7 @@ type App struct {
 	HTTPServer *http.Server
 }
 
+// New конструктор App
 func New(cfg config.Config) (*App, error) {
 	log.Println("creating router")
 	urlRepository, err := utils.CreateRepository(cfg.FilePath, cfg.DataBaseAddress)
@@ -59,6 +60,7 @@ func closeHTTPServerAndStopWorkerPool(server *http.Server, repository repositori
 
 }
 
+// Run запуск сервера
 func (app *App) Run() error {
 	log.Println("run server")
 	return app.HTTPServer.ListenAndServe()
