@@ -6,6 +6,7 @@ import (
 	"strings"
 )
 
+// AfterTest - сбрасывает тестовую конфигурацию
 func AfterTest() {
 	filePath := os.Getenv("FILE_STORAGE_PATH")
 	if len(strings.TrimSpace(filePath)) == 0 {

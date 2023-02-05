@@ -17,6 +17,7 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/urlservice"
 )
 
+// App запускает приложение.
 type App struct {
 	HTTPServer *http.Server
 }
