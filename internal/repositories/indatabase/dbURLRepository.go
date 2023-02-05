@@ -97,7 +97,7 @@ func (d *dbURLRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
 	}
 }
 
-// runDeletionWorkerPool ооздание воркер пула
+// runDeletionWorkerPool создание воркер пула
 func (d *dbURLRepository) runDeletionWorkerPool() {
 	for i := 0; i < 10; i++ {
 		d.wg.Add(1)

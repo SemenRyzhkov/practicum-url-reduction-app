@@ -20,13 +20,13 @@ var (
 	ErrRepositoryIsClosing = errors.New("repository is closing")
 )
 
-// urlKey
+// urlKey урл
 type urlKey struct {
 	UserID string
 	ID     string
 }
 
-// urlValue
+// urlValue урл
 type urlValue struct {
 	OriginalURL string
 	Deleted     bool

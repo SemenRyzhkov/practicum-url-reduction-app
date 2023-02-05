@@ -21,6 +21,7 @@ var (
 	ErrInvalidValue = errors.New("invalid cookie value")
 )
 
+// cookieServiceImpl куки сервис
 type cookieServiceImpl struct {
 	secretKey []byte
 }
