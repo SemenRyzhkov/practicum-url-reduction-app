@@ -1,3 +1,4 @@
+// Package handlers is handler provider.
 package handlers
 
 import (
@@ -23,6 +24,7 @@ func NewHandler(urlService urlservice.URLService, cookieService cookieservice.Co
 	return &urlHandlerImpl{urlService, cookieService}
 }
 
+// GetAllURL выполняет получение всех сокращенных URL по ID юзера.
 func (u *urlHandlerImpl) GetAllURL(writer http.ResponseWriter, request *http.Request) {
 	userID, cookieErr := u.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
 	if cookieErr != nil {
@@ -43,6 +45,7 @@ func (u *urlHandlerImpl) GetAllURL(writer http.ResponseWriter, request *http.Req
 	}
 }
 
+// GetURLByID выполняет получение URL по его ID.
 func (u *urlHandlerImpl) GetURLByID(writer http.ResponseWriter, request *http.Request) {
 	urlID := chi.URLParam(request, "id")
 	if urlID == "" {
@@ -64,6 +67,7 @@ func (u *urlHandlerImpl) GetURLByID(writer http.ResponseWriter, request *http.Re
 	writer.WriteHeader(http.StatusTemporaryRedirect)
 }
 
+// ReduceURLTOJSON выполняет сокращение URL, переданного в JSON-формате.
 func (u *urlHandlerImpl) ReduceURLTOJSON(writer http.ResponseWriter, request *http.Request) {
 	userID, cookieErr := u.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
 	if cookieErr != nil {
@@ -101,6 +105,7 @@ func (u *urlHandlerImpl) ReduceURLTOJSON(writer http.ResponseWriter, request *ht
 	}
 }
 
+// ReduceURL выполняет сокращение URL, переданного в текстовом формате.
 func (u *urlHandlerImpl) ReduceURL(writer http.ResponseWriter, request *http.Request) {
 	userID, cookieErr := u.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
 	if cookieErr != nil {
@@ -126,6 +131,7 @@ func (u *urlHandlerImpl) ReduceURL(writer http.ResponseWriter, request *http.Req
 	writer.Write([]byte(reduceURL))
 }
 
+// ReduceSeveralURL выполняет сокращение нескольких URL, переданныф в в JSON-формате.
 func (u *urlHandlerImpl) ReduceSeveralURL(writer http.ResponseWriter, request *http.Request) {
 	userID, cookieErr := u.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
 	if cookieErr != nil {
@@ -153,6 +159,7 @@ func (u *urlHandlerImpl) ReduceSeveralURL(writer http.ResponseWriter, request *h
 	}
 }
 
+// RemoveAll выполняет удаление нескольких URL по их ID.
 func (u *urlHandlerImpl) RemoveAll(writer http.ResponseWriter, request *http.Request) {
 	userID, cookieErr := u.cookieService.GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(writer, request, "userID")
 	if cookieErr != nil {
