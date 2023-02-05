@@ -1,3 +1,4 @@
+// Package indatabase пакет
 package indatabase
 
 import (
@@ -17,6 +18,7 @@ import (
 )
 
 var (
+	//URLRepository проверка
 	_ repositories.URLRepository = &dbURLRepository{}
 	//ErrRepositoryIsClosing ошибка закрытия репо
 	ErrRepositoryIsClosing = errors.New("repository is closing")

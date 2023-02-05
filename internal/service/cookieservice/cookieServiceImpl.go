@@ -1,3 +1,4 @@
+// Package cookieservice пакет
 package cookieservice
 
 import (
@@ -12,6 +13,7 @@ import (
 )
 
 var (
+	//CookieService проверка
 	_ CookieService = &cookieServiceImpl{}
 	//ErrValueTooLong куки слишком длинное
 	ErrValueTooLong = errors.New("cookie value too long")

@@ -1,3 +1,4 @@
+// Package inmemory пакет
 package inmemory
 
 import (
@@ -13,6 +14,7 @@ import (
 )
 
 var (
+	//URLRepository проверка
 	_ repositories.URLRepository = &urlMemoryRepository{}
 	//ErrRepositoryIsClosing ошибка закрытия репо
 	ErrRepositoryIsClosing = errors.New("repository is closing")
