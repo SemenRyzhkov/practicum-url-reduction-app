@@ -18,11 +18,13 @@ var (
 	ErrRepositoryIsClosing = errors.New("repository is closing")
 )
 
+// urlKey
 type urlKey struct {
 	UserID string
 	ID     string
 }
 
+// urlValue
 type urlValue struct {
 	OriginalURL string
 	Deleted     bool
@@ -132,6 +134,7 @@ func New() repositories.URLRepository {
 	}
 }
 
+// exists
 func exists(urlStorage map[urlKey]urlValue, urlKey urlKey) bool {
 	_, ok := urlStorage[urlKey]
 	return ok

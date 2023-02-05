@@ -51,6 +51,7 @@ func (c *cookieServiceImpl) GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissing
 	return "", err
 }
 
+// writeSigned запись
 func (c *cookieServiceImpl) writeSigned(w http.ResponseWriter) (string, error) {
 	userID := uuid.New().String()
 	cookie := http.Cookie{
@@ -70,6 +71,7 @@ func (c *cookieServiceImpl) writeSigned(w http.ResponseWriter) (string, error) {
 	return userID, write(w, cookie)
 }
 
+// readSigned чтение
 func (c *cookieServiceImpl) readSigned(r *http.Request, name string) (string, error) {
 	// {signature}{original value}
 	signedValue, err := read(r, name)
@@ -95,6 +97,7 @@ func (c *cookieServiceImpl) readSigned(r *http.Request, name string) (string, er
 	return value, nil
 }
 
+// write
 func write(w http.ResponseWriter, cookie http.Cookie) error {
 	cookie.Value = base64.URLEncoding.EncodeToString([]byte(cookie.Value))
 
@@ -107,6 +110,7 @@ func write(w http.ResponseWriter, cookie http.Cookie) error {
 	return nil
 }
 
+// read
 func read(r *http.Request, name string) (string, error) {
 	cookie, err := r.Cookie(name)
 	if err != nil {

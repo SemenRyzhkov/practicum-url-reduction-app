@@ -23,6 +23,7 @@ var (
 )
 
 const (
+	//initDBQuery инит
 	initDBQuery = "" +
 		"CREATE TABLE IF NOT EXISTS public.urls (" +
 		"id varchar(45) primary key, " +
@@ -30,19 +31,24 @@ const (
 		"user_id varchar(45), " +
 		"deleted boolean" +
 		")"
+	//createUserIDIndex креате
 	createUserIDIndex = "" +
 		"CREATE INDEX IF NOT EXISTS user_id_index " +
 		"ON public.urls (user_id)"
+	//getAllQuery гет алл
 	getAllQuery = "" +
 		"SELECT id, original_url " +
 		"FROM public.urls " +
 		"WHERE user_id=$1"
+	//getURLQuery гет
 	getURLQuery = "" +
 		"SELECT original_url, deleted FROM public.urls " +
 		"WHERE id=$1"
+	//insertURLQuery инсерт
 	insertURLQuery = "" +
 		"INSERT INTO public.urls (id, original_url, user_id, deleted) " +
 		"VALUES ($1, $2, $3, $4)"
+	//deleteQuery делете
 	deleteQuery = "" +
 		"UPDATE public.urls " +
 		"SET deleted = $1 " +
@@ -78,6 +84,7 @@ func (d *dbURLRepository) RemoveAll(ctx context.Context, removingList []entity.U
 	return nil
 }
 
+// addURLToDeletionQueue добавление в очередь
 func (d *dbURLRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
 	select {
 	case <-d.done:
@@ -87,6 +94,7 @@ func (d *dbURLRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
 	}
 }
 
+// runDeletionWorkerPool ооздание воркер пула
 func (d *dbURLRepository) runDeletionWorkerPool() {
 	for i := 0; i < 10; i++ {
 		d.wg.Add(1)
@@ -136,7 +144,6 @@ func (d *dbURLRepository) Save(ctx context.Context, userID, urlID, url string) e
 			return myerrors.NewViolationError(fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), urlID), err)
 		}
 	}
-
 	return nil
 }
 
