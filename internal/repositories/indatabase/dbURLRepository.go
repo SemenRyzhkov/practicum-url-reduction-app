@@ -17,8 +17,9 @@ import (
 )
 
 var (
-	_                      repositories.URLRepository = &dbURLRepository{}
-	ErrRepositoryIsClosing                            = errors.New("repository is closing")
+	_ repositories.URLRepository = &dbURLRepository{}
+	//ErrRepositoryIsClosing ошибка закрытия репо
+	ErrRepositoryIsClosing = errors.New("repository is closing")
 )
 
 const (

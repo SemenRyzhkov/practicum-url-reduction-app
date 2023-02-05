@@ -100,6 +100,7 @@ func (u *urlServiceImpl) PingConnection() error {
 	return u.urlRepository.Ping()
 }
 
+// Reducing самый главный метод во всем приложении
 func Reducing(url string) string {
 	hash := md5.Sum([]byte(url))
 	return hex.EncodeToString(hash[:])

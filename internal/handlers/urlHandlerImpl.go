@@ -182,6 +182,7 @@ func (u *urlHandlerImpl) RemoveAll(writer http.ResponseWriter, request *http.Req
 	writer.WriteHeader(http.StatusAccepted)
 }
 
+// PingConnection пинг
 func (u *urlHandlerImpl) PingConnection(writer http.ResponseWriter, request *http.Request) {
 	err := u.urlService.PingConnection()
 

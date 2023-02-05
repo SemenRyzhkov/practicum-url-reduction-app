@@ -13,8 +13,9 @@ import (
 )
 
 var (
-	_                      repositories.URLRepository = &urlMemoryRepository{}
-	ErrRepositoryIsClosing                            = errors.New("repository is closing")
+	_ repositories.URLRepository = &urlMemoryRepository{}
+	//ErrRepositoryIsClosing ошибка закрытия репо
+	ErrRepositoryIsClosing = errors.New("repository is closing")
 )
 
 type urlKey struct {

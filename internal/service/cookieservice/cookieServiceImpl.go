@@ -12,9 +12,11 @@ import (
 )
 
 var (
-	_               CookieService = &cookieServiceImpl{}
-	ErrValueTooLong               = errors.New("cookie value too long")
-	ErrInvalidValue               = errors.New("invalid cookie value")
+	_ CookieService = &cookieServiceImpl{}
+	//ErrValueTooLong куки слишком длинное
+	ErrValueTooLong = errors.New("cookie value too long")
+	//ErrInvalidValue куки инвалид
+	ErrInvalidValue = errors.New("invalid cookie value")
 )
 
 type cookieServiceImpl struct {
