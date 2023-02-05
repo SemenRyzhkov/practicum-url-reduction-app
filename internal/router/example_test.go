@@ -87,8 +87,7 @@ func ExampleReduceURLAndGetURLByID() {
 	testutils.AfterTest()
 
 	// Output:
-	// http://localhost:8080/1f67218b4bfbc6af9e52d502c3e5ef3d
-	// https://dzen.ru/?yredirect=true
+	// Reduce URL is http://localhost:8080/1f67218b4bfbc6af9e52d502c3e5ef3dOriginal URL is https://dzen.ru/?yredirect=true
 }
 
 func ExampleReduceURLTOJSON() {
@@ -117,7 +116,7 @@ func ExampleReduceURLTOJSON() {
 	testutils.AfterTest()
 
 	// Output:
-	// https://dzen.ru/?yredirect=true
+	// Original URL is https://dzen.ru/?yredirect=true
 }
 
 func ExampleGetAll() {
@@ -145,8 +144,7 @@ func ExampleGetAll() {
 	testutils.AfterTest()
 
 	// Output:
-	// https://dzen.ru/?yredirect=true
-	// http://localhost:8080/1f67218b4bfbc6af9e52d502c3e5ef3d
+	// Original URL is https://dzen.ru/?yredirect=trueShort URL is http://localhost:8080/1f67218b4bfbc6af9e52d502c3e5ef3d
 }
 
 func ExampleReduceSeveralURL() {
@@ -168,6 +166,5 @@ func ExampleReduceSeveralURL() {
 	testutils.AfterTest()
 
 	// Output:
-	// http://localhost:8080/b6ad61b613c33a6d62e6d14198e465b8
-	// http://localhost:8080/50754651b2f907807de0b789248f1f1b
+	// First short URL is http://localhost:8080/b6ad61b613c33a6d62e6d14198e465b8Second short URL is http://localhost:8080/b6ad61b613c33a6d62e6d14198e465b8
 }
