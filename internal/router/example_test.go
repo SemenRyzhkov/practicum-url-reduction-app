@@ -46,7 +46,7 @@ func testJSONRequestForExample(ts *httptest.Server) *http.Request {
 	if err != nil {
 		log.Fatal(err)
 	}
-	req, err := http.NewRequest(http.MethodPost, ts.URL+"/api/shorten", &buf)
+	req, _ := http.NewRequest(http.MethodPost, ts.URL+"/api/shorten", &buf)
 	return req
 }
 
@@ -56,11 +56,11 @@ func testSeveralJSONRequestForExample(ts *httptest.Server) *http.Request {
 	if err != nil {
 		log.Fatal(err)
 	}
-	req, err := http.NewRequest(http.MethodPost, ts.URL+"/api/shorten/batch", &buf)
+	req, _ := http.NewRequest(http.MethodPost, ts.URL+"/api/shorten/batch", &buf)
 	return req
 }
 
-func ExampleReduceURLAndGetURLByID() {
+func exampleReduceURLAndGetURLByID() {
 	//настраиваем сервер
 	ts := setupTestServerForExample()
 	defer ts.Close()
@@ -90,7 +90,7 @@ func ExampleReduceURLAndGetURLByID() {
 	// Reduce URL is http://localhost:8080/1f67218b4bfbc6af9e52d502c3e5ef3dOriginal URL is https://dzen.ru/?yredirect=true
 }
 
-func ExampleReduceURLTOJSON() {
+func exampleReduceURLTOJSON() {
 	//настраиваем сервер
 	ts := setupTestServerForExample()
 	defer ts.Close()
@@ -119,21 +119,26 @@ func ExampleReduceURLTOJSON() {
 	// Original URL is https://dzen.ru/?yredirect=true
 }
 
-func ExampleGetAll() {
+func exampleGetAll() {
 	//настраиваем сервер
 	ts := setupTestServerForExample()
 	defer ts.Close()
 
 	//выполняем запрос для сокращения url
 	req := testJSONRequestForExample(ts)
-	resp, _ := http.DefaultClient.Do(req)
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer resp.Body.Close()
 
 	//выполняем запрос для получения всех URL по userID
 	req = testRequestForExample(ts, "GET", "/api/user/urls", "")
 	req.Header["Cookie"] = append(req.Header["Cookie"], resp.Header.Get("Set-Cookie"))
-	resp, _ = http.DefaultClient.Do(req)
-
+	resp, err = http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
 	//получаем значение из ответа
 	var actualURLsList []entity.FullURL
 	json.NewDecoder(resp.Body).Decode(&actualURLsList)
@@ -147,7 +152,7 @@ func ExampleGetAll() {
 	// Original URL is https://dzen.ru/?yredirect=trueShort URL is http://localhost:8080/1f67218b4bfbc6af9e52d502c3e5ef3d
 }
 
-func ExampleReduceSeveralURL() {
+func exampleReduceSeveralURL() {
 	//настраиваем сервер
 	ts := setupTestServerForExample()
 	defer ts.Close()
