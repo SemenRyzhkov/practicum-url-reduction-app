@@ -1,4 +1,3 @@
-// Package cookieservice пакет
 package cookieservice
 
 import (
@@ -12,6 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// variables for cookieServiceImpl
 var (
 	//CookieService проверка
 	_ CookieService = &cookieServiceImpl{}
@@ -21,7 +21,6 @@ var (
 	ErrInvalidValue = errors.New("invalid cookie value")
 )
 
-// cookieServiceImpl куки сервис
 type cookieServiceImpl struct {
 	secretKey []byte
 }

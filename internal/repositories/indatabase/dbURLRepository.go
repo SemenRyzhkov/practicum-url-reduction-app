@@ -1,4 +1,3 @@
-// Package indatabase пакет
 package indatabase
 
 import (
@@ -17,6 +16,7 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 )
 
+// variables for dbURLRepository
 var (
 	//URLRepository проверка
 	_ repositories.URLRepository = &dbURLRepository{}
@@ -24,8 +24,8 @@ var (
 	ErrRepositoryIsClosing = errors.New("repository is closing")
 )
 
+// const for dbURLRepository
 const (
-	//initDBQuery инит
 	initDBQuery = "" +
 		"CREATE TABLE IF NOT EXISTS public.urls (" +
 		"id varchar(45) primary key, " +
@@ -33,31 +33,25 @@ const (
 		"user_id varchar(45), " +
 		"deleted boolean" +
 		")"
-	//createUserIDIndex креате
 	createUserIDIndex = "" +
 		"CREATE INDEX IF NOT EXISTS user_id_index " +
 		"ON public.urls (user_id)"
-	//getAllQuery гет алл
 	getAllQuery = "" +
 		"SELECT id, original_url " +
 		"FROM public.urls " +
 		"WHERE user_id=$1"
-	//getURLQuery гет
 	getURLQuery = "" +
 		"SELECT original_url, deleted FROM public.urls " +
 		"WHERE id=$1"
-	//insertURLQuery инсерт
 	insertURLQuery = "" +
 		"INSERT INTO public.urls (id, original_url, user_id, deleted) " +
 		"VALUES ($1, $2, $3, $4)"
-	//deleteQuery делете
 	deleteQuery = "" +
 		"UPDATE public.urls " +
 		"SET deleted = $1 " +
 		"WHERE id = $2 AND user_id = $3"
 )
 
-// dbURLRepository репо
 type dbURLRepository struct {
 	db            *sql.DB
 	deletionQueue chan entity.URLDTO

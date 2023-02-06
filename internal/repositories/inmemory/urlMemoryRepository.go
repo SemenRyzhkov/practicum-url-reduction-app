@@ -1,4 +1,3 @@
-// Package inmemory пакет
 package inmemory
 
 import (
@@ -13,6 +12,7 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 )
 
+// variables for urlMemoryRepository
 var (
 	//URLRepository проверка
 	_ repositories.URLRepository = &urlMemoryRepository{}
@@ -20,19 +20,16 @@ var (
 	ErrRepositoryIsClosing = errors.New("repository is closing")
 )
 
-// urlKey урл
 type urlKey struct {
 	UserID string
 	ID     string
 }
 
-// urlValue урл
 type urlValue struct {
 	OriginalURL string
 	Deleted     bool
 }
 
-// urlMemoryRepository репо
 type urlMemoryRepository struct {
 	mx         sync.RWMutex
 	urlStorage map[urlKey]urlValue
