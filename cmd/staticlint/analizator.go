@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/multichecker"
@@ -43,9 +44,14 @@ func main() {
 	for _, v := range cfg.Staticcheck {
 		checks[v] = true
 	}
-	// добавляем анализаторы из staticcheck, которые указаны в файле конфигурации
+
 	for _, v := range staticcheck.Analyzers {
 		if checks[v.Analyzer.Name] {
+			mychecks = append(mychecks, v.Analyzer)
+		}
+	}
+	for _, v := range staticcheck.Analyzers {
+		if strings.Contains(v.Analyzer.Name, "SA") {
 			mychecks = append(mychecks, v.Analyzer)
 		}
 	}
