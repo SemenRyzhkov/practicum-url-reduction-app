@@ -7,6 +7,7 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 )
 
+// FromMapToSliceOfFullURL мапим мапу в список FullURL
 func FromMapToSliceOfFullURL(userURLMap map[string]string) []entity.FullURL {
 	fullURLsList := make([]entity.FullURL, 0, len(userURLMap))
 

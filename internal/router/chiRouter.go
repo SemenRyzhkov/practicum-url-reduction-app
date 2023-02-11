@@ -17,6 +17,7 @@ const (
 	removeAllPath        = "/api/user/urls"
 )
 
+// NewRouter создатель роутера
 func NewRouter(h handlers.URLHandler) chi.Router {
 	r := chi.NewRouter()
 	r.Use(middleware.DecompressRequest, middleware.CompressResponse, middleware.LoggingMiddleware)

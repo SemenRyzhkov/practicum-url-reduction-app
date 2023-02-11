@@ -12,9 +12,12 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 )
 
+// variables for urlMemoryRepository
 var (
-	_                      repositories.URLRepository = &urlMemoryRepository{}
-	ErrRepositoryIsClosing                            = errors.New("repository is closing")
+	//URLRepository проверка
+	_ repositories.URLRepository = &urlMemoryRepository{}
+	//ErrRepositoryIsClosing ошибка закрытия репо
+	ErrRepositoryIsClosing = errors.New("repository is closing")
 )
 
 type urlKey struct {
@@ -32,9 +35,11 @@ type urlMemoryRepository struct {
 	urlStorage map[urlKey]urlValue
 }
 
+// StopWorkerPool остановка воркер-пула
 func (u *urlMemoryRepository) StopWorkerPool() {
 }
 
+// RemoveAll удаление всех URL
 func (u *urlMemoryRepository) RemoveAll(_ context.Context, removingList []entity.URLDTO) error {
 	u.mx.Lock()
 	defer u.mx.Unlock()
@@ -52,6 +57,7 @@ func (u *urlMemoryRepository) RemoveAll(_ context.Context, removingList []entity
 	return nil
 }
 
+// GetAllByUserID поиск всех URL по ID юзера.
 func (u *urlMemoryRepository) GetAllByUserID(_ context.Context, userID string) ([]entity.FullURL, error) {
 	listFullURL := make([]entity.FullURL, 0)
 	u.mx.RLock()
@@ -72,6 +78,7 @@ func (u *urlMemoryRepository) GetAllByUserID(_ context.Context, userID string) (
 	return listFullURL, nil
 }
 
+// Save сохранение URL.
 func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string) error {
 	uk := urlKey{
 		UserID: userID,
@@ -93,6 +100,7 @@ func (u *urlMemoryRepository) Save(_ context.Context, userID, urlID, url string)
 	return nil
 }
 
+// FindByID поиск URL по ID.
 func (u *urlMemoryRepository) FindByID(_ context.Context, urlID string) (string, error) {
 	var originalURL string
 	u.mx.RLock()
@@ -114,16 +122,19 @@ func (u *urlMemoryRepository) FindByID(_ context.Context, urlID string) (string,
 	return originalURL, nil
 }
 
+// Ping проверка связи
 func (u *urlMemoryRepository) Ping() error {
 	return nil
 }
 
+// New конструктор.
 func New() repositories.URLRepository {
 	return &urlMemoryRepository{
 		urlStorage: make(map[urlKey]urlValue),
 	}
 }
 
+// exists существует ли урл
 func exists(urlStorage map[urlKey]urlValue, urlKey urlKey) bool {
 	_, ok := urlStorage[urlKey]
 	return ok

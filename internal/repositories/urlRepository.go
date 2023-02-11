@@ -6,6 +6,7 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 )
 
+// URLRepository интерфейс для репозитория
 type URLRepository interface {
 	Save(ctx context.Context, userID, urlID, url string) error
 	FindByID(ctx context.Context, urlID string) (string, error)

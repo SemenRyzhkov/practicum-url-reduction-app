@@ -16,11 +16,15 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 )
 
+// variables for dbURLRepository
 var (
-	_                      repositories.URLRepository = &dbURLRepository{}
-	ErrRepositoryIsClosing                            = errors.New("repository is closing")
+	//URLRepository проверка
+	_ repositories.URLRepository = &dbURLRepository{}
+	//ErrRepositoryIsClosing ошибка закрытия репо
+	ErrRepositoryIsClosing = errors.New("repository is closing")
 )
 
+// const for dbURLRepository
 const (
 	initDBQuery = "" +
 		"CREATE TABLE IF NOT EXISTS public.urls (" +
@@ -56,6 +60,7 @@ type dbURLRepository struct {
 	once          sync.Once
 }
 
+// StopWorkerPool остановка воркер-пула
 func (d *dbURLRepository) StopWorkerPool() {
 	d.once.Do(func() {
 		close(d.done)
@@ -65,6 +70,7 @@ func (d *dbURLRepository) StopWorkerPool() {
 
 }
 
+// RemoveAll удаление всех URL
 func (d *dbURLRepository) RemoveAll(ctx context.Context, removingList []entity.URLDTO) error {
 	for _, ud := range removingList {
 		err := d.addURLToDeletionQueue(ud)
@@ -75,6 +81,7 @@ func (d *dbURLRepository) RemoveAll(ctx context.Context, removingList []entity.U
 	return nil
 }
 
+// addURLToDeletionQueue добавление в очередь
 func (d *dbURLRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
 	select {
 	case <-d.done:
@@ -84,6 +91,7 @@ func (d *dbURLRepository) addURLToDeletionQueue(ud entity.URLDTO) error {
 	}
 }
 
+// runDeletionWorkerPool создание воркер пула
 func (d *dbURLRepository) runDeletionWorkerPool() {
 	for i := 0; i < 10; i++ {
 		d.wg.Add(1)
@@ -110,6 +118,7 @@ func (d *dbURLRepository) runDeletionWorkerPool() {
 	}
 }
 
+// New конструктор.
 func New(dbAddress string) (repositories.URLRepository, error) {
 	db, err := initDB(dbAddress)
 	if err != nil {
@@ -124,6 +133,7 @@ func New(dbAddress string) (repositories.URLRepository, error) {
 	return &dbRepository, nil
 }
 
+// Save сохранение URL.
 func (d *dbURLRepository) Save(ctx context.Context, userID, urlID, url string) error {
 	_, err := d.db.ExecContext(ctx, insertURLQuery, urlID, url, userID, false)
 	if err != nil {
@@ -131,10 +141,10 @@ func (d *dbURLRepository) Save(ctx context.Context, userID, urlID, url string) e
 			return myerrors.NewViolationError(fmt.Sprintf("%s/%s", os.Getenv("BASE_URL"), urlID), err)
 		}
 	}
-
 	return nil
 }
 
+// FindByID поиск URL по ID.
 func (d *dbURLRepository) FindByID(ctx context.Context, urlID string) (string, error) {
 	var ud entity.URLDTO
 	row := d.db.QueryRowContext(ctx, getURLQuery, urlID)
@@ -151,6 +161,7 @@ func (d *dbURLRepository) FindByID(ctx context.Context, urlID string) (string, e
 	return ud.OriginalURL, nil
 }
 
+// GetAllByUserID поиск всех URL по ID юзера.
 func (d *dbURLRepository) GetAllByUserID(ctx context.Context, userID string) ([]entity.FullURL, error) {
 	urls := make([]entity.FullURL, 0)
 
@@ -178,6 +189,7 @@ func (d *dbURLRepository) GetAllByUserID(ctx context.Context, userID string) ([]
 	return urls, nil
 }
 
+// Ping проверка связи
 func (d *dbURLRepository) Ping() error {
 	pingErr := d.db.Ping()
 	if pingErr != nil {
@@ -186,6 +198,7 @@ func (d *dbURLRepository) Ping() error {
 	return nil
 }
 
+// initDB инициализация БД
 func initDB(dbAddress string) (*sql.DB, error) {
 	db, connectionErr := sql.Open("postgres", dbAddress)
 	if connectionErr != nil {
@@ -200,6 +213,7 @@ func initDB(dbAddress string) (*sql.DB, error) {
 	return db, nil
 }
 
+// createTableIfNotExists создание таблиц
 func createTableIfNotExists(db *sql.DB) error {
 	_, createTableErr := db.Exec(initDBQuery)
 	if createTableErr != nil {

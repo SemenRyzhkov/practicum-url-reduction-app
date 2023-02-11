@@ -11,16 +11,21 @@ import (
 	"github.com/google/uuid"
 )
 
+// variables for cookieServiceImpl
 var (
-	_               CookieService = &cookieServiceImpl{}
-	ErrValueTooLong               = errors.New("cookie value too long")
-	ErrInvalidValue               = errors.New("invalid cookie value")
+	//CookieService проверка
+	_ CookieService = &cookieServiceImpl{}
+	//ErrValueTooLong куки слишком длинное
+	ErrValueTooLong = errors.New("cookie value too long")
+	//ErrInvalidValue куки инвалид
+	ErrInvalidValue = errors.New("invalid cookie value")
 )
 
 type cookieServiceImpl struct {
 	secretKey []byte
 }
 
+// New конструктор
 func New(key string) (CookieService, error) {
 	secretKey, err := hex.DecodeString(key)
 	if err != nil {
@@ -29,6 +34,7 @@ func New(key string) (CookieService, error) {
 	return &cookieServiceImpl{secretKey}, nil
 }
 
+// GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid метод получает ID юзера и выполняет проверку куки
 func (c *cookieServiceImpl) GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissingOrInvalid(
 	w http.ResponseWriter,
 	r *http.Request, name string) (string, error) {
@@ -47,6 +53,7 @@ func (c *cookieServiceImpl) GetUserIDWithCheckCookieAndIssueNewIfCookieIsMissing
 	return "", err
 }
 
+// writeSigned запись
 func (c *cookieServiceImpl) writeSigned(w http.ResponseWriter) (string, error) {
 	userID := uuid.New().String()
 	cookie := http.Cookie{
@@ -66,6 +73,7 @@ func (c *cookieServiceImpl) writeSigned(w http.ResponseWriter) (string, error) {
 	return userID, write(w, cookie)
 }
 
+// readSigned чтение
 func (c *cookieServiceImpl) readSigned(r *http.Request, name string) (string, error) {
 	// {signature}{original value}
 	signedValue, err := read(r, name)
@@ -91,6 +99,7 @@ func (c *cookieServiceImpl) readSigned(r *http.Request, name string) (string, er
 	return value, nil
 }
 
+// write врайт
 func write(w http.ResponseWriter, cookie http.Cookie) error {
 	cookie.Value = base64.URLEncoding.EncodeToString([]byte(cookie.Value))
 
@@ -103,6 +112,7 @@ func write(w http.ResponseWriter, cookie http.Cookie) error {
 	return nil
 }
 
+// read рид
 func read(r *http.Request, name string) (string, error) {
 	cookie, err := r.Cookie(name)
 	if err != nil {

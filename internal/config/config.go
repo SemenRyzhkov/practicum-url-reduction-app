@@ -1,5 +1,6 @@
 package config
 
+// Config конфигкрация приложения
 type Config struct {
 	Host            string
 	FilePath        string
@@ -7,6 +8,7 @@ type Config struct {
 	DataBaseAddress string
 }
 
+// New конструктор Config
 func New(serverAddress, filePath, key, dbAddress string) Config {
 	return Config{
 		Host:            serverAddress,

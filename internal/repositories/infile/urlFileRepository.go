@@ -21,15 +21,18 @@ type urlFileRepository struct {
 	producer         *producer
 }
 
+// StopWorkerPool остановка воркер-пула
 func (u *urlFileRepository) StopWorkerPool() {
 	////TODO implement me
 	//panic("implement me")
 }
 
+// RemoveAll удаление всех URL
 func (u *urlFileRepository) RemoveAll(_ context.Context, _ []entity.URLDTO) error {
 	return nil
 }
 
+// GetAllByUserID поиск всех URL по ID юзера.
 func (u *urlFileRepository) GetAllByUserID(_ context.Context, userID string) ([]entity.FullURL, error) {
 	u.mx.Lock()
 	userURLMap, ok := u.urlStorage[userID]
@@ -40,6 +43,7 @@ func (u *urlFileRepository) GetAllByUserID(_ context.Context, userID string) ([]
 	return urlmapper.FromMapToSliceOfFullURL(userURLMap), nil
 }
 
+// Save сохранение URL.
 func (u *urlFileRepository) Save(_ context.Context, userID, urlID, url string) error {
 	u.mx.Lock()
 	userURLStorage, ok := u.urlStorage[userID]
@@ -62,6 +66,7 @@ func (u *urlFileRepository) Save(_ context.Context, userID, urlID, url string) e
 	return u.producer.WriteURL(&savingURL)
 }
 
+// FindByID поиск URL по ID.
 func (u *urlFileRepository) FindByID(_ context.Context, urlID string) (string, error) {
 	u.mx.Lock()
 	url, ok := u.commonURLStorage[urlID]
@@ -72,10 +77,12 @@ func (u *urlFileRepository) FindByID(_ context.Context, urlID string) (string, e
 	return url, nil
 }
 
+// Ping проверка связи
 func (u *urlFileRepository) Ping() error {
 	return nil
 }
 
+// New конструктор.
 func New(filePath string) repositories.URLRepository {
 	producer, producerErr := NewProducer(filePath)
 	if producerErr != nil {
