@@ -1,9 +1,8 @@
-package staticlint
+package main
 
 import (
 	"encoding/json"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"golang.org/x/tools/go/analysis"
@@ -14,20 +13,18 @@ import (
 	"honnef.co/go/tools/staticcheck"
 )
 
-// Config — имя файла конфигурации.
-const Config = `config.json`
+const Config = `C:/practicum/practicum-url-reduction-app/cmd/staticlint/config.json`
 
-// ConfigData описывает структуру файла конфигурации.
 type ConfigData struct {
 	Staticcheck []string
 }
 
 func main() {
-	appfile, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-	data, err := os.ReadFile(filepath.Join(filepath.Dir(appfile), Config))
+	//appfile, err := os.Executable()
+	//if err != nil {
+	//	panic(err)
+	//}
+	data, err := os.ReadFile(Config)
 	if err != nil {
 		panic(err)
 	}
@@ -39,6 +36,7 @@ func main() {
 		printf.Analyzer,
 		shadow.Analyzer,
 		structtag.Analyzer,
+		ExitDisableAnalyzer,
 	}
 	checks := make(map[string]bool)
 	for _, v := range cfg.Staticcheck {
