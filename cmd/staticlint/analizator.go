@@ -15,6 +15,7 @@ import (
 
 const Config = `C:/practicum/practicum-url-reduction-app/cmd/staticlint/config.json`
 
+// ConfigData config
 type ConfigData struct {
 	Staticcheck []string
 }

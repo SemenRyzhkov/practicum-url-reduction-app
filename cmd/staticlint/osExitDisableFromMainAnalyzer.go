@@ -7,6 +7,7 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
+// ExitDisableAnalyzer analyzer
 var ExitDisableAnalyzer = &analysis.Analyzer{
 	Name: "osExitDisableFromMain",
 	Doc:  "check for disable the use of a direct call to os.Exit in the main package main function",
