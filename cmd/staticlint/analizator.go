@@ -13,10 +13,12 @@ import (
 	"honnef.co/go/tools/staticcheck"
 )
 
+// Config file
 const Config = `C:/practicum/practicum-url-reduction-app/cmd/staticlint/config.json`
 
 // ConfigData config
 type ConfigData struct {
+	//Staticcheck variable
 	Staticcheck []string
 }
 
