@@ -69,7 +69,7 @@ func closeHTTPServerAndStopWorkerPool(server *http.Server, repository repositori
 // Run запуск сервера
 func (app *App) Run() error {
 	log.Println("run server")
-	if utils.GetEnableHttps() {
+	if utils.GetEnableHTTPS() {
 		return app.HTTPServer.ListenAndServeTLS("", "")
 	}
 	return app.HTTPServer.ListenAndServe()
