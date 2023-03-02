@@ -3,6 +3,7 @@ package utils
 import (
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -31,6 +32,15 @@ func GetKey() string {
 // GetDBAddress геттер env переменной DATABASE_DSN
 func GetDBAddress() string {
 	return os.Getenv("DATABASE_DSN")
+}
+
+// GetEnableHttps геттер env переменной ENABLE_HTTPS
+func GetEnableHttps() bool {
+	isEnableHttps, err := strconv.ParseBool(os.Getenv("ENABLE_HTTPS"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return isEnableHttps
 }
 
 // LoadEnvironments загрузка env переменных
