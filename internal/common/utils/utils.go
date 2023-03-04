@@ -44,6 +44,7 @@ func GetEnableHTTPS() bool {
 	return isEnableHTTPS
 }
 
+// GetConfigFilePath геттер env переменной CONFIG
 func GetConfigFilePath() string {
 	return os.Getenv("CONFIG")
 }
@@ -73,6 +74,7 @@ func CreateConfig(
 	}
 }
 
+// environmentsIsEmpty проверка
 func environmentsIsEmpty(serverAddress, filePath, key, dbAddress string, enableHTTPS bool) bool {
 	return len(serverAddress) == 0 && len(filePath) == 0 && len(key) == 0 && len(dbAddress) == 0 && !enableHTTPS
 }

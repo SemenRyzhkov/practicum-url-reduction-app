@@ -25,13 +25,15 @@ func New(serverAddress, filePath, key, dbAddress string, enableHTTPS bool) Confi
 		EnableHTTPS:     enableHTTPS,
 	}
 }
+
+// LoadConfiguration загрузка Config из файла
 func LoadConfiguration(file string) (Config, error) {
 	var config Config
 	configFile, err := os.Open(file)
-	defer configFile.Close()
 	if err != nil {
 		return Config{}, err
 	}
+	defer configFile.Close()
 	jsonParser := json.NewDecoder(configFile)
 	err = jsonParser.Decode(&config)
 	if err != nil {
