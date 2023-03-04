@@ -11,7 +11,6 @@ import (
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/app"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/config"
 )
 
 var (
@@ -34,14 +33,20 @@ func main() {
 	dbAddress := utils.GetDBAddress()
 	filePath := utils.GetFilePath()
 	key := utils.GetKey()
+	enableHTTPS := utils.GetEnableHTTPS()
+	configFilePath := utils.GetConfigFilePath()
 
-	cfg := config.New(serverAddress, filePath, key, dbAddress)
+	cfg, err := utils.CreateConfig(serverAddress, filePath, key, dbAddress, configFilePath, enableHTTPS)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	a, err := app.New(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = a.Run()
+	err = a.Run(cfg.EnableHTTPS)
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatal(err)
 	}

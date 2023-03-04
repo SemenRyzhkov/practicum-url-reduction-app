@@ -8,6 +8,7 @@ import (
 
 	"github.com/joho/godotenv"
 
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/config"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/indatabase"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/repositories/infile"
@@ -43,6 +44,10 @@ func GetEnableHTTPS() bool {
 	return isEnableHTTPS
 }
 
+func GetConfigFilePath() string {
+	return os.Getenv("CONFIG")
+}
+
 // LoadEnvironments загрузка env переменных
 func LoadEnvironments(envFilePath string) {
 	err := godotenv.Load(envFilePath)
@@ -50,6 +55,26 @@ func LoadEnvironments(envFilePath string) {
 	if err != nil {
 		log.Fatalf("Error loading .env file")
 	}
+}
+
+// CreateConfig создание конфига
+func CreateConfig(
+	serverAddress,
+	filePath,
+	key,
+	dbAddress,
+	configFilePath string,
+	enableHTTPS bool,
+) (config.Config, error) {
+	if environmentsIsEmpty(serverAddress, filePath, key, dbAddress, enableHTTPS) {
+		return config.LoadConfiguration(configFilePath)
+	} else {
+		return config.New(serverAddress, filePath, key, dbAddress, enableHTTPS), nil
+	}
+}
+
+func environmentsIsEmpty(serverAddress, filePath, key, dbAddress string, enableHTTPS bool) bool {
+	return len(serverAddress) == 0 && len(filePath) == 0 && len(key) == 0 && len(dbAddress) == 0 && !enableHTTPS
 }
 
 // CreateMemoryOrFileRepository создание репозитория в зависимости от переменной
