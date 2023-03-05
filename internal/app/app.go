@@ -56,7 +56,7 @@ func New(cfg config.Config) (*App, error) {
 
 func closeHTTPServerAndStopWorkerPool(server *http.Server, repository repositories.URLRepository) {
 	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	go func() {
 		<-sigs
 		server.Close()
