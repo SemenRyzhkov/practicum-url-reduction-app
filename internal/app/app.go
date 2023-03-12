@@ -37,11 +37,16 @@ func New(cfg config.Config) (*App, error) {
 	urlHandler := handlers.NewHandler(urlService, cookieService)
 	urlRouter := router.NewRouter(urlHandler)
 
+	//cert, _ := tls.LoadX509KeyPair("localhost.crt", "localhost.key")
+
 	server := &http.Server{
 		Addr:         cfg.Host,
 		Handler:      urlRouter,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
+		//TLSConfig: &tls.Config{
+		//	Certificates: []tls.Certificate{cert},
+		//},
 	}
 	defer closeHTTPServerAndStopWorkerPool(server, urlRepository)
 	return &App{
@@ -51,7 +56,7 @@ func New(cfg config.Config) (*App, error) {
 
 func closeHTTPServerAndStopWorkerPool(server *http.Server, repository repositories.URLRepository) {
 	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	go func() {
 		<-sigs
 		server.Close()
@@ -61,7 +66,10 @@ func closeHTTPServerAndStopWorkerPool(server *http.Server, repository repositori
 }
 
 // Run запуск сервера
-func (app *App) Run() error {
+func (app *App) Run(enableHTTPS bool) error {
 	log.Println("run server")
+	if enableHTTPS {
+		return app.HTTPServer.ListenAndServeTLS("localhost.crt", "localhost.key")
+	}
 	return app.HTTPServer.ListenAndServe()
 }

@@ -22,4 +22,12 @@ func HandleFlag() {
 	flag.Func("d", "Address of db connection", func(dFlagValue string) error {
 		return os.Setenv("DATABASE_DSN", dFlagValue)
 	})
+
+	flag.Func("s", "Enable https flag", func(sFlagValue string) error {
+		return os.Setenv("ENABLE_HTTPS", sFlagValue)
+	})
+
+	flag.Func("c", "Path of file config", func(cFlagValue string) error {
+		return os.Setenv("CONFIG", cFlagValue)
+	})
 }
