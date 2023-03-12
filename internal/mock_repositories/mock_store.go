@@ -65,6 +65,21 @@ func (mr *MockURLRepositoryMockRecorder) GetAllByUserID(ctx, userID interface{})
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllByUserID", reflect.TypeOf((*MockURLRepository)(nil).GetAllByUserID), ctx, userID)
 }
 
+// GetStats mocks base method.
+func (m *MockURLRepository) GetStats(ctx context.Context) (entity.Stats, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetStats", ctx)
+	ret0, _ := ret[0].(entity.Stats)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetStats indicates an expected call of GetStats.
+func (mr *MockURLRepositoryMockRecorder) GetStats(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetStats", reflect.TypeOf((*MockURLRepository)(nil).GetStats), ctx)
+}
+
 // Ping mocks base method.
 func (m *MockURLRepository) Ping() error {
 	m.ctrl.T.Helper()

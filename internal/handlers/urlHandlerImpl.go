@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"net"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/entity/myerrors"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/cookieservice"
@@ -180,6 +182,48 @@ func (u *urlHandlerImpl) RemoveAll(writer http.ResponseWriter, request *http.Req
 		return
 	}
 	writer.WriteHeader(http.StatusAccepted)
+}
+
+// GetStats возвращает количество сокращенных URL и число пользователей сервиса, если IP пользователя
+// входит в доверенную подсеть.
+func (u *urlHandlerImpl) GetStats(writer http.ResponseWriter, r *http.Request) {
+	ipInSIDR, err := ipInSIDR(r)
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if len(utils.GetTrustedSubnet()) == 0 || !ipInSIDR {
+		err := errors.New("access is denied")
+		http.Error(writer, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	writer.Header().Set("Content-Type", "application/json")
+	stats, err := u.urlService.GetStats(r.Context())
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusBadRequest)
+		return
+	} else {
+		writer.WriteHeader(http.StatusOK)
+		err = json.NewEncoder(writer).Encode(stats)
+		if err != nil {
+			http.Error(writer, err.Error(), http.StatusBadRequest)
+			return
+		}
+	}
+}
+
+func ipInSIDR(r *http.Request) (bool, error) {
+	ipStr := r.Header.Get("X-Real-IP")
+	ip := net.ParseIP(ipStr)
+
+	_, ipv4Net, err := net.ParseCIDR(utils.GetTrustedSubnet())
+	if err != nil {
+		return false, err
+	}
+
+	return ipv4Net.Contains(ip), nil
 }
 
 // PingConnection пинг

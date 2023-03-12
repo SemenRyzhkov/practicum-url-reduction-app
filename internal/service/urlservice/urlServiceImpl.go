@@ -95,6 +95,11 @@ func (u *urlServiceImpl) RemoveAll(ctx context.Context, userID string, removingL
 	return u.urlRepository.RemoveAll(ctx, removingDTOList)
 }
 
+// GetStats запрос статистики
+func (u *urlServiceImpl) GetStats(ctx context.Context) (entity.Stats, error) {
+	return u.urlRepository.GetStats(ctx)
+}
+
 // PingConnection проверка связи
 func (u *urlServiceImpl) PingConnection() error {
 	return u.urlRepository.Ping()

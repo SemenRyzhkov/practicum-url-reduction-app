@@ -35,6 +35,11 @@ func GetDBAddress() string {
 	return os.Getenv("DATABASE_DSN")
 }
 
+// GetTrustedSubnet геттер env переменной TRUSTED_SUBNET
+func GetTrustedSubnet() string {
+	return os.Getenv("TRUSTED_SUBNET")
+}
+
 // GetEnableHTTPS геттер env переменной ENABLE_HTTPS
 func GetEnableHTTPS() bool {
 	isEnableHTTPS, err := strconv.ParseBool(os.Getenv("ENABLE_HTTPS"))
@@ -67,15 +72,15 @@ func CreateConfig(
 	configFilePath string,
 	enableHTTPS bool,
 ) (config.Config, error) {
-	if environmentsIsEmpty(serverAddress, filePath, key, dbAddress, enableHTTPS) {
+	if environmentIsEmpty(serverAddress, filePath, key, dbAddress, enableHTTPS) {
 		return config.LoadConfiguration(configFilePath)
-	} else {
-		return config.New(serverAddress, filePath, key, dbAddress, enableHTTPS), nil
 	}
+	return config.New(serverAddress, filePath, key, dbAddress, enableHTTPS), nil
+
 }
 
-// environmentsIsEmpty проверка
-func environmentsIsEmpty(serverAddress, filePath, key, dbAddress string, enableHTTPS bool) bool {
+// environmentIsEmpty проверка
+func environmentIsEmpty(serverAddress, filePath, key, dbAddress string, enableHTTPS bool) bool {
 	return len(serverAddress) == 0 && len(filePath) == 0 && len(key) == 0 && len(dbAddress) == 0 && !enableHTTPS
 }
 
