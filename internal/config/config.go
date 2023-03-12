@@ -12,6 +12,7 @@ type Config struct {
 	FilePath        string `json:"file_storage_path"`
 	Key             string `json:"secret_key"`
 	DataBaseAddress string `json:"database_dsn"`
+	TrustedSubnet   string `json:"trusted_subnet"`
 	EnableHTTPS     bool   `json:"enable_https"`
 }
 
