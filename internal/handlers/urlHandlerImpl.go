@@ -182,6 +182,23 @@ func (u *urlHandlerImpl) RemoveAll(writer http.ResponseWriter, request *http.Req
 	writer.WriteHeader(http.StatusAccepted)
 }
 
+// GetStats возвращает количество сокращенных URL и число пользователей сервиса.
+func (u *urlHandlerImpl) GetStats(writer http.ResponseWriter, r *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
+	stats, err := u.urlService.GetStats(r.Context())
+	if err != nil {
+		http.Error(writer, err.Error(), http.StatusBadRequest)
+		return
+	} else {
+		writer.WriteHeader(http.StatusOK)
+		err = json.NewEncoder(writer).Encode(stats)
+		if err != nil {
+			http.Error(writer, err.Error(), http.StatusBadRequest)
+			return
+		}
+	}
+}
+
 // PingConnection пинг
 func (u *urlHandlerImpl) PingConnection(writer http.ResponseWriter, request *http.Request) {
 	err := u.urlService.PingConnection()

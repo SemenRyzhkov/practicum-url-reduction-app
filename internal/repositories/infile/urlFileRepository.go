@@ -21,6 +21,12 @@ type urlFileRepository struct {
 	producer         *producer
 }
 
+// GetStats запрос статистики
+func (u *urlFileRepository) GetStats(ctx context.Context) (entity.Stats, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 // StopWorkerPool остановка воркер-пула
 func (u *urlFileRepository) StopWorkerPool() {
 	////TODO implement me

@@ -35,6 +35,12 @@ type urlMemoryRepository struct {
 	urlStorage map[urlKey]urlValue
 }
 
+// GetStats запрос статистики
+func (u *urlMemoryRepository) GetStats(ctx context.Context) (entity.Stats, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 // StopWorkerPool остановка воркер-пула
 func (u *urlMemoryRepository) StopWorkerPool() {
 }

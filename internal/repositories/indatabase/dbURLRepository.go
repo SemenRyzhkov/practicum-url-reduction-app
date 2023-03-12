@@ -50,6 +50,15 @@ const (
 		"UPDATE public.urls " +
 		"SET deleted = $1 " +
 		"WHERE id = $2 AND user_id = $3"
+	getUrlsCountQuery = "" +
+		"SELECT count(*) " +
+		"FROM public.urls"
+	getUsersCountQuery = "" +
+		"SELECT count(*) " +
+		"FROM " +
+		"	(SELECT DISTINCT user_id " +
+		"    FROM urls) " +
+		"AS users"
 )
 
 type dbURLRepository struct {
@@ -187,6 +196,25 @@ func (d *dbURLRepository) GetAllByUserID(ctx context.Context, userID string) ([]
 		return nil, err
 	}
 	return urls, nil
+}
+
+// GetStats запрос статистики
+func (d *dbURLRepository) GetStats(ctx context.Context) (entity.Stats, error) {
+	var urls int
+	row := d.db.QueryRowContext(ctx, getUrlsCountQuery)
+	err := row.Scan(&urls)
+	if err != nil {
+		return entity.Stats{}, err
+	}
+
+	var users int
+	row = d.db.QueryRowContext(ctx, getUsersCountQuery)
+	err = row.Scan(&users)
+	if err != nil {
+		return entity.Stats{}, err
+	}
+
+	return entity.Stats{Urls: urls, Users: users}, nil
 }
 
 // Ping проверка связи
