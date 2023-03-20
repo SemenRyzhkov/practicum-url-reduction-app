@@ -33,6 +33,7 @@ func main() {
 	dbAddress := utils.GetDBAddress()
 	filePath := utils.GetFilePath()
 	key := utils.GetKey()
+
 	enableHTTPS := utils.GetEnableHTTPS()
 	configFilePath := utils.GetConfigFilePath()
 
@@ -41,14 +42,27 @@ func main() {
 		log.Fatal(err)
 	}
 
-	a, err := app.New(cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
+	enableGRPC := utils.GetEnableGRPC()
 
-	err = a.Run(cfg.EnableHTTPS)
-	if err != nil && !errors.Is(err, http.ErrServerClosed) {
-		log.Fatal(err)
+	if enableGRPC {
+		grpcApp, err := app.NewGRPC(cfg)
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = grpcApp.Run(cfg)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		a, err := app.New(cfg)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = a.Run(cfg.EnableHTTPS)
+		if err != nil && !errors.Is(err, http.ErrServerClosed) {
+			log.Fatal(err)
+		}
 	}
 
 }

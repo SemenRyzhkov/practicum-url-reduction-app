@@ -49,6 +49,15 @@ func GetEnableHTTPS() bool {
 	return isEnableHTTPS
 }
 
+// GetEnableGRPC геттер env переменной ENABLE_GRPC
+func GetEnableGRPC() bool {
+	isEnableGRPC, err := strconv.ParseBool(os.Getenv("ENABLE_GRPC"))
+	if err != nil {
+		log.Fatal(err)
+	}
+	return isEnableGRPC
+}
+
 // GetConfigFilePath геттер env переменной CONFIG
 func GetConfigFilePath() string {
 	return os.Getenv("CONFIG")
