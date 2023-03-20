@@ -9,7 +9,7 @@ import (
 
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/common/utils"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/config"
-	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/grpcServer"
+	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/grpcserver"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/internal/service/urlservice"
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/proto"
 )
@@ -28,7 +28,7 @@ func NewGRPC(cfg config.Config) (*GRPCApp, error) {
 	}
 	urlService := urlservice.New(urlRepository)
 
-	urlServerImpl := grpcServer.NewServerImpl(urlService)
+	urlServerImpl := grpcserver.NewServerImpl(urlService)
 
 	s := grpc.NewServer()
 

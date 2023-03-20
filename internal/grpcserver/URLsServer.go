@@ -1,4 +1,4 @@
-package grpcServer
+package grpcserver
 
 import (
 	"context"
@@ -16,6 +16,7 @@ import (
 	"github.com/SemenRyzhkov/practicum-url-reduction-app/proto"
 )
 
+// URLsServer сервер
 type URLsServer struct {
 	proto.UnimplementedURLsServer
 	urlService urlservice.URLService
@@ -54,8 +55,8 @@ func (u *URLsServer) GetAllURL(ctx context.Context, in *proto.GetAllByUserIDRequ
 	var protoUserURLList = make([]*proto.FullURL, 0)
 
 	for _, v := range userURLList {
-		protoFullUrl := proto.FullURL{OriginalUrl: v.OriginalURL, ShortUrl: v.ShortURL}
-		protoUserURLList = append(protoUserURLList, &protoFullUrl)
+		protoFullURL := proto.FullURL{OriginalUrl: v.OriginalURL, ShortUrl: v.ShortURL}
+		protoUserURLList = append(protoUserURLList, &protoFullURL)
 	}
 	response.FullUrls = protoUserURLList
 	return &response, nil
@@ -114,14 +115,14 @@ func (u *URLsServer) ReduceSeveralURL(ctx context.Context, in *proto.ReduceSever
 		return nil, status.Errorf(codes.Unknown, `Некорректный запрос`)
 	}
 
-	var protoUrlWithIDResponseList = make([]*proto.URLWithIDResponse, 0)
+	var protoURLWithIDResponseList = make([]*proto.URLWithIDResponse, 0)
 
 	for _, v := range urlWithIDResponseList {
-		protoUrlWithIDResp := proto.URLWithIDResponse{CorrelationId: v.CorrelationID, ShortUrl: v.ShortURL}
-		protoUrlWithIDResponseList = append(protoUrlWithIDResponseList, &protoUrlWithIDResp)
+		protoURLWithIDResp := proto.URLWithIDResponse{CorrelationId: v.CorrelationID, ShortUrl: v.ShortURL}
+		protoURLWithIDResponseList = append(protoURLWithIDResponseList, &protoURLWithIDResp)
 	}
 
-	return &proto.ReduceSeveralURLResponse{UrlWithIdResponses: protoUrlWithIDResponseList}, nil
+	return &proto.ReduceSeveralURLResponse{UrlWithIdResponses: protoURLWithIDResponseList}, nil
 }
 
 // RemoveAll выполняет удаление нескольких URL по их ID.
