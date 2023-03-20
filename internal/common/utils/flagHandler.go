@@ -27,6 +27,10 @@ func HandleFlag() {
 		return os.Setenv("ENABLE_HTTPS", sFlagValue)
 	})
 
+	flag.Func("t", "CIDR", func(tFlagValue string) error {
+		return os.Setenv("TRUSTED_SUBNET", tFlagValue)
+	})
+
 	flag.Func("c", "Path of file config", func(cFlagValue string) error {
 		return os.Setenv("CONFIG", cFlagValue)
 	})

@@ -15,6 +15,7 @@ const (
 	pingPath             = "/ping"
 	reduceSeveralURLPath = "/api/shorten/batch"
 	removeAllPath        = "/api/user/urls"
+	getStatsPath         = "/api/internal/stats"
 )
 
 // NewRouter создатель роутера
@@ -24,6 +25,7 @@ func NewRouter(h handlers.URLHandler) chi.Router {
 	r.Get(pingPath, h.PingConnection)
 	r.Get(getURLPath, h.GetURLByID)
 	r.Get(allURLPath, h.GetAllURL)
+	r.Get(getStatsPath, h.GetStats)
 	r.Post(reduceURLPath, h.ReduceURL)
 	r.Post(reduceURLToJSONPath, h.ReduceURLTOJSON)
 	r.Post(reduceSeveralURLPath, h.ReduceSeveralURL)
